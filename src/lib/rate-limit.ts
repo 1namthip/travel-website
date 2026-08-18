@@ -22,6 +22,15 @@ export const generalApiRateLimit = new Ratelimit({
   analytics: true,
 });
 
+// แชทบอทเปิดให้คนทั่วไปใช้โดยไม่ต้องล็อกอิน จึงจำกัดตาม IP
+// ตั้งไว้ 12 ข้อความต่อนาที พอสำหรับการคุยปกติ แต่กันการยิงรัวเพื่อเผาโควตา API
+export const chatRateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(12, "1 m"),
+  prefix: "ratelimit:chat",
+  analytics: true,
+});
+
 export const authRateLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(5, "15 m"),

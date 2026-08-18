@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Prompt } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import ChatWidget from "@/component/ChatWidget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
     <html lang="th" className={prompt.variable} suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <main className="font-sans">{children}</main>
+        <ChatWidget />
         <Toaster position="top-right" />
       </body>
     </html>
