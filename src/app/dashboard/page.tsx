@@ -32,7 +32,7 @@ export default async function DashboardPage() {
 
       <section className="min-w-7xl mx-auto px-4 py-8 bg-linear-to-br from-amber-50 to-orange-50">
         <CategorySection />
-        {/* <BudgetTripPlannerWrapper isLoggedIn={!!user} /> */}
+        { <BudgetTripPlannerWrapper isLoggedIn={!!user} /> }
       </section>
 
       <Footer />
