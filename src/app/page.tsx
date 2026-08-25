@@ -28,7 +28,7 @@ export default async function HomePage() {
     <div className="min-h-screen bg-linear-to-b from-sky-100 to-white flex flex-col">
       <Navbar />
       <HeroSection />
-      {/* <BudgetTripPlannerWrapper isLoggedIn={!!user} /> */}
+      <BudgetTripPlannerWrapper isLoggedIn={!!user} />
       <Footer />
     </div>
   );
