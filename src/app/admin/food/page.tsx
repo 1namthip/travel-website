@@ -13,15 +13,14 @@ export default function AdminRestaurantsPage() {
   const [filter, setFilter] = useState("ทั้งหมด");
   const [isLoading, setIsLoading] = useState(true);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<any>({
     id: "",
     name: "",
     description: "",
-    image_url: "",
+    image_url: [],
     location: "",
     category: "",
   });
-  const [file, setFile] = useState<File | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchRestaurants = async () => {
@@ -69,9 +68,8 @@ export default function AdminRestaurantsPage() {
       description: "",
       location: "",
       category: "",
-      image_url: "",
+      image_url: [],
     });
-    setFile(null);
     setIsModalOpen(true);
   };
 
@@ -272,8 +270,6 @@ export default function AdminRestaurantsPage() {
           <RestaurantModal
             form={form}
             setForm={setForm}
-            file={file}
-            setFile={setFile}
             onClose={() => setIsModalOpen(false)}
             refreshData={fetchRestaurants}
           />

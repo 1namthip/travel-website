@@ -3,31 +3,47 @@
 import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload, Image as ImageIcon, Loader2, ChevronDown, Check } from "lucide-react";
+import { X, Image as ImageIcon, Loader2, ChevronDown, Check, Trash2 } from "lucide-react";
+
+const MAX_IMAGES = 15;
 
 interface Props {
   form: any;
   setForm: (val: any) => void;
-  file: File | null;
-  setFile: (val: File | null) => void;
   onClose: () => void;
   refreshData: () => void;
 }
 
+const parseImages = (image: any): string[] => {
+  if (!image) return [];
+  if (Array.isArray(image)) return image.filter(Boolean);
+  if (typeof image === "string") {
+    try {
+      const parsed = JSON.parse(image);
+      if (Array.isArray(parsed)) return parsed.filter(Boolean);
+    } catch {}
+    return image ? [image] : [];
+  }
+  return [];
+};
+
 export default function RestaurantModal({
   form,
   setForm,
-  file,
-  setFile,
   onClose,
   refreshData,
 }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  
+
+  // Image State (existing saved URLs + newly selected files)
+  const [existingImages, setExistingImages] = useState<string[]>(() => parseImages(form.image_url));
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
   // Custom Dropdown State
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -65,17 +81,42 @@ export default function RestaurantModal({
     "อื่น ๆ",
   ];
 
-  const getImageUrl = (image: any) => {
-    if (!image) return "";
-    if (Array.isArray(image)) return image[0] || "";
-    if (typeof image === "string") {
-      try {
-        const parsed = JSON.parse(image);
-        if (Array.isArray(parsed)) return parsed[0] || "";
-      } catch {}
-      return image;
+  const totalImages = existingImages.length + imageFiles.length;
+  const canAddMoreImages = totalImages < MAX_IMAGES;
+
+  const processFiles = (incoming: File[]) => {
+    const total = existingImages.length + imageFiles.length + incoming.length;
+    if (total > MAX_IMAGES) {
+      toast.error(`สามารถอัปโหลดได้สูงสุด ${MAX_IMAGES} รูปเท่านั้น`);
+      return;
     }
-    return "";
+
+    const validFiles: File[] = [];
+    for (const f of incoming) {
+      if (!f.type.startsWith("image/")) {
+        toast.error("กรุณาเลือกไฟล์รูปภาพเท่านั้น");
+        return;
+      }
+      validFiles.push(f);
+    }
+
+    setImageFiles((prev) => [...prev, ...validFiles]);
+    validFiles.forEach((f) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews((prev) => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(f);
+    });
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeNewImage = (index: number) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   const uploadFileViaApi = async (file: File) => {
@@ -96,11 +137,12 @@ export default function RestaurantModal({
     e.preventDefault();
     setIsSubmitting(true);
 
-    let imageUrl = getImageUrl(form.image_url);
-
-    if (file) {
+    let newUrls: string[] = [];
+    if (imageFiles.length > 0) {
       try {
-        imageUrl = await uploadFileViaApi(file);
+        for (const f of imageFiles) {
+          newUrls.push(await uploadFileViaApi(f));
+        }
       } catch {
         toast.error("อัปโหลดรูปภาพไม่สำเร็จ");
         setIsSubmitting(false);
@@ -109,6 +151,7 @@ export default function RestaurantModal({
     }
 
     try {
+      const allImages = [...existingImages, ...newUrls];
       const method = form.id ? "PUT" : "POST";
       const url = form.id ? `/api/restaurants/${form.id}` : "/api/restaurants";
 
@@ -117,7 +160,7 @@ export default function RestaurantModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          image_url: imageUrl ? [imageUrl] : [],
+          image_url: allImages,
         }),
       });
 
@@ -134,7 +177,6 @@ export default function RestaurantModal({
         location: "",
         category: "",
       });
-      setFile(null);
       onClose();
       refreshData();
     } catch {
@@ -142,6 +184,12 @@ export default function RestaurantModal({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files || []);
+    if (selected.length > 0) processFiles(selected);
+    e.target.value = "";
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -152,14 +200,8 @@ export default function RestaurantModal({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type.startsWith("image/")) {
-        setFile(droppedFile);
-      } else {
-        toast.error("กรุณาอัปโหลดไฟล์รูปภาพเท่านั้น");
-      }
-    }
+    const dropped = Array.from(e.dataTransfer.files || []);
+    if (dropped.length > 0) processFiles(dropped);
   };
 
   return (
@@ -203,85 +245,71 @@ export default function RestaurantModal({
           {/* Form Body */}
           <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
             <form id="restaurant-form" onSubmit={handleSubmit} className="space-y-6">
-              
+
               {/* Image Upload Zone */}
               <div>
                 <label className="block text-[13px] font-medium text-zinc-700 mb-2">
-                  รูปภาพหน้าร้าน <span className="text-zinc-400 font-normal">(Thumbnail)</span>
+                  รูปภาพหน้าร้าน <span className="text-zinc-400 font-normal">({totalImages}/{MAX_IMAGES} รูป)</span>
                 </label>
-                <div
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`relative flex flex-col items-center justify-center w-full min-h-45 p-2 transition-all border border-dashed rounded-lg cursor-pointer overflow-hidden
-                    ${
-                      isDragging
-                        ? "border-zinc-500 bg-zinc-100/80"
-                        : file || getImageUrl(form.image_url)
-                          ? "border-transparent bg-zinc-50"
-                          : "border-zinc-300 hover:border-zinc-400 bg-zinc-50/50 hover:bg-zinc-50"
-                    }
-                  `}
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files.length > 0) {
-                        setFile(e.target.files[0]);
-                      }
-                    }}
-                    className="hidden"
-                  />
 
-                  <AnimatePresence mode="wait">
-                    {file || getImageUrl(form.image_url) ? (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="relative w-full h-48 sm:h-56 rounded-md overflow-hidden group border border-zinc-200/50 shadow-sm"
-                      >
-                        <img
-                          src={file ? URL.createObjectURL(file) : getImageUrl(form.image_url)}
-                          alt=""
-                          className="absolute inset-0 w-full h-full object-cover blur-md opacity-50 scale-110"
-                        />
-                        <img
-                          src={file ? URL.createObjectURL(file) : getImageUrl(form.image_url)}
-                          alt="Preview"
-                          className="relative h-full w-full object-contain"
-                        />
-                        <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                          <span className="text-white flex items-center gap-1.5 text-xs font-medium bg-zinc-950/60 border border-white/10 px-3 py-1.5 rounded-md backdrop-blur-md">
-                            <Upload size={14} /> เปลี่ยนรูปภาพ
-                          </span>
+                {/* Grid of existing + newly selected images */}
+                {(existingImages.length > 0 || imagePreviews.length > 0) && (
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-3">
+                    {existingImages.map((image, index) => (
+                      <div key={`existing-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-50">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={image} alt="" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button type="button" onClick={() => removeExistingImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                            <Trash2 size={13} />
+                          </button>
                         </div>
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="flex flex-col items-center text-center space-y-2 py-8"
-                      >
-                        <div className="p-2.5 bg-white shadow-sm border border-zinc-200 rounded-lg text-zinc-400 mb-1">
-                          <ImageIcon size={22} strokeWidth={1.5} />
+                      </div>
+                    ))}
+                    {imagePreviews.map((preview, index) => (
+                      <div key={`new-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-50">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={preview} alt="" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button type="button" onClick={() => removeNewImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                            <Trash2 size={13} />
+                          </button>
                         </div>
-                        <div>
-                          <p className="text-[13px] font-medium text-zinc-900">
-                            คลิกเพื่อเลือกไฟล์ <span className="font-normal text-zinc-500">หรือลากรูปมาวางที่นี่</span>
-                          </p>
-                          <p className="text-[11px] text-zinc-400 mt-1">
-                            รองรับไฟล์ JPG, PNG, WEBP (แนะนำสัดส่วน 16:9)
-                          </p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                        <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-zinc-900 text-white px-1 py-0.5 rounded">NEW</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Dropzone */}
+                {canAddMoreImages && (
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`relative flex flex-col items-center justify-center w-full min-h-35 p-4 transition-all border border-dashed rounded-lg cursor-pointer
+                      ${isDragging ? "border-zinc-500 bg-zinc-100/70" : "border-zinc-300 hover:border-zinc-400 bg-zinc-50/50 hover:bg-zinc-50"}`}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileInputChange}
+                      className="hidden"
+                    />
+                    <div className="p-2 bg-white shadow-sm border border-zinc-200/80 rounded-md text-zinc-400 mb-2">
+                      <ImageIcon size={18} strokeWidth={1.8} />
+                    </div>
+                    <p className="text-xs font-medium text-zinc-900">
+                      คลิกเพื่อเลือกไฟล์รูปภาพ <span className="font-normal text-zinc-400">หรือลากรูปมาวางที่นี่ (เลือกได้หลายรูป)</span>
+                    </p>
+                    <p className="text-[10px] text-zinc-400 mt-0.5">
+                      รองรับ JPG, PNG, WEBP · เพิ่มได้อีก {MAX_IMAGES - totalImages} รูป
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Form Grid */}
@@ -310,8 +338,8 @@ export default function RestaurantModal({
                       type="button"
                       onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                       className={`w-full pl-3 pr-3 py-2 text-sm border rounded-lg bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 ${
-                        isCategoryOpen 
-                          ? "border-zinc-400 ring-4 ring-zinc-900/5" 
+                        isCategoryOpen
+                          ? "border-zinc-400 ring-4 ring-zinc-900/5"
                           : "border-zinc-200 hover:border-zinc-300"
                       } ${form.category ? "text-zinc-900" : "text-zinc-400"}`}
                     >

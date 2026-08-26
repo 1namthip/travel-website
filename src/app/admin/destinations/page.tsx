@@ -25,7 +25,6 @@ import {
   X,
   Check,
   ChevronDown,
-  Upload,
   Loader2,
 } from "lucide-react";
 
@@ -39,6 +38,8 @@ interface DestinationFormData {
   max_price: number | string;
   image_file?: File[];
 }
+
+const MAX_IMAGES = 15;
 
 const CATEGORIES = [
   "ทั้งหมด",
@@ -275,29 +276,34 @@ export default function AdminDestinationsPage() {
       let finalImageUrl = formData.image_url; // เก็บ URL รูปเดิมไว้ก่อน (เป็น Array ตาม State)
 
       // ==========================================
-      // 1. อัปโหลดรูปภาพใหม่ (ถ้ามี)
+      // 1. อัปโหลดรูปภาพใหม่ทั้งหมด (ถ้ามี) แล้วรวมกับรูปเดิมที่เหลืออยู่
       // ==========================================
       if (formData.image_file && formData.image_file.length > 0) {
-        const file = formData.image_file[0]; // ดึงไฟล์รูปจาก State
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `destinations/${fileName}`;
+        const uploadedUrls: string[] = [];
 
-        // ⚠️ เปลี่ยน 'images' เป็นชื่อ Bucket ของคุณใน Supabase
-        const { error: uploadError } = await supabase.storage
-          .from('Images') 
-          .upload(filePath, file);
+        for (const file of formData.image_file) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+          const filePath = `destinations/${fileName}`;
 
-        if (uploadError) {
-          throw new Error(`Upload failed: ${uploadError.message}`);
+          // ⚠️ เปลี่ยน 'images' เป็นชื่อ Bucket ของคุณใน Supabase
+          const { error: uploadError } = await supabase.storage
+            .from('Images')
+            .upload(filePath, file);
+
+          if (uploadError) {
+            throw new Error(`Upload failed: ${uploadError.message}`);
+          }
+
+          // ดึง Public URL ของรูปที่เพิ่งอัปโหลด
+          const { data: { publicUrl } } = supabase.storage
+            .from('Images')
+            .getPublicUrl(filePath);
+
+          uploadedUrls.push(publicUrl);
         }
 
-        // ดึง Public URL ของรูปที่เพิ่งอัปโหลด
-        const { data: { publicUrl } } = supabase.storage
-          .from('Images')
-          .getPublicUrl(filePath);
-
-        finalImageUrl = [publicUrl]; 
+        finalImageUrl = [...formData.image_url, ...uploadedUrls];
       }
 
       // ==========================================
@@ -343,9 +349,9 @@ export default function AdminDestinationsPage() {
 
   // ==================== HANDLERS ====================
   const handleOpenModal = (destination?: Destination) => {
+    setImagePreview([]); // เคลียร์พรีวิวไฟล์ใหม่ที่เพิ่งเลือกไว้เสมอเมื่อเปิดโมดัล
     if (destination) {
       setEditingDestination(destination);
-      setImagePreview(parseImageUrl(destination.image_url || ""));
       setFormData({
         name: destination.name,
         description: destination.description || "",
@@ -353,10 +359,10 @@ export default function AdminDestinationsPage() {
         image_url: parseImageUrl(destination.image_url || ""),
         min_price: destination.min_price ?? 0,
         max_price: destination.max_price ?? 0,
+        image_file: [],
       });
     } else {
       setEditingDestination(null);
-      setImagePreview([]);
       setFormData({
         name: "",
         description: "",
@@ -364,8 +370,8 @@ export default function AdminDestinationsPage() {
         image_url: [],
         min_price: 0,
         max_price: 0,
+        image_file: [],
       });
-      setImagePreview([]);
     }
     setIsModalOpen(true);
   };
@@ -377,19 +383,49 @@ export default function AdminDestinationsPage() {
   };
 
 
-  const handleImageProcessing = (file: File) => {
-    const previewUrl = URL.createObjectURL(file);
-    setImagePreview([previewUrl]);
-    setFormData((prev) => ({ ...prev, image_file: [file] }));
+  const processImageFiles = (files: File[]) => {
+    const currentCount =
+      formData.image_url.length + (formData.image_file?.length || 0);
+    const validFiles = files.filter((f) => f.type.startsWith("image/"));
+
+    if (validFiles.length < files.length) {
+      toast.error("กรุณาเลือกไฟล์รูปภาพเท่านั้น");
+    }
+    if (validFiles.length === 0) return;
+
+    if (currentCount + validFiles.length > MAX_IMAGES) {
+      toast.error(`สามารถอัปโหลดได้สูงสุด ${MAX_IMAGES} รูปเท่านั้น`);
+      return;
+    }
+
+    const newPreviews = validFiles.map((f) => URL.createObjectURL(f));
+    setImagePreview((prev) => [...prev, ...newPreviews]);
+    setFormData((prev) => ({
+      ...prev,
+      image_file: [...(prev.image_file || []), ...validFiles],
+    }));
+  };
+
+  const removeExistingImage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      image_url: prev.image_url.filter((_, i) => i !== index),
+    }));
+  };
+
+  const removeNewImage = (index: number) => {
+    setImagePreview((prev) => prev.filter((_, i) => i !== index));
+    setFormData((prev) => ({
+      ...prev,
+      image_file: (prev.image_file || []).filter((_, i) => i !== index),
+    }));
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith("image/")) {
-      handleImageProcessing(file);
-    }
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length > 0) processImageFiles(files);
   };
 
   const handleMenuToggle = (e: React.MouseEvent, id: string | number) => {
@@ -450,6 +486,9 @@ export default function AdminDestinationsPage() {
       (a) => (a.max_price || 0) > 0 || (a.min_price || 0) > 0
     ).length,
   };
+
+  const totalImages = formData.image_url.length + (formData.image_file?.length || 0);
+  const canAddMoreImages = totalImages < MAX_IMAGES;
 
   // ==================== RENDER ====================
   if (authLoaded && !user) {
@@ -1013,97 +1052,82 @@ export default function AdminDestinationsPage() {
                       <label className="block text-[13px] font-medium text-zinc-700 mb-2">
                         รูปภาพแลนด์มาร์ค{" "}
                         <span className="text-zinc-400 font-normal">
-                          (Thumbnail)
+                          ({totalImages}/{MAX_IMAGES} รูป)
                         </span>
                       </label>
-                      <div
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                          setIsDragging(true);
-                        }}
-                        onDragLeave={(e) => {
-                          e.preventDefault();
-                          setIsDragging(false);
-                        }}
-                        onDrop={handleDrop}
-                        onClick={() => fileInputRef.current?.click()}
-                        className={`relative flex flex-col items-center justify-center w-full min-h-35 p-2 transition-all border border-dashed rounded-lg cursor-pointer overflow-hidden ${isDragging
-                            ? "border-zinc-500 bg-zinc-100/80"
-                            : imagePreview.length > 0 ||
-                              formData.image_url.length > 0
-                              ? "border-transparent bg-zinc-50"
+
+                      {(formData.image_url.length > 0 || imagePreview.length > 0) && (
+                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-3">
+                          {formData.image_url.map((image, index) => (
+                            <div key={`existing-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-50">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={image} alt="" className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button type="button" onClick={() => removeExistingImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                          {imagePreview.map((preview, index) => (
+                            <div key={`new-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-50">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={preview} alt="" className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button type="button" onClick={() => removeNewImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                              <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-zinc-900 text-white px-1 py-0.5 rounded">NEW</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {canAddMoreImages && (
+                        <div
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setIsDragging(true);
+                          }}
+                          onDragLeave={(e) => {
+                            e.preventDefault();
+                            setIsDragging(false);
+                          }}
+                          onDrop={handleDrop}
+                          onClick={() => fileInputRef.current?.click()}
+                          className={`relative flex flex-col items-center justify-center w-full min-h-35 p-4 transition-all border border-dashed rounded-lg cursor-pointer ${
+                            isDragging
+                              ? "border-zinc-500 bg-zinc-100/80"
                               : "border-zinc-300 hover:border-zinc-400 bg-zinc-50/50 hover:bg-zinc-50"
                           }`}
-                      >
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          onChange={(e) => {
-                            if (e.target.files?.[0])
-                              handleImageProcessing(e.target.files[0]);
-                          }}
-                          accept="image/*"
-                          className="hidden"
-                        />
-                        <AnimatePresence mode="wait">
-                          {imagePreview.length > 0 ||
-                            formData.image_url.length > 0 ? (
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              className="relative w-full h-48 sm:h-56 rounded-md overflow-hidden group border border-zinc-200/50 shadow-sm"
-                            >
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={
-                                  imagePreview.length > 0
-                                    ? imagePreview[0]
-                                    : formData.image_url[0]
-                                }
-                                alt=""
-                                className="absolute inset-0 w-full h-full object-cover blur-md opacity-50 scale-110"
-                              />
-                              <img
-                                src={
-                                  imagePreview.length > 0
-                                    ? imagePreview[0]
-                                    : formData.image_url[0]
-                                }
-                                alt="Preview"
-                                className="relative h-full w-full object-contain"
-                              />
-                              <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                                <span className="text-white flex items-center gap-1.5 text-xs font-medium bg-zinc-950/60 border border-white/10 px-3 py-1.5 rounded-md backdrop-blur-md">
-                                  <Upload size={14} /> เปลี่ยนรูปภาพ
-                                </span>
-                              </div>
-                            </motion.div>
-                          ) : (
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              className="flex flex-col items-center text-center space-y-2 py-8"
-                            >
-                              <div className="p-2.5 bg-white shadow-sm border border-zinc-200 rounded-lg text-zinc-400 mb-1">
-                                <ImageIcon size={22} strokeWidth={1.5} />
-                              </div>
-                              <div>
-                                <p className="text-[13px] font-medium text-zinc-900">
-                                  คลิกเพื่อเลือกไฟล์{" "}
-                                  <span className="font-normal text-zinc-500">
-                                    หรือลากรูปมาวางที่นี่
-                                  </span>
-                                </p>
-                                <p className="text-[11px] text-zinc-400 mt-1">
-                                  รองรับไฟล์ JPG, PNG, WEBP
-                                </p>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
+                        >
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            multiple
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || []);
+                              if (files.length > 0) processImageFiles(files);
+                              e.target.value = "";
+                            }}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                          <div className="p-2.5 bg-white shadow-sm border border-zinc-200 rounded-lg text-zinc-400 mb-1">
+                            <ImageIcon size={22} strokeWidth={1.5} />
+                          </div>
+                          <p className="text-[13px] font-medium text-zinc-900">
+                            คลิกเพื่อเลือกไฟล์{" "}
+                            <span className="font-normal text-zinc-500">
+                              หรือลากรูปมาวางที่นี่ (เลือกได้หลายรูป)
+                            </span>
+                          </p>
+                          <p className="text-[11px] text-zinc-400 mt-1">
+                            รองรับไฟล์ JPG, PNG, WEBP · เพิ่มได้อีก {MAX_IMAGES - totalImages} รูป
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">

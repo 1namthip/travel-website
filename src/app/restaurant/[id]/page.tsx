@@ -2,10 +2,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { 
-  MapPin, Phone, Clock, Star, MessageSquare, 
+import {
+  MapPin, Phone, Clock, Star, MessageSquare,
   Trash2, Share, Heart, Utensils, Info,
-  ChevronLeft
+  ChevronLeft, Navigation
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -384,15 +384,26 @@ export default function RestaurantDetail() {
                 </div>
               </div>
 
-              {restaurant.phone ? (
-                <a href={`tel:${restaurant.phone}`} className="flex items-center justify-center gap-2 w-full py-4 bg-neutral-900 text-white font-bold rounded-xl hover:bg-black transition active:scale-[0.98] shadow-lg shadow-neutral-900/10">
-                  <Phone className="w-5 h-5" /> โทรจองโต๊ะเลย
+              <div className="space-y-3">
+                {restaurant.phone ? (
+                  <a href={`tel:${restaurant.phone}`} className="flex items-center justify-center gap-2 w-full py-4 bg-neutral-900 text-white font-bold rounded-xl hover:bg-black transition active:scale-[0.98] shadow-lg shadow-neutral-900/10">
+                    <Phone className="w-5 h-5" /> โทรจองโต๊ะเลย
+                  </a>
+                ) : (
+                  <div className="w-full py-4 bg-neutral-100 text-neutral-400 font-bold rounded-xl text-center flex items-center justify-center gap-2 cursor-not-allowed">
+                    <Phone className="w-5 h-5" /> ไม่มีเบอร์โทรศัพท์
+                  </div>
+                )}
+
+                <a
+                  href={`https://maps.google.com/?q=${encodeURIComponent(restaurant.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-4 bg-white border border-neutral-200 text-neutral-700 font-bold rounded-xl hover:bg-neutral-50 hover:border-neutral-300 transition active:scale-[0.98]"
+                >
+                  <Navigation className="w-5 h-5" /> นำทางด้วย Google Maps
                 </a>
-              ) : (
-                <div className="w-full py-4 bg-neutral-100 text-neutral-400 font-bold rounded-xl text-center flex items-center justify-center gap-2 cursor-not-allowed">
-                  <Phone className="w-5 h-5" /> ไม่มีเบอร์โทรศัพท์
-                </div>
-              )}
+              </div>
             </div>
           </div>
         </div>

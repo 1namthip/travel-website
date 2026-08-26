@@ -20,6 +20,8 @@ import {
   Trash2
 } from "lucide-react";
 
+const MAX_IMAGES = 15;
+
 interface Accommodation {
   id: string;
   name: string;
@@ -161,8 +163,8 @@ export const AddAccommodationModal = ({
   // ─── Image Processing ───
   const processFiles = useCallback((files: File[]) => {
     const totalImages = existingImages.length + imageFiles.length + files.length;
-    if (totalImages > 5) {
-      setError("สามารถอัปโหลดได้สูงสุด 5 รูปเท่านั้น");
+    if (totalImages > MAX_IMAGES) {
+      setError(`สามารถอัปโหลดได้สูงสุด ${MAX_IMAGES} รูปเท่านั้น`);
       return;
     }
 
@@ -323,7 +325,7 @@ export const AddAccommodationModal = ({
   };
 
   const totalImages = existingImages.length + imageFiles.length;
-  const canAddMoreImages = totalImages < 5;
+  const canAddMoreImages = totalImages < MAX_IMAGES;
 
   return (
     <AnimatePresence>
@@ -389,7 +391,7 @@ export const AddAccommodationModal = ({
                 {/* MODULE LAYER: IMAGE MANAGEMENT DECK */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-medium text-zinc-700">
-                    รูปภาพที่พักประกอบการตัดสินใจ <span className="text-zinc-400 font-normal">({totalImages}/5 รูป)</span>
+                    รูปภาพที่พักประกอบการตัดสินใจ <span className="text-zinc-400 font-normal">({totalImages}/{MAX_IMAGES} รูป)</span>
                   </label>
                   
                   {/* Grid Assets Stream */}
@@ -437,7 +439,7 @@ export const AddAccommodationModal = ({
                         คลิกเพื่อเลือกไฟล์รูปภาพ <span className="font-normal text-zinc-400">หรือลากรูปมาวางที่นี่</span>
                       </p>
                       <p className="text-[10px] text-zinc-400 mt-0.5">
-                        รองรับ JPG, PNG, WEBP (ไม่เกิน 5MB) · เพิ่มได้อีก {5 - totalImages} รูป
+                        รองรับ JPG, PNG, WEBP (ไม่เกิน 5MB) · เพิ่มได้อีก {MAX_IMAGES - totalImages} รูป
                       </p>
                     </div>
                   )}

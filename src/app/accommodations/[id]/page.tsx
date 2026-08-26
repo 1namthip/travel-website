@@ -20,6 +20,7 @@ import {
   Heart,
   CheckCircle2,
   ChevronLeft,
+  Navigation,
 } from "lucide-react";
 
 interface Review {
@@ -477,6 +478,15 @@ export default function AccommodationDetail() {
                     <span>เข้าชมเพจ Facebook</span>
                   </a>
                 )}
+
+                <a
+                  href={`https://maps.google.com/?q=${encodeURIComponent(accommodation.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-3.5 bg-white border border-neutral-200 text-neutral-700 font-bold rounded-xl hover:bg-neutral-50 hover:border-neutral-300 transition active:scale-[0.98]"
+                >
+                  <Navigation className="w-5 h-5" /> นำทางด้วย Google Maps
+                </a>
               </div>
               <div className="text-center text-sm text-neutral-400">
                 แจ้งว่าติดต่อมาจากเว็บไซต์ของเรา

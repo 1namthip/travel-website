@@ -396,7 +396,7 @@ export default function DestinationDetail() {
               </div>
 
               <a
-                href={`https://maps.google.com/?q=${encodeURIComponent(destination.location || destination.name)}`}
+                href={`https://maps.google.com/?q=${encodeURIComponent(destination.name)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 w-full py-4 bg-neutral-900 text-white font-bold rounded-xl hover:bg-black transition active:scale-[0.98] shadow-lg shadow-neutral-900/10"
