@@ -4,12 +4,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { createSupabaseClient } from "@/lib/supabaseClient";
 import Link from "next/link";
-import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { createBrowserClient } from "@supabase/ssr";
 import type { User } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
+import ImageGallery from "@/component/ImageGallery";
 import {
   MapPin,
   Phone,
@@ -331,35 +331,7 @@ export default function AccommodationDetail() {
         </div>
 
         {/* 🌟 Image Gallery Grid (Premium Style) */}
-        <div className="w-full h-[40vh] md:h-[50vh] lg:h-[60vh] relative rounded-3xl overflow-hidden mb-12 flex gap-2">
-          {/* Main Large Image */}
-          <div className="relative w-full md:w-1/2 h-full cursor-pointer group">
-            <Image
-              src={images[0]}
-              alt={accommodation.name}
-              fill
-              unoptimized
-              className="object-cover group-hover:brightness-95 transition-all duration-300"
-            />
-          </div>
-          {/* Grid Small Images (Desktop Only) */}
-          <div className="hidden md:grid w-1/2 h-full grid-cols-2 grid-rows-2 gap-2">
-            {[1, 2, 3, 4].map((idx) => (
-              <div
-                key={idx}
-                className="relative w-full h-full cursor-pointer group overflow-hidden bg-neutral-100"
-              >
-                <Image
-                  src={images[idx] || images[0]} 
-                  alt={`Gallery ${idx}`}
-                  fill
-                  unoptimized
-                  className="object-cover group-hover:scale-105 group-hover:brightness-95 transition-all duration-500"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+        <ImageGallery images={images} alt={accommodation.name} />
 
         {/* 🌟 Content & Sidebar Split */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
