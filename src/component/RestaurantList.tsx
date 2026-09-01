@@ -170,7 +170,7 @@ export default function RestaurantList() {
           <p className="text-sm text-red-600/80 mb-6">{error}</p>
           <button
             onClick={() => fetchRestaurants(search, category)}
-            className="bg-neutral-900 hover:bg-black transition-colors text-white px-6 py-2.5 rounded-full text-sm font-medium"
+            className="bg-amber-600 hover:bg-amber-700 transition-colors text-white px-6 py-2.5 rounded-full text-sm font-medium"
           >
             ลองใหม่อีกครั้ง
           </button>
@@ -198,7 +198,7 @@ export default function RestaurantList() {
           </div>
 
           <div className="w-full lg:w-auto">
-            <div className="flex items-center bg-white px-4 py-3 lg:py-2.5 rounded-full border border-neutral-200 shadow-sm focus-within:ring-2 focus-within:ring-neutral-900/10 focus-within:border-neutral-900 transition-all w-full lg:w-80">
+            <div className="flex items-center bg-white px-4 py-3 lg:py-2.5 rounded-full border border-neutral-200 shadow-sm focus-within:ring-2 focus-within:ring-amber-500/20 focus-within:border-amber-500 transition-all w-full lg:w-80">
               <Search className="w-4 h-4 text-neutral-400 mr-3 shrink-0" />
               <input
                 type="text"
@@ -228,7 +228,7 @@ export default function RestaurantList() {
                 key={cat.value}
                 onClick={() => setCategory(cat.value)}
                 className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors shrink-0 border flex items-center gap-2 ${isActive
-                    ? "bg-neutral-900 text-white border-neutral-900"
+                    ? "bg-amber-600 text-white border-amber-600"
                     : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
                   }`}
               >
@@ -255,7 +255,7 @@ export default function RestaurantList() {
               setSearch("");
               setCategory("");
             }}
-            className="px-6 py-2.5 bg-neutral-900 text-white rounded-full text-sm font-medium hover:bg-black transition-colors"
+            className="px-6 py-2.5 bg-amber-600 text-white rounded-full text-sm font-medium hover:bg-amber-700 transition-colors"
           >
             ล้างตัวกรองทั้งหมด
           </button>

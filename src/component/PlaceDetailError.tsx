@@ -20,7 +20,7 @@ export default function PlaceDetailError({
         <p className="text-neutral-500 mb-7 leading-relaxed">{message}</p>
         <Link
           href={backHref}
-          className="inline-flex w-full h-11 items-center justify-center rounded-xl bg-neutral-900 px-8 text-sm font-semibold text-white transition-colors hover:bg-black"
+          className="inline-flex w-full h-11 items-center justify-center rounded-xl bg-amber-600 px-8 text-sm font-semibold text-white transition-colors hover:bg-amber-700"
         >
           {backLabel}
         </Link>

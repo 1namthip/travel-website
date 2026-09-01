@@ -276,7 +276,7 @@ export default function AccommodationsPage() {
                   onClick={() => setSelectedCategory(cat.value)}
                   className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors shrink-0 border flex items-center gap-2.5 ${
                     isActive
-                      ? "bg-neutral-900 text-white border-neutral-900"
+                      ? "bg-amber-600 text-white border-amber-600"
                       : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300 hover:text-neutral-900"
                   }`}
                 >
@@ -427,7 +427,7 @@ export default function AccommodationsPage() {
                 setSelectedCategory("all");
                 setPriceFilter("all");
               }}
-              className="inline-flex h-10 items-center justify-center rounded-xl bg-neutral-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-black"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-amber-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-amber-700"
             >
               ล้างตัวกรองทั้งหมด
             </button>

@@ -31,7 +31,7 @@ export default async function DashboardPage() {
       <HeroSection />
 
       <section className="max-w-7xl mx-auto px-4 py-8 bg-amber-50/40">
-        <CategorySection />
+        {/* <CategorySection /> */}
         { <BudgetTripPlannerWrapper isLoggedIn={!!user} /> }
       </section>
 

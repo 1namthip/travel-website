@@ -170,7 +170,7 @@ export default function DestinationList() {
           <p className="text-sm text-red-600/80 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-neutral-900 hover:bg-black transition-colors text-white px-6 py-2.5 rounded-full text-sm font-medium"
+            className="bg-amber-600 hover:bg-amber-700 transition-colors text-white px-6 py-2.5 rounded-full text-sm font-medium"
           >
             ลองใหม่อีกครั้ง
           </button>
@@ -281,7 +281,7 @@ export default function DestinationList() {
               onClick={() => setActiveCategory(cat)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all border ${
                 activeCategory === cat
-                  ? "bg-neutral-900 text-white border-neutral-900"
+                  ? "bg-amber-600 text-white border-amber-600"
                   : "bg-white text-neutral-600 border-neutral-200 hover:border-neutral-400 hover:text-neutral-900"
               }`}
             >
@@ -303,7 +303,7 @@ export default function DestinationList() {
           </p>
           <button
             onClick={clearAllFilters}
-            className="px-6 py-2.5 bg-neutral-900 text-white rounded-full text-sm font-medium hover:bg-black transition-colors"
+            className="px-6 py-2.5 bg-amber-600 text-white rounded-full text-sm font-medium hover:bg-amber-700 transition-colors"
           >
             ล้างตัวกรองทั้งหมด
           </button>

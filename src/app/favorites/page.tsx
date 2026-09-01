@@ -218,7 +218,7 @@ export default function FavoritesPage() {
             </p>
             <Link
               href="/sign-in"
-              className="inline-flex h-10 items-center justify-center rounded-xl bg-neutral-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-black"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-amber-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-amber-700"
             >
               เข้าสู่ระบบ
             </Link>
@@ -236,7 +236,7 @@ export default function FavoritesPage() {
             </p>
             <Link
               href="/destinations"
-              className="inline-flex h-10 items-center justify-center rounded-xl bg-neutral-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-black"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-amber-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-amber-700"
             >
               เริ่มสำรวจ
             </Link>

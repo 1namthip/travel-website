@@ -276,7 +276,7 @@ export default function AccommodationDetail() {
   ) : accommodation.contact_phone ? (
     <a
       href={`tel:${accommodation.contact_phone}`}
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-neutral-900 px-5 text-sm font-bold text-white transition-colors hover:bg-black"
+      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-amber-600 px-5 text-sm font-bold text-white transition-colors hover:bg-amber-700"
     >
       <Phone className="w-4 h-4" /> โทรสอบถาม
     </a>
@@ -285,7 +285,7 @@ export default function AccommodationDetail() {
       href={mapsHref}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-neutral-900 px-5 text-sm font-bold text-white transition-colors hover:bg-black"
+      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-amber-600 px-5 text-sm font-bold text-white transition-colors hover:bg-amber-700"
     >
       <Navigation className="w-4 h-4" /> นำทาง
     </a>
@@ -360,11 +360,11 @@ export default function AccommodationDetail() {
           {avgRating && (
             <a
               href="#reviews"
-              className="inline-flex items-center gap-1.5 rounded-full bg-neutral-900 px-3 py-1 text-sm font-semibold text-white"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white border border-neutral-200 px-3 py-1 text-sm font-semibold text-neutral-900"
             >
               <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               {avgRating}
-              <span className="font-normal text-white/70">
+              <span className="font-normal text-neutral-400">
                 · {reviews.length} รีวิว
               </span>
             </a>
@@ -460,7 +460,7 @@ export default function AccommodationDetail() {
                 {accommodation.contact_phone && (
                   <a
                     href={`tel:${accommodation.contact_phone}`}
-                    className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl bg-neutral-900 text-sm font-bold text-white transition-colors hover:bg-black"
+                    className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl bg-amber-600 text-sm font-bold text-white transition-colors hover:bg-amber-700"
                   >
                     <Phone className="w-4 h-4" /> โทร {accommodation.contact_phone}
                   </a>

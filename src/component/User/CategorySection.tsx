@@ -60,7 +60,7 @@ export default function SearchBar() {
       {/* Search Action */}
       <Link
         href="/accommodations"
-        className="w-full md:w-16 md:h-16 py-4 md:py-0 rounded-full bg-neutral-900 text-white flex items-center justify-center hover:bg-black transition-colors shrink-0 shadow-lg"
+        className="w-full md:w-16 md:h-16 py-4 md:py-0 rounded-full bg-amber-600 text-white flex items-center justify-center hover:bg-amber-700 transition-colors shrink-0 shadow-lg"
       >
         <span className="md:hidden font-medium mr-2">
           ค้นหาที่พัก

@@ -285,14 +285,14 @@ export default function PlaceReviews({
                     placeholder={copy.placeholder}
                     rows={4}
                     required
-                    className="w-full p-3.5 rounded-xl border border-neutral-200 bg-white text-sm text-neutral-800 outline-none resize-none transition-colors focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10"
+                    className="w-full p-3.5 rounded-xl border border-neutral-200 bg-white text-sm text-neutral-800 outline-none resize-none transition-colors focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex w-full h-11 items-center justify-center rounded-xl bg-neutral-900 text-sm font-bold text-white transition-colors hover:bg-black disabled:bg-neutral-300 disabled:cursor-not-allowed"
+                  className="inline-flex w-full h-11 items-center justify-center rounded-xl bg-amber-600 text-sm font-bold text-white transition-colors hover:bg-amber-700 disabled:bg-neutral-300 disabled:cursor-not-allowed"
                 >
                   {submitting ? "กำลังส่งรีวิว..." : "ส่งรีวิวของคุณ"}
                 </button>
@@ -310,7 +310,7 @@ export default function PlaceReviews({
                 </p>
                 <Link
                   href={signInHref}
-                  className="inline-flex w-full h-11 items-center justify-center rounded-xl bg-neutral-900 text-sm font-bold text-white transition-colors hover:bg-black"
+                  className="inline-flex w-full h-11 items-center justify-center rounded-xl bg-amber-600 text-sm font-bold text-white transition-colors hover:bg-amber-700"
                 >
                   เข้าสู่ระบบ / สมัครสมาชิก
                 </Link>

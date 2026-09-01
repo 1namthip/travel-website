@@ -119,7 +119,7 @@ function LoginPromptModal({
 
         <button
           onClick={onLogin}
-          className="w-full bg-black text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-neutral-800 transition-all mb-3"
+          className="w-full bg-amber-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-amber-700 transition-all mb-3"
         >
           <LogIn className="w-4.5 h-4.5" />
           ไปล็อกอิน
@@ -183,7 +183,7 @@ function BudgetBar({
             disabled={count === 0}
             className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-all ${
               count > 0
-                ? "bg-black text-white hover:bg-neutral-800"
+                ? "bg-amber-600 text-white hover:bg-amber-700"
                 : "bg-neutral-100 text-neutral-400 cursor-not-allowed"
             }`}
           >
@@ -307,7 +307,7 @@ function OverBudgetModal({
 
         <button
           onClick={onClose}
-          className="w-full bg-neutral-900 text-white py-3.5 rounded-xl font-semibold hover:bg-neutral-800 transition-all"
+          className="w-full bg-amber-600 text-white py-3.5 rounded-xl font-semibold hover:bg-amber-700 transition-all"
         >
           เข้าใจแล้ว
         </button>
@@ -687,7 +687,7 @@ export function TripSummaryModal({
               <button
                 onClick={onSave}
                 disabled={items.length === 0 || isLoading}
-                className="w-full bg-neutral-900 hover:bg-black text-white py-2.5 px-5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2.5 px-5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <RefreshCcw className="w-5 h-5 animate-spin" />
@@ -701,7 +701,7 @@ export function TripSummaryModal({
             ) : (
               <button
                 onClick={onLoginRequired}
-                className="w-full bg-neutral-900 hover:bg-black text-white py-2.5 px-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all"
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2.5 px-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all"
               >
                 <LogIn className="w-4 h-4 text-amber-400 shrink-0" />
                 <span className="truncate text-sm">ล็อกอินเพื่อบันทึก</span>
@@ -1040,9 +1040,9 @@ export default function BudgetTripPlanner({
             onClick={handleGenerate}
             disabled={isLoading || !budgetValid}
             title={!budgetValid ? budgetHint : undefined}
-            className={`bg-black text-white px-8 py-3.5 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${
+            className={`bg-amber-600 text-white px-8 py-3.5 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${
               budgetValid && !isLoading
-                ? "hover:bg-neutral-800"
+                ? "hover:bg-amber-700"
                 : "opacity-40 cursor-not-allowed"
             }`}
           >

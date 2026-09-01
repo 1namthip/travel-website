@@ -365,7 +365,7 @@ export function EditTripModal({
             <button
               onClick={handleSave}
               disabled={isSaving || !name.trim()}
-              className="h-11 px-6 rounded-xl text-sm font-bold text-white bg-neutral-900 hover:bg-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              className="h-11 px-6 rounded-xl text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             >
               {isSaving ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -578,7 +578,7 @@ function EmptyState() {
       </p>
       <Link
         href="/dashboard#planner"
-        className="bg-neutral-900 text-white px-7 h-11 inline-flex items-center rounded-xl font-semibold text-sm gap-2 hover:bg-black transition-colors"
+        className="bg-amber-600 text-white px-7 h-11 inline-flex items-center rounded-xl font-semibold text-sm gap-2 hover:bg-amber-700 transition-colors"
       >
         <Plus className="w-4 h-4" />
         จัดทริปใหม่
@@ -711,7 +711,7 @@ export default function MyTripsPage() {
 
         <Link
           href="/dashboard#planner"
-          className="bg-neutral-900 text-white px-5 h-11 inline-flex items-center rounded-xl font-semibold text-sm gap-2 hover:bg-black transition-colors shrink-0"
+          className="bg-amber-600 text-white px-5 h-11 inline-flex items-center rounded-xl font-semibold text-sm gap-2 hover:bg-amber-700 transition-colors shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">จัดทริปใหม่</span>
