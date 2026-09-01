@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useSpring,
-} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, ArrowRight, ArrowLeft, Play, Loader2 } from "lucide-react";
 
 // สร้าง Interface สำหรับรับข้อมูลจาก API ให้ตรงกับโครงสร้างเดิมที่ UI ต้องการ
@@ -19,10 +14,9 @@ interface DestinationUI {
   desc: string;
 }
 
-const springTransition = {
-  type: "spring",
-  stiffness: 200,
-  damping: 30,
+const slideTransition = {
+  duration: 0.5,
+  ease: [0.075, 0.82, 0.165, 1],
 } as const;
 
 const easeOutCirc = [0.075, 0.82, 0.165, 1] as const;
@@ -57,12 +51,6 @@ export default function HeroSection() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springConfig = { damping: 50, stiffness: 400 };
-  const parallaxX = useSpring(mouseX, springConfig);
-  const parallaxY = useSpring(mouseY, springConfig);
-
   // ฟังก์ชันดึงข้อมูลจาก API
   useEffect(() => {
     const fetchDestinations = async () => {
@@ -90,18 +78,6 @@ export default function HeroSection() {
     fetchDestinations();
   }, []);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const { innerWidth, innerHeight } = window;
-      const x = (e.clientX / innerWidth - 0.5) * 2;
-      const y = (e.clientY / innerHeight - 0.5) * 2;
-      mouseX.set(x * -15);
-      mouseY.set(y * -15);
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [mouseX, mouseY]);
-
   const nextSlide = () => {
     if (isAnimating || destinations.length === 0) return;
     setIsAnimating(true);
@@ -128,8 +104,8 @@ export default function HeroSection() {
   // Loading State
   if (isLoading) {
     return (
-      <div className="w-full h-screen min-h-185 bg-[#050505] flex items-center justify-center text-white">
-        <Loader2 className="w-10 h-10 animate-spin text-[#E5A93C]" />
+      <div className="w-full h-screen min-h-185 bg-neutral-950 flex items-center justify-center text-white">
+        <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
       </div>
     );
   }
@@ -137,7 +113,7 @@ export default function HeroSection() {
   // Fallback in case API fails or returns empty
   if (!destinations || destinations.length === 0) {
     return (
-      <div className="w-full h-screen min-h-185 bg-[#050505] flex items-center justify-center text-white">
+      <div className="w-full h-screen min-h-185 bg-neutral-950 flex items-center justify-center text-white">
         <p>ไม่พบข้อมูลสถานที่ท่องเที่ยว</p>
       </div>
     );
@@ -146,7 +122,7 @@ export default function HeroSection() {
   const activeData = destinations[activeIdx];
 
   return (
-    <section className="relative w-full h-screen min-h-185 overflow-hidden bg-[#050505] text-white">
+    <section className="relative w-full h-screen min-h-185 overflow-hidden bg-neutral-950 text-white">
       {/* 1. Background Layer */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <AnimatePresence mode="popLayout">
@@ -158,13 +134,9 @@ export default function HeroSection() {
             transition={{ duration: 1.2, ease: "easeInOut" }}
             className="absolute inset-0 w-full h-full"
           >
-            <motion.div
-              className="absolute inset-[-5%] w-[110%] h-[110%] bg-cover bg-center"
-              style={{
-                backgroundImage: `url(${activeData.image})`,
-                x: parallaxX,
-                y: parallaxY,
-              }}
+            <div
+              className="absolute inset-0 w-full h-full bg-cover bg-center"
+              style={{ backgroundImage: `url(${activeData.image})` }}
             />
             <div className="absolute inset-0 bg-black/40" />
             <div className="absolute inset-0 bg-linear-to-r from-black/90 via-black/40 to-transparent w-full md:w-3/4" />
@@ -186,7 +158,7 @@ export default function HeroSection() {
               transition={{ duration: 0.8, ease: easeOutCirc }}
               className="flex flex-col gap-2"
             >
-              <div className="flex items-center gap-3 text-[#E5A93C]">
+              <div className="flex items-center gap-3 text-amber-500">
                 <MapPin className="w-5 h-5" />
                 <span className="uppercase tracking-[0.2em] text-sm font-semibold">
                   {activeData.subtitle}
@@ -210,7 +182,7 @@ export default function HeroSection() {
                     สำรวจสถานที่แนะนำ
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
-                  <div className="absolute inset-0 bg-[#E5A93C] transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0" />
+                  <div className="absolute inset-0 bg-amber-500 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0" />
                 </a>
                 <button className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group">
                   <Play className="w-4 h-4 ml-1 group-hover:scale-110 transition-transform" />
@@ -266,7 +238,7 @@ export default function HeroSection() {
                     zIndex: zIndex,
                     rotateY: isActive ? 0 : -12 * normalizedOffset,
                   }}
-                  transition={springTransition}
+                  transition={slideTransition}
                   className="absolute left-0 w-full aspect-3/4 rounded-3xl overflow-hidden shadow-2xl cursor-grab active:cursor-grabbing origin-center border border-white/10"
                   onClick={() => i !== activeIdx && setActiveIdx(i)}
                   drag="x"
@@ -291,8 +263,8 @@ export default function HeroSection() {
                       }
                       className="flex items-center gap-2 mb-2"
                     >
-                      <MapPin className="w-3 h-3 text-[#E5A93C]" />
-                      <span className="text-xs uppercase tracking-widest text-[#E5A93C] font-medium">
+                      <MapPin className="w-3 h-3 text-amber-500" />
+                      <span className="text-xs uppercase tracking-widest text-amber-500 font-medium">
                         {dest.location}
                       </span>
                     </motion.div>

@@ -89,13 +89,13 @@ export default function RestaurantsTable({ restaurants, onEdit, onDelete }: Rest
             return (
               <motion.div
                 layout
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.16 }}
                 key={r.id}
                 onClick={() => onEdit(r)}
-                className="group bg-white border border-zinc-200 shadow-sm hover:border-blue-300 transition-all p-4 rounded-xl flex flex-col sm:flex-row gap-5 relative cursor-pointer"
+                className="group bg-white border border-zinc-200 shadow-sm hover:border-zinc-300 transition-colors p-4 rounded-xl flex flex-col sm:flex-row gap-5 relative cursor-pointer"
               >
                 {/* Image Container Block */}
                 <div className="relative w-full sm:w-50 aspect-16/10 sm:h-32 shrink-0 overflow-hidden rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-center">
@@ -104,11 +104,11 @@ export default function RestaurantsTable({ restaurants, onEdit, onDelete }: Rest
                       <img
                         src={imgData.primary}
                         alt={r.name}
-                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out"
+                        className="w-full h-full object-cover"
                         loading="lazy"
                       />
                       {imgData.count > 1 && (
-                        <div className="absolute bottom-2 right-2 bg-zinc-950/70 backdrop-blur-md text-white text-[10px] font-medium px-1.5 py-0.5 rounded select-none">
+                        <div className="absolute bottom-2 right-2 bg-zinc-950/70 text-white text-[10px] font-medium px-1.5 py-0.5 rounded select-none">
                           +{imgData.count - 1} รูป
                         </div>
                       )}
@@ -116,10 +116,10 @@ export default function RestaurantsTable({ restaurants, onEdit, onDelete }: Rest
                   ) : (
                     <ImageIcon size={20} className="text-zinc-300" />
                   )}
-                  
-                  {/* Premium Flat Label */}
+
+                  {/* Section label */}
                   <div className="absolute top-2 left-2">
-                    <span className="bg-pink-400/75 border-[#EC4899] shadow-pink-200 backdrop-blur-sm text-white text-[9px] font-medium px-2 py-0.5 rounded tracking-wide shadow-sm">
+                    <span className="bg-white/95 text-zinc-700 border border-zinc-200 text-[10px] font-medium px-1.5 py-0.5 rounded">
                       ร้านอาหาร
                     </span>
                   </div>
@@ -143,11 +143,11 @@ export default function RestaurantsTable({ restaurants, onEdit, onDelete }: Rest
                       <AnimatePresence>
                         {openMenuId === r.id && (
                           <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 5 }}
+                            initial={{ opacity: 0, scale: 0.98, y: 4 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 5 }}
-                            transition={{ duration: 0.1 }}
-                            className="absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-zinc-200 py-1 z-50 text-left overflow-hidden"
+                            exit={{ opacity: 0, scale: 0.98, y: 4 }}
+                            transition={{ duration: 0.12 }}
+                            className="absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-lg border border-zinc-200 py-1 z-50 text-left overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <button
@@ -183,18 +183,18 @@ export default function RestaurantsTable({ restaurants, onEdit, onDelete }: Rest
                     </div>
                     
                     {/* Restaurant Name */}
-                    <h3 className="text-base font-medium text-zinc-900 hover:text-blue-700 leading-snug truncate">
+                    <h3 className="text-[15px] font-semibold text-zinc-900 leading-snug truncate">
                       {r.name}
                     </h3>
-                    
+
                     {/* Rich Description */}
-                    <p className="text-xs text-zinc-500 mt-2 line-clamp-2 leading-relaxed max-w-xl">
+                    <p className="text-xs text-zinc-500 mt-1.5 line-clamp-2 leading-relaxed max-w-xl">
                       {r.description || "พร้อมมอบประสบการณ์อาหารเลิศรสและบริการที่ประทับใจให้กับคุณ"}
                     </p>
                   </div>
 
                   {/* Secondary Metadata Footer Bar */}
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-zinc-100/80">
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-zinc-100">
                     <div className="flex items-center gap-4 text-xs text-zinc-400">
                       {r.phone ? (
                         <span className="flex items-center gap-1">
@@ -212,27 +212,23 @@ export default function RestaurantsTable({ restaurants, onEdit, onDelete }: Rest
         </AnimatePresence>
       </div>
 
-      {/* ─── Premium Pagination Bar ─── */}
+      {/* ─── Pagination ─── */}
       {totalPages > 1 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex items-center justify-between mt-8 px-1"
-        >
-          <p className="hidden sm:block text-xs text-zinc-400 font-medium">
-            Showing <span className="text-zinc-900">{(page - 1) * itemsPerPage + 1}</span> to{" "}
-            <span className="text-zinc-900">{Math.min(page * itemsPerPage, restaurants.length)}</span> of{" "}
-            <span className="text-zinc-900">{restaurants.length}</span> records
+        <div className="flex items-center justify-between mt-8 px-1">
+          <p className="hidden sm:block text-xs text-zinc-500">
+            แสดง <span className="font-medium text-zinc-900">{(page - 1) * itemsPerPage + 1}</span>–
+            <span className="font-medium text-zinc-900">{Math.min(page * itemsPerPage, restaurants.length)}</span> จาก{" "}
+            <span className="font-medium text-zinc-900">{restaurants.length}</span> รายการ
           </p>
 
-          <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
             <button
               disabled={page === 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-zinc-600 bg-white border border-zinc-200 rounded-md hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-30 disabled:pointer-events-none transition-all"
+              className="inline-flex items-center gap-1 h-8 px-2.5 text-xs font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
             >
               <ChevronLeft size={14} />
-              <span>Previous</span>
+              <span>ก่อนหน้า</span>
             </button>
 
             <div className="flex items-center gap-1">
@@ -240,10 +236,10 @@ export default function RestaurantsTable({ restaurants, onEdit, onDelete }: Rest
                 <button
                   key={pageNum}
                   onClick={() => setPage(pageNum)}
-                  className={`w-7 h-7 rounded-md text-xs font-medium transition-all flex items-center justify-center ${
+                  className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors flex items-center justify-center ${
                     page === pageNum
-                      ? "bg-blue-600 text-white font-semibold shadow-sm"
-                      : "text-slate-500 hover:bg-slate-100 hover:text-blue-600"
+                      ? "bg-blue-600 text-white"
+                      : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
                   }`}
                 >
                   {pageNum}
@@ -254,13 +250,13 @@ export default function RestaurantsTable({ restaurants, onEdit, onDelete }: Rest
             <button
               disabled={page === totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-blue-600 bg-white border border-blue-200 rounded-md hover:bg-blue-50 hover:text-blue-900 disabled:opacity-30 disabled:pointer-events-none transition-all"
+              className="inline-flex items-center gap-1 h-8 px-2.5 text-xs font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
             >
-              <span>Next</span>
+              <span>ถัดไป</span>
               <ChevronRight size={14} />
             </button>
           </div>
-        </motion.div>
+        </div>
       )}
 
       {/* ─── Global Destructive Action Confirm Dialog ─── */}
@@ -268,14 +264,14 @@ export default function RestaurantsTable({ restaurants, onEdit, onDelete }: Rest
         open={!!confirmId}
         danger={true}
         loading={isDeleting}
-        title="Delete Restaurant Entry"
+        title="ลบข้อมูลร้านอาหาร"
         message={
-          <span className="text-blue-500 text-sm block mt-1 leading-relaxed">
+          <span className="block leading-relaxed">
             คุณต้องการลบข้อมูลร้านอาหารนี้ออกจากระบบหรือไม่? ข้อมูลประวัติและรูปภาพทั้งหมดจะถูก{" "}
-            <span className="font-semibold text-red-600">ลบอย่างถาวร</span> โดยไม่สามารถกู้คืนได้
+            <span className="font-semibold text-zinc-900">ลบอย่างถาวร</span> โดยไม่สามารถกู้คืนได้
           </span>
         }
-        confirmText="ลบข้อมูลถาวร"
+        confirmText="ลบถาวร"
         cancelText="ยกเลิก"
         onConfirm={() => confirmId && handleDelete(confirmId)}
         onCancel={() => setConfirmId(null)}

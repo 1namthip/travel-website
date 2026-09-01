@@ -51,29 +51,6 @@ type DialogState =
 
 const ROWS_PER_PAGE = 8;
 
-// Redesigned: Elegant, subtle gradients for avatars (Enterprise look)
-const AVATAR_PALETTE = [
-  "from-zinc-200 to-zinc-300 text-zinc-700",
-  "from-slate-200 to-slate-300 text-slate-700",
-  "from-gray-200 to-gray-300 text-gray-700",
-  "from-stone-200 to-stone-300 text-stone-700",
-  "from-neutral-200 to-neutral-300 text-neutral-700",
-];
-
-function hashString(str: string) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
-function getAvatarGradient(email?: string) {
-  if (!email) return AVATAR_PALETTE[0];
-  return AVATAR_PALETTE[hashString(email) % AVATAR_PALETTE.length];
-}
-
 function useDebouncedValue<T>(value: T, delay = 300): T {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -347,7 +324,7 @@ export default function AdminUsersPage() {
       <main className="max-w-6xl mx-auto pt-10 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="text-xl font-semibold tracking-tight text-zinc-900">
             จัดการสมาชิกและผู้ดูแลระบบ
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
@@ -355,47 +332,26 @@ export default function AdminUsersPage() {
           </p>
         </div>
 
-        {/* Minimal Stripe-style Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        {/* Stats strip */}
+        <div className="grid grid-cols-3 divide-x divide-zinc-200 rounded-xl border border-zinc-200 bg-white shadow-sm mb-8">
           {[
-            {
-              key: "total",
-              label: "สมาชิกทั้งหมด",
-              value: loading ? "-" : stats.total,
-            },
-            {
-              key: "online",
-              label: "ออนไลน์",
-              value: loading ? "-" : stats.online,
-              highlight: true,
-            },
-            {
-              key: "admins",
-              label: "แอดมิน",
-              value: loading ? "-" : stats.admins,
-            },
+            { key: "total", label: "สมาชิกทั้งหมด", value: loading ? "—" : stats.total },
+            { key: "online", label: "ออนไลน์", value: loading ? "—" : stats.online, highlight: true },
+            { key: "admins", label: "แอดมิน", value: loading ? "—" : stats.admins },
           ].map((stat) => (
-            <div
-              key={stat.key}
-              className="bg-white p-5 rounded-xl border border-zinc-200 shadow-sm flex flex-col justify-between"
-            >
-              <p className="text-xs font-medium text-zinc-500 mb-2">
-                {stat.label}
-              </p>
-              <div className="flex items-center gap-2">
-                <p className="text-2xl font-semibold text-zinc-900 tracking-tight">
+            <div key={stat.key} className="flex flex-col px-5 py-4">
+              <span className="text-xs font-medium text-zinc-500">{stat.label}</span>
+              <div className="mt-1 flex items-center gap-2">
+                <span className="text-2xl font-semibold tracking-tight text-zinc-900 tabular-nums">
                   {typeof stat.value === "number"
                     ? stat.value.toLocaleString("th-TH")
                     : stat.value}
-                </p>
+                </span>
                 {stat.highlight &&
                   !loading &&
                   typeof stat.value === "number" &&
                   stat.value > 0 && (
-                    <span className="relative flex h-2 w-2 ml-1">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                    </span>
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
                   )}
               </div>
             </div>
@@ -405,48 +361,46 @@ export default function AdminUsersPage() {
         {/* Data Container (Unified Toolbar + Table) */}
         <div className="bg-white rounded-xl border border-zinc-200 shadow-sm flex flex-col">
           {/* Integrated Toolbar */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between p-2 border-b border-zinc-200 gap-2">
-            <div className="flex p-1 space-x-1">
+          <div className="flex flex-col md:flex-row md:items-center justify-between p-2.5 border-b border-zinc-200 gap-2.5">
+            <div className="flex items-center gap-1.5">
               {(Object.keys(TAB_LABEL) as TabKey[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`relative px-3 py-1.5 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${
                     activeTab === tab
-                      ? "text-zinc-900 bg-zinc-100"
-                      : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50"
+                      ? "bg-blue-600 text-white"
+                      : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
                   }`}
                 >
                   {TAB_LABEL[tab]}
                   <span
-                    className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
-                      activeTab === tab
-                        ? "bg-white text-zinc-600"
-                        : "bg-zinc-100 text-zinc-400"
+                    className={`text-[11px] tabular-nums ${
+                      activeTab === tab ? "text-blue-100" : "text-zinc-400"
                     }`}
                   >
-                    {loading ? "-" : TAB_COUNT[tab]}
+                    {loading ? "—" : TAB_COUNT[tab]}
                   </span>
                 </button>
               ))}
             </div>
 
-            <div className="relative w-full md:w-64 px-1 md:px-0 md:pr-1">
+            <div className="relative w-full md:w-64">
               <Search
-                className="absolute left-3 md:left-2 top-1/2 -translate-y-1/2 text-zinc-400"
-                size={14}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                size={16}
               />
               <input
                 type="text"
-                placeholder="ค้นหาด้วยอีเมล . . ."
+                placeholder="ค้นหาด้วยอีเมล..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full bg-transparent border border-zinc-200 text-zinc-900 rounded-md pl-8 pr-8 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                className="w-full h-9 bg-white border border-zinc-200 text-zinc-900 rounded-lg pl-9 pr-9 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-zinc-400"
               />
               {searchInput && (
                 <button
                   onClick={() => setSearchInput("")}
-                  className="absolute right-3 md:right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 p-1 rounded-md transition-colors"
                 >
                   <X size={14} />
                 </button>
@@ -559,7 +513,7 @@ export default function AdminUsersPage() {
                     return (
                       <tr
                         key={u.id}
-                        className={`group transition-colors ${isSelected ? "bg-blue-50/50" : "hover:bg-zinc-50/80"}`}
+                        className={`group transition-colors ${isSelected ? "bg-blue-50/50" : "hover:bg-zinc-50"}`}
                         onClick={() => toggleSelectOne(u.id)}
                       >
                         <td className="pl-4 py-3">
@@ -577,7 +531,7 @@ export default function AdminUsersPage() {
                           <div className="flex items-center gap-2.5">
                             <div className="relative">
                               <div
-                                className={`w-6 h-6 rounded bg-linear-to-br ${getAvatarGradient(u.email)} flex items-center justify-center text-[10px] font-medium uppercase shrink-0`}
+                                className="w-6 h-6 rounded bg-zinc-100 text-zinc-600 flex items-center justify-center text-[10px] font-medium uppercase shrink-0"
                               >
                                 {u.email?.charAt(0)}
                               </div>
@@ -690,11 +644,11 @@ export default function AdminUsersPage() {
                           <AnimatePresence>
                             {openMenuId === u.id && (
                               <motion.div
-                                initial={{ opacity: 0, scale: 0.95, y: 5 }}
+                                initial={{ opacity: 0, scale: 0.98, y: 4 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95, y: 5 }}
-                                transition={{ duration: 0.1 }}
-                                className="absolute right-4 top-10 w-44 bg-white rounded-lg shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-zinc-200 py-1 z-50 overflow-hidden"
+                                exit={{ opacity: 0, scale: 0.98, y: 4 }}
+                                transition={{ duration: 0.12 }}
+                                className="absolute right-4 top-10 w-44 bg-white rounded-lg shadow-lg border border-zinc-200 py-1 z-50 overflow-hidden"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {isAdmin ? (
@@ -711,7 +665,7 @@ export default function AdminUsersPage() {
                                     className="w-full text-left px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-2"
                                   >
                                     <User size={14} className="text-zinc-400" />{" "}
-                                    Demote to User
+                                    ลดสิทธิ์เป็นผู้ใช้
                                   </button>
                                 ) : (
                                   <button
@@ -730,7 +684,7 @@ export default function AdminUsersPage() {
                                       size={14}
                                       className="text-zinc-400"
                                     />{" "}
-                                    Promote to Admin
+                                    เลื่อนเป็นแอดมิน
                                   </button>
                                 )}
                                 <div className="h-px bg-zinc-100 my-1" />
@@ -749,7 +703,7 @@ export default function AdminUsersPage() {
                                     size={14}
                                     className="text-red-500/70"
                                   />{" "}
-                                  Delete account
+                                  ลบบัญชี
                                 </button>
                               </motion.div>
                             )}
@@ -801,7 +755,7 @@ export default function AdminUsersPage() {
                         className="w-4 h-4 rounded-sm border-zinc-300 accent-blue-600 text-blue-600"
                       />
                       <div
-                        className={`w-8 h-8 rounded bg-linear-to-br ${getAvatarGradient(u.email)} flex items-center justify-center text-[11px] font-medium uppercase shrink-0`}
+                        className="w-8 h-8 rounded bg-zinc-100 text-zinc-600 flex items-center justify-center text-[11px] font-medium uppercase shrink-0"
                       >
                         {u.email?.charAt(0)}
                       </div>
@@ -842,8 +796,8 @@ export default function AdminUsersPage() {
                         className="text-left px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-100 rounded"
                       >
                         {u.role === "admin"
-                          ? "Demote to User"
-                          : "Promote to Admin"}
+                          ? "ลดสิทธิ์เป็นผู้ใช้"
+                          : "เลื่อนเป็นแอดมิน"}
                       </button>
                       <button
                         onClick={() => {
@@ -856,7 +810,7 @@ export default function AdminUsersPage() {
                         }}
                         className="text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded"
                       >
-                        Delete account
+                        ลบบัญชี
                       </button>
                     </div>
                   )}
@@ -865,34 +819,36 @@ export default function AdminUsersPage() {
             )}
           </div>
 
-          {/* Minimal Pagination */}
+          {/* Pagination */}
           {!loading && sortedUsers.length > 0 && (
             <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-200 bg-zinc-50/50">
               <p className="text-xs text-zinc-500">
+                แสดง{" "}
                 <span className="font-medium text-zinc-900">
                   {(page - 1) * ROWS_PER_PAGE + 1}
                 </span>
-                -
+                –
                 <span className="font-medium text-zinc-900">
                   {Math.min(page * ROWS_PER_PAGE, sortedUsers.length)}
                 </span>{" "}
-                of{" "}
+                จาก{" "}
                 <span className="font-medium text-zinc-900">
                   {sortedUsers.length}
-                </span>
+                </span>{" "}
+                รายการ
               </p>
               <div className="flex items-center gap-1">
                 <button
                   disabled={page === 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/50 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                  className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-zinc-500 border border-zinc-200 bg-white hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                 >
                   <ChevronLeft size={16} />
                 </button>
                 <button
                   disabled={page === totalPages}
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/50 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                  className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-zinc-500 border border-zinc-200 bg-white hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -901,44 +857,44 @@ export default function AdminUsersPage() {
           )}
         </div>
 
-        {/* Vercel-style Floating Command Bar for Bulk Actions */}
+        {/* Floating bulk-action bar */}
         <AnimatePresence>
           {selectedIds.size > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 40, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 40, scale: 0.95 }}
-              transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.15 }}
               className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
             >
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-zinc-900 text-white rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-zinc-800 backdrop-blur-md">
-                <span className="text-sm font-medium px-2">
-                  {selectedIds.size} selected
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-zinc-900 text-white rounded-xl shadow-lg border border-zinc-800">
+                <span className="text-xs font-medium px-1">
+                  เลือกแล้ว {selectedIds.size} รายการ
                 </span>
                 <div className="w-px h-4 bg-zinc-700" />
                 <button
                   onClick={() => openBulkRoleDialog("admin")}
-                  className="text-xs font-medium hover:text-white text-zinc-300 hover:bg-zinc-800 px-3 py-1.5 rounded-full transition-colors"
+                  className="text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 px-2 py-1 rounded-md transition-colors"
                 >
-                  Make Admin
+                  ตั้งเป็นแอดมิน
                 </button>
                 <button
                   onClick={() => openBulkRoleDialog("user")}
-                  className="text-xs font-medium hover:text-white text-zinc-300 hover:bg-zinc-800 px-3 py-1.5 rounded-full transition-colors"
+                  className="text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 px-2 py-1 rounded-md transition-colors"
                 >
-                  Make User
+                  ตั้งเป็นผู้ใช้
                 </button>
                 <button
                   onClick={openBulkDeleteDialog}
-                  className="text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-950/30 px-3 py-1.5 rounded-full transition-colors"
+                  className="text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-400/10 px-2 py-1 rounded-md transition-colors"
                 >
-                  Delete
+                  ลบ
                 </button>
                 <div className="w-px h-4 bg-zinc-700 ml-1" />
                 <button
                   onClick={() => setSelectedIds(new Set())}
-                  className="p-1.5 text-zinc-400 hover:text-white transition-colors rounded-full"
-                  aria-label="Clear selection"
+                  className="p-1.5 text-zinc-400 hover:text-white transition-colors rounded-md"
+                  aria-label="ล้างการเลือก"
                 >
                   <X size={14} />
                 </button>
@@ -957,53 +913,52 @@ export default function AdminUsersPage() {
               ? ""
               : dialog.type === "delete"
                 ? dialog.ids.length > 1
-                  ? `Delete ${dialog.ids.length} users`
-                  : "Delete user"
-                : "Update role"
+                  ? `ลบผู้ใช้ ${dialog.ids.length} คน`
+                  : "ลบผู้ใช้"
+                : "เปลี่ยนสิทธิ์การใช้งาน"
           }
           message={
             !dialog ? null : (
-              <span className="text-zinc-500 block mt-2 text-sm leading-relaxed">
+              <span className="block leading-relaxed">
                 {dialog.type === "delete" ? (
                   dialog.ids.length > 1 ? (
                     <>
-                      You are about to permanently delete{" "}
+                      กำลังจะลบผู้ใช้{" "}
                       <span className="font-semibold text-zinc-900">
-                        {dialog.ids.length} users
-                      </span>
-                      . This action cannot be undone and will remove all
-                      associated data.
+                        {dialog.ids.length} คน
+                      </span>{" "}
+                      อย่างถาวร รวมถึงข้อมูลที่เกี่ยวข้องทั้งหมด และกู้คืนไม่ได้
                     </>
                   ) : (
                     <>
-                      You are about to permanently delete{" "}
+                      กำลังจะลบผู้ใช้{" "}
                       <span className="font-semibold text-zinc-900">
                         {dialog.emails[0]}
-                      </span>
-                      . This action cannot be undone.
+                      </span>{" "}
+                      อย่างถาวร และกู้คืนไม่ได้
                     </>
                   )
                 ) : dialog.ids.length > 1 ? (
                   <>
-                    Are you sure you want to change the role of{" "}
+                    ยืนยันการเปลี่ยนสิทธิ์ของผู้ใช้{" "}
                     <span className="font-semibold text-zinc-900">
-                      {dialog.ids.length} users
+                      {dialog.ids.length} คน
                     </span>{" "}
-                    to{" "}
-                    <span className="font-semibold text-zinc-900 capitalize">
-                      {dialog.newRole}
+                    เป็น{" "}
+                    <span className="font-semibold text-zinc-900">
+                      {dialog.newRole === "admin" ? "แอดมิน" : "ผู้ใช้"}
                     </span>
                     ?
                   </>
                 ) : (
                   <>
-                    Are you sure you want to change the role of{" "}
+                    ยืนยันการเปลี่ยนสิทธิ์ของ{" "}
                     <span className="font-semibold text-zinc-900">
                       {dialog.emails[0]}
                     </span>{" "}
-                    to{" "}
-                    <span className="font-semibold text-zinc-900 capitalize">
-                      {dialog.newRole}
+                    เป็น{" "}
+                    <span className="font-semibold text-zinc-900">
+                      {dialog.newRole === "admin" ? "แอดมิน" : "ผู้ใช้"}
                     </span>
                     ?
                   </>
@@ -1011,10 +966,8 @@ export default function AdminUsersPage() {
               </span>
             )
           }
-          confirmText={
-            dialog?.type === "delete" ? "Delete permanently" : "Confirm"
-          }
-          cancelText="Cancel"
+          confirmText={dialog?.type === "delete" ? "ลบถาวร" : "ยืนยัน"}
+          cancelText="ยกเลิก"
           onConfirm={handleConfirmAction}
           onCancel={() => setDialog(null)}
         />
@@ -1024,7 +977,7 @@ export default function AdminUsersPage() {
 }
 
 // ============================================================
-// Vercel-style Empty State
+// Empty State
 // ============================================================
 function EmptyState({
   hasUsers,
@@ -1036,21 +989,21 @@ function EmptyState({
   onClear: () => void;
 }) {
   const title = searchQuery
-    ? "No users found"
+    ? "ไม่พบผู้ใช้"
     : hasUsers
-      ? "No matching users"
-      : "No users yet";
+      ? "ไม่มีผู้ใช้ที่ตรงกับตัวกรอง"
+      : "ยังไม่มีผู้ใช้";
 
   const subtitle = searchQuery
-    ? `Your search for "${searchQuery}" didn't match any users.`
+    ? `ไม่พบผู้ใช้ที่ตรงกับคำค้นหา "${searchQuery}"`
     : hasUsers
-      ? "Try selecting a different tab."
-      : "When new users sign up, they will appear here.";
+      ? "ลองเลือกแท็บอื่นดู"
+      : "เมื่อมีผู้ใช้สมัครเข้ามา รายชื่อจะแสดงที่นี่";
 
   return (
     <div className="flex flex-col items-center justify-center py-8">
-      <div className="w-12 h-12 bg-zinc-50 border border-zinc-200 rounded-lg flex items-center justify-center mb-4">
-        <Search size={20} className="text-zinc-400" />
+      <div className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-lg flex items-center justify-center mb-4">
+        <Search size={18} className="text-zinc-400" />
       </div>
       <h3 className="text-sm font-semibold text-zinc-900">{title}</h3>
       <p className="text-sm text-zinc-500 mt-1 max-w-sm mx-auto">{subtitle}</p>
@@ -1059,7 +1012,7 @@ function EmptyState({
           onClick={onClear}
           className="mt-4 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
         >
-          Clear search
+          ล้างการค้นหา
         </button>
       )}
     </div>

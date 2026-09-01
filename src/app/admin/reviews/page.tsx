@@ -326,10 +326,10 @@ export default function AdminReviewsPage() {
       <main className="max-w-6xl mx-auto pt-10 px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
-              จัดการการีวิวของแต่ละสถานที่
+            <h1 className="text-xl font-semibold tracking-tight text-zinc-900">
+              จัดการรีวิวของแต่ละสถานที่
             </h1>
             <p className="text-zinc-500 mt-1 text-sm">
               ตรวจสอบ ตรวจทาน และจัดการโพสต์ความคิดเห็นของผู้ใช้บนสถานที่ต่างๆ
@@ -337,10 +337,10 @@ export default function AdminReviewsPage() {
           </div>
         </div>
 
-        {/* Unified Enterprise Command Toolbar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between p-2 bg-white border border-zinc-200 rounded-xl shadow-sm gap-2 mb-6">
-          {/* Segmented Controller (Replaced raw Select Box) */}
-          <div className="flex p-1 space-x-1 bg-zinc-50 rounded-lg overflow-x-auto scrollbar-none shrink-0">
+        {/* Toolbar */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between p-2.5 bg-white border border-zinc-200 rounded-xl shadow-sm gap-2.5 mb-6">
+          {/* Category filter */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none shrink-0">
             {(["ทั้งหมด", "ที่พัก", "ร้านอาหาร", "สถานที่ท่องเที่ยว"] as CategoryType[]).map((type) => (
               <button
                 key={type}
@@ -348,10 +348,10 @@ export default function AdminReviewsPage() {
                   setActiveType(type);
                   setPage(1);
                 }}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${
+                className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${
                   activeType === type
-                    ? "bg-white text-zinc-900 shadow-sm border border-zinc-200/50"
-                    : "text-zinc-500 hover:text-zinc-900"
+                    ? "bg-blue-600 text-white"
+                    : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
                 }`}
               >
                 {type === "ทั้งหมด" ? "ทุกหมวดหมู่" : type}
@@ -360,8 +360,8 @@ export default function AdminReviewsPage() {
           </div>
 
           {/* Search Field */}
-          <div className="relative w-full md:w-64 px-1 md:px-0">
-            <Search className="absolute left-3 md:left-2 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
+          <div className="relative w-full md:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
             <input
               type="text"
               placeholder="ค้นหาชื่อสถานที่..."
@@ -370,12 +370,12 @@ export default function AdminReviewsPage() {
                 setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-transparent border border-zinc-200 text-zinc-900 rounded-md pl-8 pr-8 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+              className="w-full h-9 bg-white border border-zinc-200 text-zinc-900 rounded-lg pl-9 pr-9 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-zinc-400"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 md:right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 p-1 rounded-md transition-colors"
               >
                 <X size={14} />
               </button>
@@ -435,7 +435,7 @@ export default function AdminReviewsPage() {
                   <div
                     key={loc.target_id}
                     onClick={() => setSelectedLocation(loc)}
-                    className="group bg-white rounded-xl border border-zinc-200 shadow-sm hover:border-zinc-300 transition-all cursor-pointer overflow-hidden flex flex-col justify-between"
+                    className="group bg-white rounded-xl border border-zinc-200 shadow-sm hover:border-zinc-300 transition-colors cursor-pointer overflow-hidden flex flex-col justify-between"
                   >
                     <div>
                       <div className="relative aspect-square bg-zinc-50 overflow-hidden border-b border-zinc-100">
@@ -443,7 +443,7 @@ export default function AdminReviewsPage() {
                           <img
                             src={loc.target_image}
                             alt={loc.target_name}
-                            className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 ease-out"
+                            className="w-full h-full object-cover"
                             loading="lazy"
                           />
                         ) : (
@@ -451,8 +451,8 @@ export default function AdminReviewsPage() {
                             <ImageIcon size={32} strokeWidth={1.5} />
                           </div>
                         )}
-                        <div className="absolute top-2.5 left-2.5">
-                          <span className="bg-blue-500/90 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-0.5 rounded-md tracking-wide">
+                        <div className="absolute top-2 left-2">
+                          <span className="bg-white/95 text-zinc-700 border border-zinc-200 text-[10px] font-medium px-1.5 py-0.5 rounded">
                             {loc.target_type}
                           </span>
                         </div>
@@ -488,9 +488,9 @@ export default function AdminReviewsPage() {
           </AnimatePresence>
         </div>
 
-        {/* Pagination Console */}
+        {/* Pagination */}
         {!loading && totalPages > 1 && (
-          <div className="flex items-center justify-between mt-8 px-2 py-3 border-t border-zinc-200 bg-transparent">
+          <div className="flex items-center justify-between mt-8 px-1 py-3 border-t border-zinc-200">
             <p className="text-xs text-zinc-500">
               หน้า <span className="font-medium text-zinc-900">{page}</span> จาก <span className="font-medium text-zinc-900">{totalPages}</span>
             </p>
@@ -498,14 +498,14 @@ export default function AdminReviewsPage() {
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/50 disabled:opacity-30 disabled:pointer-events-none transition-colors border border-zinc-200 bg-white shadow-sm"
+                className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-zinc-500 border border-zinc-200 bg-white hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
               >
                 <ChevronLeft size={14} />
               </button>
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/50 disabled:opacity-30 disabled:pointer-events-none transition-colors border border-zinc-200 bg-white shadow-sm"
+                className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-zinc-500 border border-zinc-200 bg-white hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
               >
                 <ChevronRight size={14} />
               </button>
@@ -526,16 +526,16 @@ export default function AdminReviewsPage() {
               />
 
               <motion.div
-                initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                initial={{ opacity: 0, scale: 0.98, y: 8 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                transition={{ duration: 0.23, ease: "easeOut" }}
-                className="relative w-full h-[90vh] md:h-auto md:max-h-[80vh] max-w-4xl bg-white rounded-xl shadow-2xl flex flex-col md:flex-row overflow-hidden border border-zinc-200"
+                exit={{ opacity: 0, scale: 0.98, y: 8 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="relative w-full h-[90vh] md:h-auto md:max-h-[80vh] max-w-4xl bg-white rounded-xl shadow-xl flex flex-col md:flex-row overflow-hidden border border-zinc-200"
               >
                 {/* Close Button on Mobile layout */}
                 <button
                   onClick={() => setSelectedLocation(null)}
-                  className="md:hidden absolute top-3 right-3 z-50 p-1.5 bg-white/80 text-zinc-700 rounded-full border border-zinc-200 shadow-sm backdrop-blur-sm"
+                  className="md:hidden absolute top-3 right-3 z-50 p-1.5 bg-white text-zinc-700 rounded-lg border border-zinc-200 shadow-sm"
                 >
                   <X size={16} />
                 </button>
@@ -554,7 +554,7 @@ export default function AdminReviewsPage() {
                       <p className="text-xs">ไม่มีรูปภาพสถานที่</p>
                     </div>
                   )}
-                  <div className="hidden md:block absolute top-3 left-3 bg-zinc-900/90 backdrop-blur-sm text-white text-[11px] font-medium px-2 py-0.5 rounded-md">
+                  <div className="hidden md:block absolute top-3 left-3 bg-zinc-900/85 text-white text-[11px] font-medium px-2 py-0.5 rounded-md">
                     {selectedLocation.target_type}
                   </div>
                 </div>
@@ -593,13 +593,13 @@ export default function AdminReviewsPage() {
                     {selectedLocation.reviews.map((r) => (
                       <div key={r.id} className="flex gap-3 items-start group">
                         {/* Elegant Minimal Initial Circle */}
-                        <div className="w-7 h-7 rounded-md bg-zinc-100 border border-zinc-200/60 flex items-center justify-center text-zinc-700 font-medium text-xs shrink-0 select-none">
+                        <div className="w-7 h-7 rounded-md bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-600 font-medium text-xs shrink-0 select-none">
                           {r.created_by.charAt(0).toUpperCase()}
                         </div>
 
                         {/* Speech Block */}
                         <div className="flex-1 min-w-0">
-                          <div className="bg-zinc-50 border border-zinc-200/70 p-3 rounded-lg rounded-tl-none">
+                          <div className="bg-zinc-50 border border-zinc-200 p-3 rounded-lg rounded-tl-none">
                             <div className="flex justify-between items-center mb-1 gap-2">
                               <span className="font-medium text-xs text-zinc-500 truncate" title={r.created_by}>
                                 ID: {r.created_by.slice(0, 8)}...
@@ -640,13 +640,13 @@ export default function AdminReviewsPage() {
           open={!!deleteConfirm}
           danger={true}
           loading={isDeleting}
-          title="Delete Review Log"
+          title="ลบรีวิว"
           message={
-            <span className="text-zinc-500 text-sm block mt-2 leading-relaxed">
-              คุณแน่ใจหรือไม่ว่าต้องการลบรายการรีวิวนี้? การดำเนินการนี้จะทำลายข้อมูลคอมเมนต์และคะแนนประเมินออกไปอย่าง <span className="font-semibold text-red-600">ถาวรจากระบบ</span> โดยไม่สามารถกู้คืนได้
+            <span className="block leading-relaxed">
+              คุณแน่ใจหรือไม่ว่าต้องการลบรายการรีวิวนี้? ข้อมูลคอมเมนต์และคะแนนจะถูก <span className="font-semibold text-zinc-900">ลบอย่างถาวร</span> โดยไม่สามารถกู้คืนได้
             </span>
           }
-          confirmText="ลบข้อมูลถาวร"
+          confirmText="ลบถาวร"
           cancelText="ยกเลิก"
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeleteConfirm(null)}

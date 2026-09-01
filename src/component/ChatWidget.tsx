@@ -72,7 +72,7 @@ const KIND_META: Record<
   destination: {
     label: "ที่เที่ยว",
     icon: MapPin,
-    className: "bg-emerald-50 text-emerald-700",
+    className: "bg-amber-50 text-amber-700",
   },
   restaurant: {
     label: "ของกิน",
@@ -82,7 +82,7 @@ const KIND_META: Record<
   accommodation: {
     label: "ที่พัก",
     icon: BedDouble,
-    className: "bg-sky-50 text-sky-700",
+    className: "bg-amber-50 text-amber-700",
   },
 };
 
@@ -104,7 +104,7 @@ function PlaceCardItem({ place }: { place: PlaceCard }) {
   return (
     <Link
       href={place.url}
-      className="flex gap-3 rounded-2xl border border-neutral-200 bg-white p-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50/40"
+      className="flex gap-3 rounded-2xl border border-neutral-200 bg-white p-2.5 transition-all duration-200  hover:border-amber-300 hover:bg-amber-50/40"
     >
       {place.imageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -359,7 +359,7 @@ export default function ChatWidget() {
                     scale: 0.9,
                   }}
                   transition={{
-                    type: "spring",
+                    type: "tween", ease: "easeOut",
                     stiffness: 400,
                     damping: 25,
                   }}
@@ -374,16 +374,16 @@ export default function ChatWidget() {
                     w-[245px]
                     rounded-2xl
                     border
-                    border-emerald-100
+                    border-amber-100
                     bg-white
                     px-4
                     py-3
                     text-left
                     shadow-xl
-                    shadow-emerald-900/10
+                    
                     transition-all
-                    hover:-translate-y-0.5
-                    hover:shadow-2xl
+                    
+                    hover:shadow-xl
                   "
                 >
                   {/* Bubble Arrow */}
@@ -397,7 +397,7 @@ export default function ChatWidget() {
                       rotate-45
                       border-b
                       border-r
-                      border-emerald-100
+                      border-amber-100
                       bg-white
                     "
                   />
@@ -415,8 +415,8 @@ export default function ChatWidget() {
                         overflow-hidden
                         rounded-full
                         border-2
-                        border-emerald-100
-                        bg-emerald-50
+                        border-amber-100
+                        bg-amber-50
                       "
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -438,7 +438,7 @@ export default function ChatWidget() {
                     </div>
 
                     <div>
-                      <p className="text-xs font-semibold text-emerald-700">
+                      <p className="text-xs font-semibold text-amber-700">
                         บอทน้อยน้องโรมี่ ♡
                       </p>
 
@@ -472,7 +472,7 @@ export default function ChatWidget() {
                 scale: 0.94,
               }}
               transition={{
-                type: "spring",
+                type: "tween", ease: "easeOut",
                 stiffness: 400,
                 damping: 22,
               }}
@@ -493,35 +493,10 @@ export default function ChatWidget() {
                 rounded-full
                 border-[3px]
                 border-white
-                bg-gradient-to-br
-                from-emerald-400
-                via-emerald-500
-                to-teal-600
-                shadow-xl
-                shadow-emerald-600/30
+                bg-amber-500
+                shadow-lg
               "
             >
-
-              {/* Glow ด้านหลัง */}
-
-              <motion.div
-                animate={{
-                  scale: [1, 1.15, 1],
-                  opacity: [0.2, 0.4, 0.2],
-                }}
-                transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="
-                  absolute
-                  inset-0
-                  z-0
-                  rounded-full
-                  bg-white/20
-                "
-              />
 
               {/* ═══════════════════════════
                   รูปบอทน้อยน้องโรมี่
@@ -544,7 +519,7 @@ export default function ChatWidget() {
                   object-[50%_8%]
                   transition-transform
                   duration-300
-                  group-hover:scale-105
+                  group-
                 "
               />
 
@@ -593,7 +568,7 @@ export default function ChatWidget() {
               scale: 0.96,
             }}
             transition={{
-              type: "spring",
+              type: "tween", ease: "easeOut",
               stiffness: 380,
               damping: 30,
             }}
@@ -606,11 +581,11 @@ export default function ChatWidget() {
               h-[min(600px,85vh)]
               flex-col
               overflow-hidden
-              rounded-3xl
+              rounded-2xl
               border
               border-neutral-200
               bg-white
-              shadow-2xl
+              shadow-xl
               sm:inset-x-auto
               sm:right-5
               sm:bottom-5
@@ -627,10 +602,7 @@ export default function ChatWidget() {
                 flex
                 items-center
                 gap-3
-                bg-gradient-to-r
-                from-emerald-600
-                via-emerald-500
-                to-teal-500
+                bg-amber-600
                 px-4
                 py-3.5
                 text-white
@@ -651,7 +623,7 @@ export default function ChatWidget() {
                   rounded-full
                   border-2
                   border-white/80
-                  bg-emerald-100
+                  bg-amber-100
                   shadow-md
                 "
               >
@@ -699,7 +671,7 @@ export default function ChatWidget() {
                   <Sparkles className="h-3.5 w-3.5" />
                 </div>
 
-                <p className="text-[11px] text-emerald-50">
+                <p className="text-[11px] text-amber-50">
                   บอทน้อยโรมี่จะเป็นผู้ช่วยแนะนำการท่องเที่ยวในโคราชให้เองครับ
                 </p>
               </div>
@@ -748,10 +720,7 @@ export default function ChatWidget() {
                 flex-1
                 space-y-3
                 overflow-y-auto
-                bg-gradient-to-b
-                from-emerald-50/40
-                via-neutral-50
-                to-white
+                bg-neutral-50
                 px-3.5
                 py-4
               "
@@ -776,8 +745,8 @@ export default function ChatWidget() {
                         overflow-hidden
                         rounded-full
                         border
-                        border-emerald-100
-                        bg-emerald-50
+                        border-amber-100
+                        bg-amber-50
                       "
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -806,7 +775,7 @@ export default function ChatWidget() {
                         rounded-2xl
                         rounded-tl-md
                         border
-                        border-emerald-100
+                        border-amber-100
                         bg-white
                         px-3.5
                         py-2.5
@@ -834,16 +803,16 @@ export default function ChatWidget() {
                         className="
                           rounded-full
                           border
-                          border-emerald-200
+                          border-amber-200
                           bg-white
                           px-3
                           py-1.5
                           text-xs
-                          text-emerald-700
+                          text-amber-700
                           shadow-sm
                           transition-all
-                          hover:-translate-y-0.5
-                          hover:bg-emerald-50
+                          
+                          hover:bg-amber-50
                           hover:shadow
                         "
                       >
@@ -869,7 +838,7 @@ export default function ChatWidget() {
                           max-w-[85%]
                           rounded-2xl
                           rounded-tr-md
-                          bg-emerald-600
+                          bg-amber-600
                           px-3.5
                           py-2.5
                           text-sm
@@ -893,8 +862,8 @@ export default function ChatWidget() {
                           overflow-hidden
                           rounded-full
                           border
-                          border-emerald-100
-                          bg-emerald-50
+                          border-amber-100
+                          bg-amber-50
                         "
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -977,8 +946,8 @@ export default function ChatWidget() {
                       overflow-hidden
                       rounded-full
                       border
-                      border-emerald-100
-                      bg-emerald-50
+                      border-amber-100
+                      bg-amber-50
                     "
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1020,7 +989,7 @@ export default function ChatWidget() {
                         h-4
                         w-4
                         animate-spin
-                        text-emerald-500
+                        text-amber-500
                       "
                     />
 
@@ -1074,7 +1043,7 @@ export default function ChatWidget() {
                   placeholder:text-neutral-400
                   focus:bg-white
                   focus:ring-2
-                  focus:ring-emerald-500/40
+                  focus:ring-amber-500/40
                   disabled:opacity-60
                 "
               />
@@ -1094,11 +1063,11 @@ export default function ChatWidget() {
                   items-center
                   justify-center
                   rounded-full
-                  bg-emerald-600
+                  bg-amber-600
                   text-white
                   transition-all
-                  hover:scale-105
-                  hover:bg-emerald-700
+                  
+                  hover:bg-amber-700
                   disabled:cursor-not-allowed
                   disabled:bg-neutral-300
                 "

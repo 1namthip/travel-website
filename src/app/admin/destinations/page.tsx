@@ -21,7 +21,6 @@ import {
   Inbox,
   Filter,
   Plus,
-  Map,
   X,
   Check,
   ChevronDown,
@@ -567,63 +566,26 @@ export default function AdminDestinationsPage() {
   return (
     <div className="min-h-screen bg-zinc-50 pb-24 font-sans text-zinc-900 selection:bg-blue-100 selection:text-blue-900">
       <main className="max-w-6xl mx-auto pt-10 px-4 sm:px-6 lg:px-8">
-        {/* ─── 1. PREMIUM HEADER ─── */}
+        {/* ─── 1. HEADER ─── */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8"
+          className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-end sm:justify-between"
         >
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br
-    from-blue-600
-    via-blue-500
-    to-indigo-700
-    border border-white/10
-    shadow-[0_8px_30px_rgba(37,99,235,0.35)]
-    hover:shadow-[0_12px_40px_rgba(37,99,235,0.5)] text-white"
-            >
-              <Map size={22} strokeWidth={2.2} />
-            </div>
-
-            <div>
-              <h1 className="text-2xl font-bold text-zinc-900">
-                จัดการสถานที่ท่องเที่ยว
-              </h1>
-
-              <p className="mt-1 text-sm text-zinc-500">
-                จัดการฐานข้อมูลสถานที่ท่องเที่ยว จุดเช็คอิน และแลนด์มาร์ค
-              </p>
-            </div>
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-zinc-900">
+              จัดการสถานที่ท่องเที่ยว
+            </h1>
+            <p className="mt-1 text-sm text-zinc-500">
+              จัดการฐานข้อมูลสถานที่ท่องเที่ยว จุดเช็คอิน และแลนด์มาร์ค
+            </p>
           </div>
 
           <button
             onClick={() => handleOpenModal()}
-            className="
-    group relative overflow-hidden
-    w-full sm:w-auto
-    rounded-xl
-    px-5 py-2.5
-    text-sm font-semibold tracking-wide
-    text-white
-    bg-linear-to-br
-    from-blue-600
-    to-blue-500
-    border border-white/10
-    shadow-[0_8px_30px_rgba(37,99,235,0.35)]
-    hover:shadow-[0_12px_40px_rgba(37,99,235,0.5)]
-    transition-all duration-300
-    hover:-translate-y-0.5
-    active:translate-y-0
-    active:scale-[0.98]
-    flex items-center justify-center gap-2
-  "
+            className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 sm:w-auto"
           >
-            <Plus
-              size={16}
-              strokeWidth={2.5}
-              className="transition-transform duration-300 group-hover:rotate-90"
-            />
+            <Plus size={16} />
             เพิ่มสถานที่ใหม่
           </button>
         </motion.div>
@@ -642,57 +604,27 @@ export default function AdminDestinationsPage() {
           )}
         </AnimatePresence>
 
-        {/* ─── STATS PANELS ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        {/* ─── STATS STRIP ─── */}
+        <div className="grid grid-cols-3 divide-x divide-zinc-200 rounded-xl border border-zinc-200 bg-white shadow-sm mb-6">
           {[
-            {
-              label: "Total Destinations",
-              value: stats.total,
-              color: "bg-blue-600",
-            },
-            {
-              label: "Free Entry",
-              value: stats.free,
-              color: "bg-emerald-500",
-              dot: true,
-            },
-            {
-              label: "Paid Entry",
-              value: stats.paid,
-              color: "bg-blue-500",
-              dot: true,
-            },
-          ].map((stat, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-              className="bg-white p-5 rounded-xl border border-zinc-200 shadow-sm flex flex-col"
-            >
-              <div className="flex items-center gap-1.5 mb-1 text-zinc-500 select-none">
-                {stat.dot && (
-                  <span className={`w-1.5 h-1.5 rounded-full ${stat.color}`} />
-                )}
-                <p className="text-xs font-medium">{stat.label}</p>
-              </div>
-              <p className="text-2xl font-semibold text-zinc-900 tracking-tight">
-                {loading ? "-" : stat.value}
-              </p>
-            </motion.div>
+            { label: "ทั้งหมด", value: stats.total },
+            { label: "เข้าฟรี", value: stats.free },
+            { label: "มีค่าเข้าชม", value: stats.paid },
+          ].map((stat) => (
+            <div key={stat.label} className="flex flex-col px-5 py-4">
+              <span className="text-xs font-medium text-zinc-500">{stat.label}</span>
+              <span className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 tabular-nums">
+                {loading ? "—" : stat.value}
+              </span>
+            </div>
           ))}
         </div>
 
-        {/* ─── 2. THE UNIFIED COMMAND BOX ─── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08 }}
-          className="bg-white p-3 rounded-2xl border border-zinc-200/80 shadow-sm mb-6 space-y-3"
-        >
+        {/* ─── 2. TOOLBAR ─── */}
+        <div className="bg-white p-2.5 rounded-xl border border-zinc-200 shadow-sm mb-6 space-y-2.5">
           <div className="relative flex items-center">
             <Search
-              className="absolute left-3.5 text-zinc-400 pointer-events-none"
+              className="absolute left-3 text-zinc-400 pointer-events-none"
               size={16}
             />
             <input
@@ -704,22 +636,22 @@ export default function AdminDestinationsPage() {
                 setPage(1);
                 setSelectedIds([]);
               }}
-              className="w-full pl-10 pr-9 py-2.5 bg-zinc-50/80 hover:bg-zinc-100/50 focus:bg-white border border-zinc-200/80 focus:border-zinc-400 rounded-xl text-xs text-zinc-900 placeholder:text-zinc-400 transition-all outline-none"
+              className="w-full h-9 pl-9 pr-9 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 text-zinc-400 hover:text-zinc-600 p-1 rounded-md transition-colors"
+                className="absolute right-2.5 text-zinc-400 hover:text-zinc-600 p-1 rounded-md transition-colors"
               >
                 <X size={14} />
               </button>
             )}
           </div>
 
-          <div className="flex items-center justify-between overflow-x-auto pt-0.5 pb-1 scrollbar-none">
+          <div className="flex items-center justify-between overflow-x-auto pb-0.5 scrollbar-none">
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider pl-1 pr-1.5 flex items-center gap-1 shrink-0 select-none">
-                <Filter size={12} /> หมวดหมู่:
+              <span className="text-[11px] font-medium text-zinc-400 pr-1 flex items-center gap-1 shrink-0 select-none">
+                <Filter size={11} /> หมวดหมู่
               </span>
               {CATEGORIES.map((tab) => (
                 <button
@@ -729,9 +661,9 @@ export default function AdminDestinationsPage() {
                     setPage(1);
                     setSelectedIds([]); // หรือ [] ถ้าทำตามข้อ 3 ด้านล่าง
                   }}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all shrink-0 select-none ${activeCategory === tab
-                      ? "bg-blue-600 text-white font-semibold shadow-sm"
-                      : "text-slate-500 hover:bg-slate-100 hover:text-blue-600"
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors shrink-0 select-none ${activeCategory === tab
+                      ? "bg-blue-600 text-white"
+                      : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
                     }`}
                 >
                   {tab}
@@ -757,9 +689,9 @@ export default function AdminDestinationsPage() {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
-        {/* ─── 3. CORE CARD STREAM ─── */}
+        {/* ─── 3. CONTENT LIST ─── */}
         <div className="min-h-100 space-y-4">
           <AnimatePresence mode="wait">
             {loading ? (
@@ -771,9 +703,9 @@ export default function AdminDestinationsPage() {
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white border border-zinc-200/80 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row gap-5 animate-pulse"
+                    className="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-5 animate-pulse"
                   >
-                    <div className="w-full sm:w-60 aspect-16/10 rounded-xl bg-zinc-100 shrink-0" />
+                    <div className="w-full sm:w-60 aspect-16/10 rounded-lg bg-zinc-100 shrink-0" />
                     <div className="flex-1 flex flex-col justify-between py-1 space-y-4">
                       <div className="space-y-2.5">
                         <div className="h-3.5 bg-zinc-100 rounded w-1/3" />
@@ -793,10 +725,10 @@ export default function AdminDestinationsPage() {
                 key="empty"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="bg-white border border-zinc-200 rounded-2xl p-16 text-center flex flex-col items-center justify-center border-dashed"
+                className="bg-white border border-dashed border-zinc-200 rounded-xl p-16 text-center flex flex-col items-center justify-center"
               >
-                <div className="w-12 h-12 bg-zinc-50 border border-zinc-200 rounded-2xl flex items-center justify-center mb-3 text-zinc-400">
-                  <Inbox size={20} />
+                <div className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-lg flex items-center justify-center mb-3 text-zinc-400">
+                  <Inbox size={18} />
                 </div>
                 <h3 className="text-sm font-semibold text-zinc-900">
                   ไม่พบสถานที่ท่องเที่ยว
@@ -807,7 +739,7 @@ export default function AdminDestinationsPage() {
               </motion.div>
             ) : (
               <motion.div key="card-list" layout className="space-y-4">
-                {displayedDestinations.map((d, index) => {
+                {displayedDestinations.map((d) => {
                   const isSelected = selectedIds.includes(d.id);
                   const parsedImages = parseImageUrl(d.image_url || "");
                   const displayImgUrl =
@@ -816,19 +748,19 @@ export default function AdminDestinationsPage() {
                   return (
                     <motion.div
                       layout
-                      initial={{ opacity: 0, y: 15 }}
+                      initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.98 }}
-                      transition={{ duration: 0.2, delay: index * 0.04 }}
+                      transition={{ duration: 0.16 }}
                       key={d.id}
                       onClick={() => handleOpenModal(d)}
-                      className={`group bg-white rounded-2xl p-4 transition-all flex flex-col sm:flex-row gap-5 relative cursor-pointer border ${isSelected
-                          ? "border-blue-900 shadow-md ring-1 ring-blue-900/10 bg-blue-50/40"
-                          : "border-blue-200/80 shadow-sm hover:shadow-md hover:border-blue-300"
+                      className={`group bg-white rounded-xl p-4 shadow-sm transition-colors flex flex-col sm:flex-row gap-5 relative cursor-pointer border ${isSelected
+                          ? "border-blue-600 ring-1 ring-blue-600/10 bg-blue-50/40"
+                          : "border-zinc-200 hover:border-zinc-300"
                         }`}
                     >
                       {/* THUMBNAIL BLOCK */}
-                      <div className="relative w-full sm:w-60 aspect-16/10 shrink-0 rounded-xl overflow-hidden bg-zinc-100 border border-blue-200/50 flex items-center justify-center">
+                      <div className="relative w-full sm:w-60 aspect-16/10 shrink-0 rounded-lg overflow-hidden bg-zinc-100 border border-zinc-100 flex items-center justify-center">
                         {displayImgUrl ? (
                           <>
                             <Image
@@ -836,10 +768,10 @@ export default function AdminDestinationsPage() {
                               alt={d.name}
                               fill
                               sizes="(max-width: 640px) 100vw, 240px"
-                              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                              className="object-cover"
                             />
                             {parsedImages.length > 1 && (
-                              <div className="absolute bottom-2 right-2 bg-zinc-900/70 backdrop-blur-md text-white text-[11px] font-medium px-2 py-0.5 rounded-md">
+                              <div className="absolute bottom-2 right-2 bg-zinc-900/70 text-white text-[10px] font-medium px-1.5 py-0.5 rounded">
                                 +{parsedImages.length - 1} รูป
                               </div>
                             )}
@@ -849,10 +781,10 @@ export default function AdminDestinationsPage() {
                         )}
 
                         <div
-                          className="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10"
+                          className="absolute top-2 left-2 flex items-center gap-1.5 z-10"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <span className="bg-pink-400/75 border-[#EC4899] shadow-pink-200 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wider shadow-sm">
+                          <span className="bg-white/95 text-zinc-700 border border-zinc-200 text-[10px] font-medium px-1.5 py-0.5 rounded">
                             สถานที่ท่องเที่ยว
                           </span>
                         </div>
@@ -875,10 +807,10 @@ export default function AdminDestinationsPage() {
                             <AnimatePresence>
                               {openCardMenuId === d.id && (
                                 <motion.div
-                                  initial={{ opacity: 0, scale: 0.95, y: 5 }}
+                                  initial={{ opacity: 0, scale: 0.98, y: 4 }}
                                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                                  exit={{ opacity: 0, scale: 0.95, y: 5 }}
-                                  className="absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-zinc-200 py-1 z-50 text-left overflow-hidden"
+                                  exit={{ opacity: 0, scale: 0.98, y: 4 }}
+                                  className="absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-lg border border-zinc-200 py-1 z-50 text-left overflow-hidden"
                                 >
                                   <button
                                     onClick={() => {
@@ -915,31 +847,31 @@ export default function AdminDestinationsPage() {
                             </AnimatePresence>
                           </div>
 
-                          <div className="flex items-center gap-2 text-xs text-blue-800 font-medium truncate mb-1.5 pr-6">
+                          <div className="flex items-center gap-2 text-[11px] text-zinc-500 font-medium truncate mb-1 pr-6">
                             <span>{d.category || "ทั่วไป"}</span>
                             <span className="text-zinc-300">•</span>
                             <span className="truncate">จุดท่องเที่ยวแนะนำ</span>
                           </div>
 
-                          <h3 className="text-lg font-bold text-zinc-900 tracking-tight truncate leading-tight">
+                          <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight truncate leading-snug">
                             {d.name}
                           </h3>
 
-                          <p className="text-sm text-zinc-500 mt-2 line-clamp-2 leading-relaxed pr-4">
+                          <p className="text-sm text-zinc-500 mt-1.5 line-clamp-2 leading-relaxed pr-4">
                             {d.description ||
                               "ไม่มีคำอธิบายเพิ่มเติมสำหรับสถานที่นี้"}
                           </p>
                         </div>
 
-                        {/* Faint Footer Bar */}
+                        {/* Footer meta */}
                         <div className="mt-4 pt-3 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-400">
                           <div className="flex items-center gap-3 truncate">
-                            <span className="italic text-zinc-400">
+                            <span className="text-zinc-400">
                               เปิดให้บริการทุกวัน
                             </span>
                           </div>
 
-                          <div className="font-bold text-zinc-900 text-sm shrink-0 pl-2">
+                          <div className="font-semibold text-zinc-900 text-sm shrink-0 pl-2">
                             {d.max_price === 0 && d.min_price === 0 ? (
                               <span className="text-emerald-600">
                                 เข้าชมฟรี
@@ -958,32 +890,32 @@ export default function AdminDestinationsPage() {
           </AnimatePresence>
         </div>
 
-        {/* ─── PREMIUM PAGINATION ─── */}
+        {/* ─── PAGINATION ─── */}
         {!loading && totalPages > 1 && (
           <div className="flex items-center justify-between mt-8 px-1">
-            <p className="hidden sm:block text-xs text-zinc-400 font-medium">
-              Showing{" "}
-              <span className="text-zinc-900">
+            <p className="hidden sm:block text-xs text-zinc-500">
+              แสดง{" "}
+              <span className="font-medium text-zinc-900">
                 {(page - 1) * itemsPerPage + 1}
-              </span>{" "}
-              to{" "}
-              <span className="text-zinc-900">
+              </span>
+              –
+              <span className="font-medium text-zinc-900">
                 {Math.min(page * itemsPerPage, filteredDestinations.length)}
               </span>{" "}
-              of{" "}
-              <span className="text-zinc-900">
+              จาก{" "}
+              <span className="font-medium text-zinc-900">
                 {filteredDestinations.length}
               </span>{" "}
-              entries
+              รายการ
             </p>
-            <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-blue-600 bg-white border border-blue-200 rounded-md hover:bg-blue-50 hover:text-blue-900 disabled:opacity-30 transition-all"
+                className="inline-flex items-center gap-1 h-8 px-2.5 text-xs font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
               >
                 <ChevronLeft size={14} />
-                <span>Previous</span>
+                <span>ก่อนหน้า</span>
               </button>
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -991,7 +923,7 @@ export default function AdminDestinationsPage() {
                     <button
                       key={pNum}
                       onClick={() => setPage(pNum)}
-                      className={`w-7 h-7 rounded-md text-xs font-medium transition-all flex items-center justify-center ${page === pNum ? "bg-blue-800 text-white font-semibold" : "text-blue-500 hover:bg-blue-100"}`}
+                      className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors flex items-center justify-center ${page === pNum ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"}`}
                     >
                       {pNum}
                     </button>
@@ -1001,28 +933,29 @@ export default function AdminDestinationsPage() {
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-blue-600 bg-white border border-blue-200 rounded-md hover:bg-blue-50 hover:text-zinc-900 disabled:opacity-30 transition-all"
+                className="inline-flex items-center gap-1 h-8 px-2.5 text-xs font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
               >
-                <span>Next</span>
+                <span>ถัดไป</span>
                 <ChevronRight size={14} />
               </button>
             </div>
           </div>
         )}
 
-        {/* ─── VERCEL-STYLE FLOATING COMMAND BAR ─── */}
+        {/* ─── FLOATING BULK-ACTION BAR ─── */}
         <AnimatePresence>
           {selectedIds.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 40, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 40, scale: 0.95 }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.15 }}
               className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
             >
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-zinc-900 text-white rounded-full shadow-2xl border border-zinc-800 text-xs font-medium">
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-zinc-900 text-white rounded-xl shadow-lg border border-zinc-800 text-xs font-medium">
                 <span className="text-zinc-300">
                   เลือกแล้ว{" "}
-                  <span className="text-white font-bold">
+                  <span className="text-white font-semibold">
                     {selectedIds.length}
                   </span>{" "}
                   รายการ
@@ -1033,19 +966,19 @@ export default function AdminDestinationsPage() {
                     setBulkDialog({
                       type: "delete",
                       ids: Array.from(selectedIds),
-                      title: "Delete Destinations",
+                      title: "ลบสถานที่ท่องเที่ยว",
                       message: `ยืนยันการลบสถานที่ท่องเที่ยว ${selectedIds.length} รายการอย่างถาวร?`,
                     })
                   }
-                  className="text-red-400 hover:text-red-300 px-2 py-1 rounded transition-colors"
+                  className="text-red-400 hover:text-red-300 px-2 py-1 rounded-md transition-colors"
                 >
-                  Delete Selected
+                  ลบรายการที่เลือก
                 </button>
                 <div className="w-px h-4 bg-zinc-700 ml-1" />
                 <button
                   onClick={() => setSelectedIds([])}
-                  className="p-1.5 text-zinc-400 hover:text-white transition-colors rounded-full"
-                  aria-label="Clear"
+                  className="p-1.5 text-zinc-400 hover:text-white transition-colors rounded-md"
+                  aria-label="ล้างการเลือก"
                 >
                   <X size={12} />
                 </button>
@@ -1066,23 +999,22 @@ export default function AdminDestinationsPage() {
                 className="absolute inset-0 bg-zinc-950/40 backdrop-blur-sm"
               />
               <motion.div
-                initial={{ opacity: 0, scale: 0.96, y: 15 }}
+                initial={{ opacity: 0, scale: 0.98, y: 8 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.96, y: 15 }}
-                transition={{ duration: 0.23, ease: "easeOut" }}
-                className="relative w-full max-w-2xl bg-white rounded-xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-zinc-200/50 flex flex-col max-h-[85vh] overflow-hidden"
+                exit={{ opacity: 0, scale: 0.98, y: 8 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl border border-zinc-200 flex flex-col max-h-[85vh] overflow-hidden"
               >
                 <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white z-10 shrink-0">
                   <div>
-                    <h2 className="text-[16px] font-semibold text-zinc-900 tracking-tight flex items-center gap-2">
-                      <Map size={16} className="text-zinc-500" />
+                    <h2 className="text-[15px] font-semibold text-zinc-900 tracking-tight">
                       {editingDestination
-                        ? "Edit Destination"
-                        : "New Destination"}
+                        ? "แก้ไขข้อมูลสถานที่ท่องเที่ยว"
+                        : "เพิ่มสถานที่ท่องเที่ยวใหม่"}
                     </h2>
                     <p className="text-xs text-zinc-400 mt-0.5">
                       {editingDestination
-                        ? "แก้ไขข้อมูลสถานที่ท่องเที่ยว"
+                        ? "ปรับปรุงรายละเอียดของสถานที่ในระบบ"
                         : "เพิ่มจุดเช็คอินใหม่เข้าสู่ระบบ"}
                     </p>
                   </div>
@@ -1222,7 +1154,7 @@ export default function AdminDestinationsPage() {
                           onChange={(e) =>
                             setFormData({ ...formData, name: e.target.value })
                           }
-                          className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                          className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors placeholder:text-zinc-400"
                           placeholder="เช่น น้ำตกเอราวัณ"
                         />
                       </div>
@@ -1239,7 +1171,7 @@ export default function AdminDestinationsPage() {
                           <button
                             type="button"
                             onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                            className={`w-full pl-3 pr-3 py-2 text-sm border rounded-lg bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 ${isCategoryOpen ? "border-zinc-400 ring-4 ring-zinc-900/5" : "border-zinc-200 hover:border-zinc-300"} text-zinc-900`}
+                            className={`w-full pl-3 pr-3 py-2 text-sm border rounded-lg bg-white transition-colors flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${isCategoryOpen ? "border-blue-500 ring-2 ring-blue-500/20" : "border-zinc-200 hover:border-zinc-300"} text-zinc-900`}
                           >
                             <span>{formData.category}</span>
                             <ChevronDown
@@ -1254,7 +1186,7 @@ export default function AdminDestinationsPage() {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 4, scale: 0.98 }}
                                 transition={{ duration: 0.13 }}
-                                className="absolute z-50 w-full mt-1 bg-white border border-zinc-200 rounded-lg shadow-[0_12px_30px_-10px_rgba(0,0,0,0.1)] py-1 overflow-hidden"
+                                className="absolute z-50 w-full mt-1 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 overflow-hidden"
                               >
                                 <div className="max-h-48 overflow-y-auto custom-scrollbar">
                                   {CATEGORIES.filter(
@@ -1302,7 +1234,7 @@ export default function AdminDestinationsPage() {
                             })
                           }
                           rows={3}
-                          className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400 resize-none leading-relaxed"
+                          className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors placeholder:text-zinc-400 resize-none leading-relaxed"
                           placeholder="ประวัติ, จุดเด่น, หรือข้อมูลการเดินทาง..."
                         />
                       </div>
@@ -1324,7 +1256,7 @@ export default function AdminDestinationsPage() {
                               min_price: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                          className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors placeholder:text-zinc-400"
                           placeholder="0"
                         />
                       </div>
@@ -1346,7 +1278,7 @@ export default function AdminDestinationsPage() {
                               max_price: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                          className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors placeholder:text-zinc-400"
                           placeholder="0"
                         />
                       </div>
@@ -1359,7 +1291,7 @@ export default function AdminDestinationsPage() {
                     type="button"
                     onClick={handleCloseModal}
                     disabled={isSubmitting}
-                    className="px-4 py-2 text-[13px] font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] transition-all disabled:opacity-50"
+                    className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-50"
                   >
                     ยกเลิก
                   </button>
@@ -1367,7 +1299,7 @@ export default function AdminDestinationsPage() {
                     form="destination-modal-form"
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-4 py-2 text-[13px] font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 shadow-sm active:scale-[0.98] transition-all disabled:opacity-70 flex items-center justify-center min-w-30"
+                    className="inline-flex h-9 min-w-30 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:opacity-70"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">

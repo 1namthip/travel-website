@@ -26,11 +26,11 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-neutral-50">
       <Navbar />
       <HeroSection />
 
-      <section className="min-w-7xl mx-auto px-4 py-8 bg-linear-to-br from-amber-50 to-orange-50">
+      <section className="max-w-7xl mx-auto px-4 py-8 bg-amber-50/40">
         <CategorySection />
         { <BudgetTripPlannerWrapper isLoggedIn={!!user} /> }
       </section>

@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 import RestaurantsTable from "@/component/RestaurantsTable";
 import RestaurantModal from "@/component/RestaurantModal";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, Store, Filter, X, UtensilsCrossed } from "lucide-react";
+import { Plus, Search, Filter, X, UtensilsCrossed } from "lucide-react";
 
 export default function AdminRestaurantsPage() {
   const [restaurants, setRestaurants] = useState<any[]>([]);
@@ -96,81 +96,33 @@ export default function AdminRestaurantsPage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ─── Premium Header Section ─── */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8"
+          className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-end sm:justify-between"
         >
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br
-    from-blue-600
-    via-blue-500
-    to-indigo-700
-    border border-white/10
-    shadow-[0_8px_30px_rgba(37,99,235,0.35)]
-    hover:shadow-[0_12px_40px_rgba(37,99,235,0.5)] text-white"
-            >
-              <Store size={22} strokeWidth={2.2} />
-            </div>
-
-            <div>
-              <h1 className="text-2xl font-bold text-zinc-900">
-                จัดการร้านอาหารและคาเฟ่
-              </h1>
-
-              <p className="mt-1 text-sm text-zinc-500">
-                จัดการข้อมูลร้านอาหาร เมนูแนะนำ รีวิว และตำแหน่งบนแผนที่
-              </p>
-            </div>
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-zinc-900">
+              จัดการร้านอาหารและคาเฟ่
+            </h1>
+            <p className="mt-1 text-sm text-zinc-500">
+              จัดการข้อมูลร้านอาหาร เมนูแนะนำ รีวิว และตำแหน่งบนแผนที่
+            </p>
           </div>
 
           <button
             onClick={handleOpenModal}
-            className="
-    group relative overflow-hidden
-    w-full sm:w-auto
-    rounded-xl
-    px-5 py-2.5
-    text-sm font-semibold tracking-wide
-    text-white
-    bg-linear-to-br
-    from-blue-600
-    to-blue-500
-    border border-white/10
-    shadow-[0_8px_30px_rgba(37,99,235,0.35)]
-    hover:shadow-[0_12px_40px_rgba(37,99,235,0.5)]
-    hover:-translate-y-0.5
-    transition-all duration-300
-    active:translate-y-0
-    active:scale-[0.98]
-    focus-visible:outline-none
-    focus-visible:ring-2
-    focus-visible:ring-zinc-400/30
-    flex items-center justify-center gap-2
-  "
+            className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 sm:w-auto"
           >
-            {/* Shine Effect */}
-            <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-linear-to-t from-black/10 to-white/5" />
-
-            <Plus
-              size={16}
-              strokeWidth={2.5}
-              className="relative z-10 transition-transform duration-300 group-hover:rotate-90"
-            />
-
-            <span className="relative z-10">เพิ่มร้านอาหาร</span>
+            <Plus size={16} />
+            เพิ่มร้านอาหาร
           </button>
         </motion.div>
 
-        {/* ─── Command Center (Unified Search & Segmented Filter Card) ─── */}
+        {/* ─── Toolbar: search + category filter ─── */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08 }}
-          className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm mb-6 space-y-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white p-2.5 rounded-xl border border-zinc-200 shadow-sm mb-6 space-y-2.5"
         >
           {/* Search Row */}
           <div className="relative flex items-center">
@@ -183,32 +135,32 @@ export default function AdminRestaurantsPage() {
               placeholder="ค้นหาจากชื่อร้าน หรือทำเลที่ตั้ง (เช่น ทองหล่อ, อารีย์, เชียงใหม่)..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-9 py-2 bg-zinc-50/80 hover:bg-zinc-100/60 focus:bg-white border border-zinc-200/80 focus:border-zinc-400 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 transition-all outline-none"
+              className="w-full h-9 pl-9 pr-9 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             />
             {search && (
               <button
                 onClick={() => setSearch("")}
                 className="absolute right-2.5 text-zinc-400 hover:text-zinc-600 p-1 rounded-md transition-colors"
-                aria-label="Clear search"
+                aria-label="ล้างการค้นหา"
               >
                 <X size={14} />
               </button>
             )}
           </div>
 
-          {/* Horizontal Scrollable Pill Strip */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pt-0.5 pb-1 scrollbar-none">
-            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider pl-1 pr-1.5 flex items-center gap-1 shrink-0 select-none">
-              <Filter size={11} /> หมวดหมู่:
+          {/* Category filter strip */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+            <span className="text-[11px] font-medium text-zinc-400 pr-1 flex items-center gap-1 shrink-0 select-none">
+              <Filter size={11} /> หมวดหมู่
             </span>
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setFilter(cat)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all shrink-0 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/30 ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors shrink-0 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${
                   filter === cat
-                    ? "bg-blue-600 text-white font-semibold shadow-sm"
-                    : "text-slate-500 hover:bg-slate-100 hover:text-blue-600"
+                    ? "bg-blue-600 text-white"
+                    : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
                 }`}
               >
                 {cat}

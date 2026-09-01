@@ -25,7 +25,7 @@ export default async function HomePage() {
   } = await supabase.auth.getUser();
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-sky-100 to-white flex flex-col">
+    <div className="min-h-screen bg-neutral-50 flex flex-col">
       <Navbar />
       <HeroSection />
       <BudgetTripPlannerWrapper isLoggedIn={!!user} />

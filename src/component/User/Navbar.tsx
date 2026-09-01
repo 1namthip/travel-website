@@ -23,6 +23,7 @@ const navItems = [
   { name: "สถานที่ท่องเที่ยว", href: "/destinations" },
   { name: "ของกิน", href: "/restaurant" },
   { name: "ที่พัก", href: "/accommodations" },
+  { name: "คอลเลคชั่น", href: "/favorites" },
   { name: "ทริปเที่ยวของฉัน", href: "/trips" }
 ];
 
@@ -33,6 +34,7 @@ const HERO_PAGES = [
   "/destinations",
   "/restaurant",
   "/accommodations",
+  "/favorites",
   "/trips",
 ];
 
@@ -139,8 +141,8 @@ export const Navbar = () => {
               flex h-14 items-center justify-between px-4 transition-all duration-300 ease-out lg:px-6
               ${
                 scrolled
-                  ? "rounded-none border-b border-slate-200/80 bg-white shadow-sm"
-                  : "rounded-full border border-white/20 bg-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.16)] backdrop-blur-2xl"
+                  ? "rounded-none border-b border-neutral-200/80 bg-white shadow-sm"
+                  : "rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-2xl"
               }
             `}
           >
@@ -160,7 +162,7 @@ export const Navbar = () => {
               <div className="hidden sm:flex flex-col leading-tight">
                 <span
                   className={`text-base font-bold tracking-wide transition-colors duration-300 ${
-                    isGlass ? "text-white" : "text-slate-800"
+                    isGlass ? "text-white" : "text-neutral-800"
                   }`}
                 >
                   เที่ยวตามงบ<span className="text-amber-400">โคราช</span>
@@ -191,8 +193,8 @@ export const Navbar = () => {
                               ? "text-white"
                               : "text-white/70 hover:bg-white/10 hover:text-white"
                             : isActive
-                              ? "text-slate-900"
-                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                              ? "text-neutral-900"
+                              : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
                         }
                       `}
                     >
@@ -210,7 +212,7 @@ export const Navbar = () => {
                             ${
                               isGlass
                                 ? "border border-white/20 bg-white/15"
-                                : "bg-slate-100"
+                                : "bg-neutral-100"
                             }
                           `}
                         />
@@ -234,7 +236,7 @@ export const Navbar = () => {
                   ${
                     isGlass
                       ? "border border-white/20 bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
-                      : "border border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800"
+                      : "border border-transparent bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-800"
                   }
                 `}
               >
@@ -249,7 +251,7 @@ export const Navbar = () => {
                   ${
                     isGlass
                       ? "border border-white/20 bg-white/10 hover:bg-white/15"
-                      : "border border-slate-200 bg-slate-100 hover:bg-slate-200"
+                      : "border border-neutral-200 bg-neutral-100 hover:bg-neutral-200"
                   }
                 `}
               >
@@ -263,7 +265,7 @@ export const Navbar = () => {
                     ${
                       isGlass
                         ? "text-white/80 hover:text-white"
-                        : "text-slate-500 hover:text-slate-800"
+                        : "text-neutral-500 hover:text-neutral-800"
                     }
                   `}
                 >
@@ -277,7 +279,7 @@ export const Navbar = () => {
                 {/* Divider — mobile only */}
                 <div
                   className={`h-4 w-px lg:hidden ${
-                    isGlass ? "bg-white/20" : "bg-slate-300"
+                    isGlass ? "bg-white/20" : "bg-neutral-300"
                   }`}
                 />
 
@@ -286,7 +288,7 @@ export const Navbar = () => {
                   <div className="flex h-7 w-7 items-center justify-center">
                     <Loader2
                       className={`h-4 w-4 animate-spin ${
-                        isGlass ? "text-white" : "text-slate-400"
+                        isGlass ? "text-white" : "text-neutral-400"
                       }`}
                     />
                   </div>
@@ -298,8 +300,8 @@ export const Navbar = () => {
                         flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border text-xs font-bold uppercase transition-colors
                         ${
                           isGlass
-                            ? "border-transparent bg-white text-emerald-600 hover:border-amber-300"
-                            : "border-transparent bg-emerald-100 text-emerald-700 hover:border-emerald-300"
+                            ? "border-transparent bg-white text-amber-700 hover:border-amber-300"
+                            : "border-transparent bg-amber-100 text-amber-800 hover:border-amber-300"
                         }
                       `}
                     >
@@ -325,20 +327,20 @@ export const Navbar = () => {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute right-0 top-full mt-3 hidden w-56 rounded-2xl border border-slate-100 bg-white py-2 shadow-[0_8px_30px_rgb(0,0,0,0.12)] lg:block"
+                          className="absolute right-0 top-full mt-3 hidden w-56 rounded-2xl border border-neutral-100 bg-white py-2 shadow-lg lg:block"
                         >
-                          <div className="mb-1 border-b border-slate-100 px-4 py-2">
-                            <p className="text-xs font-medium text-slate-400">
+                          <div className="mb-1 border-b border-neutral-100 px-4 py-2">
+                            <p className="text-xs font-medium text-neutral-400">
                               เข้าสู่ระบบด้วย
                             </p>
                             {fullName && (
-                              <p className="truncate text-sm font-semibold text-slate-800">
+                              <p className="truncate text-sm font-semibold text-neutral-800">
                                 {fullName}
                               </p>
                             )}
                             <p
-                              className={`truncate text-sm text-slate-600 ${
-                                !fullName && "font-semibold text-slate-800"
+                              className={`truncate text-sm text-neutral-600 ${
+                                !fullName && "font-semibold text-neutral-800"
                               }`}
                             >
                               {user.email}
@@ -349,7 +351,7 @@ export const Navbar = () => {
                               setDropdownOpen(false);
                               setIsProfileModalOpen(true);
                             }}
-                            className="flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-emerald-600"
+                            className="flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 hover:text-amber-600"
                           >
                             <UserRound className="h-4 w-4" /> โปรไฟล์
                           </button>
@@ -371,7 +373,7 @@ export const Navbar = () => {
                       ${
                         isGlass
                           ? "text-white hover:text-amber-300"
-                          : "text-slate-700 hover:text-amber-500"
+                          : "text-neutral-700 hover:text-amber-500"
                       }
                     `}
                   >
@@ -400,7 +402,7 @@ export const Navbar = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-neutral-900/40 backdrop-blur-sm lg:hidden"
             />
 
             {/* Drawer panel */}
@@ -410,19 +412,19 @@ export const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 320, damping: 32 }}
-              className="fixed bottom-0 right-0 top-0 z-50 flex w-72 flex-col bg-white shadow-2xl lg:hidden"
+              className="fixed bottom-0 right-0 top-0 z-50 flex w-72 flex-col bg-white shadow-xl lg:hidden"
             >
               {/* Drawer header */}
-              <div className="flex h-16 items-center justify-between border-b border-slate-100 px-5">
+              <div className="flex h-16 items-center justify-between border-b border-neutral-100 px-5">
                 <Link
                   href="/"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2.5"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-amber-300 to-yellow-500">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500">
                     <Compass className="h-4 w-4 text-white" />
                   </div>
-                  <span className="font-bold text-slate-800">
+                  <span className="font-bold text-neutral-800">
                     เที่ยวตาม<span className="text-amber-400">งบ</span>
                   </span>
                 </Link>
@@ -430,7 +432,7 @@ export const Navbar = () => {
                   type="button"
                   onClick={() => setMobileOpen(false)}
                   aria-label="ปิดเมนู"
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -463,7 +465,7 @@ export const Navbar = () => {
                             ${
                               isActive
                                 ? "bg-amber-50 text-amber-700"
-                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
                             }
                           `}
                         >
@@ -476,38 +478,38 @@ export const Navbar = () => {
               </nav>
 
               {/* Drawer footer (Auth) */}
-              <div className="border-t border-slate-100 bg-slate-50/50 p-4">
+              <div className="border-t border-neutral-100 bg-neutral-50/50 p-4">
                 {loading ? (
                   <div className="flex justify-center py-3">
                     <Loader2 className="h-5 w-5 animate-spin text-amber-500" />
                   </div>
                 ) : user ? (
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2">
+                    <div className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white px-3 py-2">
                       {avatarUrl ? (
                         <Image
                           width={40}
                           height={40}
                           src={avatarUrl}
                           alt="Profile"
-                          className="h-10 w-10 shrink-0 rounded-full border border-slate-100 object-cover"
+                          className="h-10 w-10 shrink-0 rounded-full border border-neutral-100 object-cover"
                           referrerPolicy="no-referrer"
                         />
                       ) : (
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold uppercase text-emerald-700">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-sm font-bold uppercase text-amber-800">
                           {user.email?.charAt(0) || "U"}
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="mb-0.5 text-[11px] font-medium text-slate-400">
+                        <p className="mb-0.5 text-[11px] font-medium text-neutral-400">
                           เข้าสู่ระบบแล้ว
                         </p>
                         {fullName && (
-                          <p className="truncate text-sm font-semibold text-slate-800">
+                          <p className="truncate text-sm font-semibold text-neutral-800">
                             {fullName}
                           </p>
                         )}
-                        <p className="truncate text-xs text-slate-500">
+                        <p className="truncate text-xs text-neutral-500">
                           {user.email}
                         </p>
                       </div>

@@ -4,6 +4,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { createSupabaseClient } from "@/lib/supabaseClient";
 import {Navbar} from "@/component/User/Navbar";
+import { useFavorites } from "@/component/FavoritesProvider";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
@@ -39,17 +40,16 @@ const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+    transition: { staggerChildren: 0.05, delayChildren: 0.05 },
   },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20, scale: 0.98 },
+  hidden: { opacity: 0, y: 12 },
   show: {
     opacity: 1,
     y: 0,
-    scale: 1,
-    transition: { type: "spring", stiffness: 400, damping: 30 },
+    transition: { duration: 0.3, ease: "easeOut" },
   },
 };
 
@@ -92,6 +92,7 @@ const getFirstImageUrl = (data: any): string => {
 };
 
 export default function AccommodationsPage() {
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -171,26 +172,26 @@ export default function AccommodationsPage() {
 
       {/* 🌟 Hero Banner Section */}
       <div className="relative w-full min-h-100 md:min-h-125 bg-neutral-900 flex flex-col items-center justify-center overflow-hidden pt-20 pb-12">
-        <div 
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-[20s] hover:scale-110 ease-linear"
-          style={{ backgroundImage: "url('/images/banner3.png')" }} 
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/banner3.png')" }}
         />
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-black/45" />
         <div className="absolute inset-0 bg-linear-to-t from-neutral-900 via-neutral-900/40 to-transparent" />
-        
+
         <div className="relative z-10 text-center px-4 md:px-8 w-full max-w-4xl mx-auto mt-8">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 drop-shadow-xl tracking-tight leading-tight"
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 drop-shadow-md tracking-tight leading-tight"
           >
-            ค้นหาที่พักใน<span className="text-blue-400">โคราช</span>
+            ค้นหาที่พักใน<span className="text-amber-400">โคราช</span>
           </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
             className="text-neutral-200 text-base sm:text-lg md:text-xl max-w-2xl mx-auto font-medium drop-shadow-md"
           >
             ไม่ว่าจะเป็นบ้านพักตากอากาศ คอนโดใจกลางเมือง หรือโฮมสเตย์ชิลๆ เราคัดสรรมาให้คุณแล้ว
@@ -204,8 +205,8 @@ export default function AccommodationsPage() {
         <nav aria-label="Breadcrumb" className="flex mt-6 mb-8">
           <ol className="flex items-center gap-2 text-sm text-neutral-500 font-medium">
             <li>
-              <Link href="/" className="hover:text-blue-600 transition-colors flex items-center gap-1.5 focus:outline-none group">
-                <Home className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+              <Link href="/" className="hover:text-amber-600 transition-colors flex items-center gap-1.5 focus:outline-none group">
+                <Home className="w-4 h-4" />
                 <span>หน้าแรก</span>
               </Link>
             </li>
@@ -224,15 +225,15 @@ export default function AccommodationsPage() {
                 รายการที่พัก
               </h2>
               <p className="text-sm sm:text-base font-medium text-neutral-500">
-                พบ <span className="text-blue-600 font-bold">{filteredAccommodations.length}</span> รายการที่ตรงกับใจคุณ
+                พบ <span className="text-amber-600 font-bold">{filteredAccommodations.length}</span> รายการที่ตรงกับใจคุณ
               </p>
             </div>
 
             {/* Search & Price Filter Controls */}
             <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
               {/* Search Bar */}
-              <div className="flex items-center bg-white px-5 py-3.5 sm:py-3 rounded-full border border-neutral-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-400 transition-all w-full sm:w-72 lg:w-80 group">
-                <Search className="w-4 h-4 text-neutral-400 mr-3 shrink-0 group-focus-within:text-blue-600 transition-colors" />
+              <div className="flex items-center bg-white px-5 py-3 rounded-full border border-neutral-200 shadow-sm focus-within:ring-2 focus-within:ring-amber-500/30 focus-within:border-amber-500 transition-colors w-full sm:w-72 lg:w-80 group">
+                <Search className="w-4 h-4 text-neutral-400 mr-3 shrink-0 group-focus-within:text-amber-600 transition-colors" />
                 <input
                   type="text"
                   placeholder="ค้นหาชื่อที่พัก, ทำเลที่ตั้ง..."
@@ -252,7 +253,7 @@ export default function AccommodationsPage() {
                 <select
                   value={priceFilter}
                   onChange={(e) => setPriceFilter(e.target.value)}
-                  className="w-full appearance-none bg-white px-5 py-3.5 sm:py-3 pr-10 rounded-full border border-neutral-200 text-sm font-medium text-neutral-700 shadow-[0_2px_10px_rgb(0,0,0,0.02)] focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 outline-none transition-all cursor-pointer"
+                  className="w-full appearance-none bg-white px-5 py-3 pr-10 rounded-full border border-neutral-200 text-sm font-medium text-neutral-700 shadow-sm focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 outline-none transition-colors cursor-pointer"
                 >
                   {priceRanges.map((range) => (
                     <option key={range.value} value={range.value}>{range.label}</option>
@@ -273,10 +274,10 @@ export default function AccommodationsPage() {
                 <button
                   key={cat.value}
                   onClick={() => setSelectedCategory(cat.value)}
-                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all active:scale-95 shrink-0 border flex items-center gap-2.5 ${
+                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors shrink-0 border flex items-center gap-2.5 ${
                     isActive
-                      ? "bg-neutral-900 text-white border-neutral-900 shadow-md"
-                      : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300 hover:text-neutral-900 shadow-sm"
+                      ? "bg-neutral-900 text-white border-neutral-900"
+                      : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300 hover:text-neutral-900"
                   }`}
                 >
                   <span className="text-base">{cat.icon}</span>
@@ -289,7 +290,7 @@ export default function AccommodationsPage() {
 
         {/* 🚨 Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-100 rounded-3xl p-6 mb-8 flex items-start gap-4 shadow-sm max-w-3xl mx-auto">
+          <div className="bg-red-50 border border-red-100 rounded-2xl p-6 mb-8 flex items-start gap-4 shadow-sm max-w-3xl mx-auto">
             <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
               <AlertCircle className="w-5 h-5 text-red-600" />
             </div>
@@ -305,8 +306,8 @@ export default function AccommodationsPage() {
           // Skeleton Loading 3-4 Columns
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 mt-6">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="bg-white rounded-3xl p-3 shadow-sm border border-neutral-100 animate-pulse">
-                <div className="w-full aspect-4/3 bg-neutral-200/80 rounded-2xl mb-5" />
+              <div key={i} className="bg-white rounded-2xl p-3 shadow-sm border border-neutral-100 animate-pulse">
+                <div className="w-full aspect-4/3 bg-neutral-200/80 rounded-xl mb-5" />
                 <div className="px-2 space-y-4 pb-2">
                   <div className="h-5 bg-neutral-200/80 rounded-md w-3/4" />
                   <div className="space-y-2">
@@ -333,22 +334,21 @@ export default function AccommodationsPage() {
             {filteredAccommodations.map((acc) => (
               <motion.div variants={itemVariants} key={acc.id}>
                 <Link href={`/accommodations/${acc.id}`} className="block outline-none group h-full">
-                  <div className="bg-white rounded-3xl p-3 shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-neutral-100 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-500 ease-out h-full flex flex-col relative z-10">
-                    
+                  <div className="bg-white rounded-2xl p-3 shadow-sm border border-neutral-100 hover:shadow-md hover:border-neutral-200 transition-all duration-300 h-full flex flex-col relative z-10">
+
                     {/* Image Section */}
-                    <div className="relative w-full aspect-4/3 rounded-2xl overflow-hidden mb-5 bg-neutral-100 shadow-inner">
+                    <div className="relative w-full aspect-4/3 rounded-xl overflow-hidden mb-5 bg-neutral-100">
                       <Image
                         src={getFirstImageUrl(acc.images)}
                         alt={acc.name}
                         fill
                         unoptimized={true} // ป้องกัน Error จาก External Image Domain
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        className="object-cover transition-[filter] duration-300 group-hover:brightness-95"
                       />
-                      <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                       {/* Badge Top Left */}
-                      <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[0.7rem] font-bold text-neutral-900 shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex items-center gap-1.5">
+                      <div className="absolute top-3 left-3 bg-white/95 px-3 py-1.5 rounded-full text-[0.7rem] font-bold text-neutral-900 shadow-sm flex items-center gap-1.5">
                         <span className="text-xs">
                           {categoryOptions.find(c => c.value === acc.category)?.icon || "🏠"}
                         </span>
@@ -357,33 +357,45 @@ export default function AccommodationsPage() {
 
                       {/* Favorite Button */}
                       <button
-                        onClick={(e) => { e.preventDefault(); }}
-                        className="absolute top-3 right-3 w-8 h-8 bg-white/95 backdrop-blur-md rounded-full flex items-center justify-center text-neutral-400 hover:text-rose-500 hover:scale-110 active:scale-95 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.08)] z-10"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleFavorite("accommodation", acc.id);
+                        }}
+                        aria-label="เก็บไว้ในคอลเลคชั่น"
+                        className={`absolute top-3 right-3 w-8 h-8 bg-white/95 rounded-full flex items-center justify-center transition-colors shadow-sm z-10 ${
+                          isFavorite("accommodation", acc.id)
+                            ? "text-rose-500"
+                            : "text-neutral-400 hover:text-rose-500"
+                        }`}
                       >
-                        <Heart className="w-4 h-4 transition-colors" />
+                        <Heart
+                          className={`w-4 h-4 ${isFavorite("accommodation", acc.id) ? "fill-rose-500" : ""}`}
+                        />
                       </button>
                     </div>
 
                     {/* Content Section */}
                     <div className="px-3 pb-3 flex flex-col grow">
-                      <h4 className="text-lg font-bold text-neutral-900 line-clamp-1 mb-1.5 group-hover:text-blue-600 transition-colors">
+                      <h4 className="text-lg font-bold text-neutral-900 line-clamp-1 mb-1.5 group-hover:text-amber-700 transition-colors">
                         {acc.name}
                       </h4>
                       <p className="text-sm text-neutral-500 line-clamp-2 mb-5 grow leading-relaxed">
                         {acc.description || "ไม่มีคำอธิบายเพิ่มเติม"}
                       </p>
 
-                      <div className="pt-3.5 border-t border-neutral-100 flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-1.5 text-neutral-500">
-                          <MapPin className="w-4 h-4 opacity-70 text-blue-500" />
-                          <span className="text-sm font-medium truncate max-w-30 sm:max-w-35">
+                      <div className="pt-3.5 border-t border-neutral-100 flex items-center justify-between gap-2 mt-auto">
+                        <div className="flex items-center gap-1.5 text-neutral-500 min-w-0 flex-1">
+                          <MapPin className="w-4 h-4 text-neutral-400 shrink-0" />
+                          <span className="text-sm font-medium truncate">
                             {acc.address || "ไม่ระบุตำแหน่ง"}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1.5 bg-blue-50/80 px-2.5 py-1.5 rounded-lg border border-blue-100">
-                          <Banknote className="w-4 h-4 text-blue-600" />
-                          <span className="text-xs font-bold text-blue-800">
+                        <div className="flex items-center gap-1.5 bg-amber-50 px-2 py-1.5 rounded-lg border border-amber-100 shrink-0">
+                          <Banknote className="w-3 h-3 text-amber-600 shrink-0" />
+                          <span className="text-xs font-bold text-amber-800 whitespace-nowrap">
                             {acc.price_range || "สอบถาม"}
                           </span>
                         </div>
@@ -398,12 +410,12 @@ export default function AccommodationsPage() {
         ) : (
           // Empty State
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-[2.5rem] p-16 text-center border border-neutral-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center mt-8"
+            className="bg-white rounded-2xl p-16 text-center border border-neutral-100 shadow-sm flex flex-col items-center mt-8"
           >
-            <div className="w-20 h-20 bg-neutral-50 rounded-full flex items-center justify-center mb-6">
-              <BedDouble className="w-10 h-10 text-neutral-300" />
+            <div className="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mb-6">
+              <BedDouble className="w-8 h-8 text-neutral-300" />
             </div>
             <h4 className="text-xl font-bold text-neutral-900 mb-3">ไม่พบที่พักที่คุณค้นหา</h4>
             <p className="text-neutral-500 mb-8 max-w-sm leading-relaxed">
@@ -415,7 +427,7 @@ export default function AccommodationsPage() {
                 setSelectedCategory("all");
                 setPriceFilter("all");
               }}
-              className="px-8 py-3 bg-neutral-900 text-white rounded-full text-sm font-semibold shadow-lg shadow-neutral-900/20 hover:bg-black hover:-translate-y-0.5 transition-all active:scale-95"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-neutral-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-black"
             >
               ล้างตัวกรองทั้งหมด
             </button>

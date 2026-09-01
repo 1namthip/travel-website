@@ -22,7 +22,6 @@ import {
   Inbox,
   Filter,
   Plus,
-  BedDouble,
   X,
 } from "lucide-react";
 
@@ -300,13 +299,13 @@ export default function AdminAccommodationsPage() {
 
   if (authLoaded && !user) {
     return (
-      <main className="max-w-6xl mx-auto py-20 px-4 flex justify-center font-sans text-slate-900">
-        <div className="bg-white border border-slate-200 rounded-xl p-8 text-center max-w-sm w-full shadow-sm flex flex-col items-center justify-center">
-          <AlertCircle size={32} className="text-slate-400 mb-3" />
-          <h2 className="text-sm font-semibold text-slate-900 mb-1">
+      <main className="max-w-6xl mx-auto py-20 px-4 flex justify-center font-sans text-zinc-900">
+        <div className="bg-white border border-zinc-200 rounded-xl p-8 text-center max-w-sm w-full shadow-sm flex flex-col items-center justify-center">
+          <AlertCircle size={32} className="text-zinc-400 mb-3" />
+          <h2 className="text-sm font-semibold text-zinc-900 mb-1">
             จำเป็นต้องเข้าสู่ระบบ
           </h2>
-          <p className="text-slate-500 text-xs max-w-xs mx-auto leading-relaxed">
+          <p className="text-zinc-500 text-xs max-w-xs mx-auto leading-relaxed">
             กรุณาเข้าสู่ระบบด้วยบัญชีแอดมินก่อนตรวจสอบและจัดการข้อมูลระบบหลังบ้าน
           </p>
         </div>
@@ -315,71 +314,29 @@ export default function AdminAccommodationsPage() {
   }
 
   return (
-    // ขาว 60% (bg-slate-50) ชมพู 10% (selection:bg-pink-100)
-    <div className="min-h-screen bg-slate-50 pb-24 font-sans text-slate-900 selection:bg-pink-100 selection:text-pink-900">
+    <div className="min-h-screen bg-zinc-50 pb-24 font-sans text-zinc-900 selection:bg-blue-100 selection:text-blue-900">
       <main className="max-w-6xl mx-auto pt-10 px-4 sm:px-6 lg:px-8">
         {/* ─── 1. HEADER ─── */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8"
+          className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-end sm:justify-between"
         >
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br
-    from-blue-600
-    via-blue-500
-    to-indigo-700
-    border border-white/10
-    shadow-[0_8px_30px_rgba(37,99,235,0.35)]
-    hover:shadow-[0_12px_40px_rgba(37,99,235,0.5)] text-white"
-            >
-              <BedDouble size={22} strokeWidth={2.2} />
-            </div>
-
-            <div>
-              <h1 className="text-2xl font-bold text-zinc-900">
-                จัดการห้องพัก & ที่พัก
-              </h1>
-
-              <p className="mt-1 text-sm text-zinc-500">
-                จัดการข้อมูลห้องพัก และที่พักต่างๆ
-              </p>
-            </div>
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-zinc-900">
+              จัดการห้องพัก & ที่พัก
+            </h1>
+            <p className="mt-1 text-sm text-zinc-500">
+              จัดการข้อมูลห้องพัก และที่พักต่างๆ
+            </p>
           </div>
 
-          {/* น้ำเงิน 30% (bg-blue-600) */}
           <button
             onClick={() => setIsModalOpen(true)}
-            className="
-    group relative overflow-hidden
-    w-full sm:w-auto
-    rounded-xl
-    px-5 py-2.5
-    text-sm font-semibold tracking-wide
-    text-white
-    bg-linear-to-br
-    from-blue-600
-    to-blue-500
-    border border-white/10
-    shadow-[0_8px_30px_rgba(37,99,235,0.35)]
-    hover:shadow-[0_12px_40px_rgba(37,99,235,0.5)]
-    transition-all duration-300
-    hover:-translate-y-0.5
-    active:translate-y-0
-    active:scale-[0.98]
-    flex items-center justify-center gap-2
-  "
+            className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 sm:w-auto"
           >
-            <div className="absolute inset-0 bg-linear-to-t from-black/10 to-white/10" />
-
-            <Plus
-              size={16}
-              strokeWidth={2.5}
-              className="relative z-10 transition-transform duration-300 group-hover:rotate-90"
-            />
-
-            <span className="relative z-10">เพิ่มที่พักใหม่</span>
+            <Plus size={16} />
+            เพิ่มที่พักใหม่
           </button>
         </motion.div>
 
@@ -397,17 +354,12 @@ export default function AdminAccommodationsPage() {
           )}
         </AnimatePresence>
 
-        {/* ─── 2. THE UNIFIED COMMAND BOX ─── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08 }}
-          className="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-6 space-y-3"
-        >
+        {/* ─── 2. TOOLBAR ─── */}
+        <div className="bg-white p-2.5 rounded-xl border border-zinc-200 shadow-sm mb-6 space-y-2.5">
           {/* Search Row */}
           <div className="relative flex items-center">
             <Search
-              className="absolute left-3.5 text-blue-400 pointer-events-none"
+              className="absolute left-3 text-zinc-400 pointer-events-none"
               size={16}
             />
             <input
@@ -415,23 +367,23 @@ export default function AdminAccommodationsPage() {
               placeholder="ค้นหาจากชื่อที่พัก หรือทำเลที่ตั้ง (เช่น หลังมอ, หน้ามอ, ชื่อถนน)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 bg-slate-50 hover:bg-slate-100/50 focus:bg-white border border-slate-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 transition-all outline-none"
+              className="w-full h-9 pl-9 pr-9 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 text-slate-400 hover:text-slate-600 p-1 rounded-md transition-colors"
+                className="absolute right-2.5 text-zinc-400 hover:text-zinc-600 p-1 rounded-md transition-colors"
               >
                 <X size={14} />
               </button>
             )}
           </div>
 
-          {/* Horizontal Scrollable Filter Strip */}
-          <div className="flex items-center justify-between overflow-x-auto pt-0.5 pb-1 scrollbar-none">
+          {/* Status filter strip */}
+          <div className="flex items-center justify-between overflow-x-auto pb-0.5 scrollbar-none">
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider pl-1 pr-1.5 flex items-center gap-1 shrink-0 select-none">
-                <Filter size={12} /> สถานะ:
+              <span className="text-[11px] font-medium text-zinc-400 pr-1 flex items-center gap-1 shrink-0 select-none">
+                <Filter size={11} /> สถานะ
               </span>
               {(["all", "published", "draft"] as const).map((tab) => {
                 const label =
@@ -444,11 +396,10 @@ export default function AdminAccommodationsPage() {
                   <button
                     key={tab}
                     onClick={() => setActiveFilter(tab)}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all shrink-0 select-none ${
-                      // น้ำเงิน 30% สำหรับ Tab ที่ถูกเลือก
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors shrink-0 select-none ${
                       activeFilter === tab
-                        ? "bg-blue-600 text-white font-semibold shadow-sm"
-                        : "text-slate-600 hover:text-blue-700 hover:bg-blue-50 bg-transparent"
+                        ? "bg-blue-600 text-white"
+                        : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
                     }`}
                   >
                     {label}
@@ -459,25 +410,24 @@ export default function AdminAccommodationsPage() {
 
             {/* Select All Sub-control */}
             {!loading && filteredAccommodations.length > 0 && (
-              <div className="flex items-center gap-2 pl-4 text-xs text-slate-400 shrink-0">
+              <div className="flex items-center gap-2 pl-4 text-xs text-zinc-400 shrink-0">
                 <input
                   type="checkbox"
                   checked={allOnPageSelected}
                   onChange={toggleSelectAllOnPage}
-                  // ชมพู 10% สำหรับ Checkbox
-                  className="w-3.5 h-3.5 rounded border-slate-300 text-pink-500 accent-pink-500 cursor-pointer focus:ring-pink-500"
+                  className="w-3.5 h-3.5 rounded border-zinc-300 accent-blue-600 cursor-pointer"
                   id="select-all"
                 />
                 <label
                   htmlFor="select-all"
-                  className="cursor-pointer hover:text-slate-600 select-none"
+                  className="cursor-pointer hover:text-zinc-600 select-none"
                 >
                   เลือกทั้งหมดในหน้านี้
                 </label>
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* ─── 3. CORE CARD STREAM ─── */}
         <div className="min-h-100 space-y-4">
@@ -491,18 +441,18 @@ export default function AdminAccommodationsPage() {
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row gap-5 animate-pulse"
+                    className="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row gap-5 animate-pulse"
                   >
-                    <div className="w-full sm:w-60 aspect-16/10 rounded-xl bg-slate-100 shrink-0" />
+                    <div className="w-full sm:w-60 aspect-16/10 rounded-lg bg-zinc-100 shrink-0" />
                     <div className="flex-1 flex flex-col justify-between py-1 space-y-4">
                       <div className="space-y-2.5">
-                        <div className="h-3.5 bg-slate-100 rounded w-1/3" />
-                        <div className="h-5 bg-slate-200 rounded w-3/4" />
-                        <div className="h-4 bg-slate-100 rounded w-full mt-3" />
+                        <div className="h-3.5 bg-zinc-100 rounded w-1/3" />
+                        <div className="h-5 bg-zinc-200 rounded w-3/4" />
+                        <div className="h-4 bg-zinc-100 rounded w-full mt-3" />
                       </div>
-                      <div className="pt-3 border-t border-slate-100 flex justify-between">
-                        <div className="h-3 bg-slate-100 rounded w-24" />
-                        <div className="h-4 bg-slate-200 rounded w-20" />
+                      <div className="pt-3 border-t border-zinc-100 flex justify-between">
+                        <div className="h-3 bg-zinc-100 rounded w-24" />
+                        <div className="h-4 bg-zinc-200 rounded w-20" />
                       </div>
                     </div>
                   </div>
@@ -513,64 +463,62 @@ export default function AdminAccommodationsPage() {
                 key="empty"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="bg-white border border-slate-200 rounded-2xl p-16 text-center flex flex-col items-center justify-center border-dashed"
+                className="bg-white border border-dashed border-zinc-200 rounded-xl p-16 text-center flex flex-col items-center justify-center"
               >
-                <div className="w-12 h-12 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-center mb-3 text-slate-400">
-                  <Inbox size={20} />
+                <div className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-lg flex items-center justify-center mb-3 text-zinc-400">
+                  <Inbox size={18} />
                 </div>
-                <h3 className="text-sm font-semibold text-slate-900">
+                <h3 className="text-sm font-semibold text-zinc-900">
                   ไม่พบรายการห้องพัก
                 </h3>
-                <p className="text-slate-500 text-xs mt-1">
+                <p className="text-zinc-500 text-xs mt-1">
                   ยังไม่มีข้อมูลที่ตรงกับการค้นหาในหมวดหมู่นี้
                 </p>
               </motion.div>
             ) : (
               <motion.div key="card-list" layout className="space-y-4">
-                {displayedAccommodations.map((acc, index) => {
+                {displayedAccommodations.map((acc) => {
                   const isSelected = selectedIds.has(acc.id);
                   return (
                     <motion.div
                       layout
-                      initial={{ opacity: 0, y: 15 }}
+                      initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.98 }}
-                      transition={{ duration: 0.2, delay: index * 0.04 }}
+                      transition={{ duration: 0.16 }}
                       key={acc.id}
                       onClick={() => handleEdit(acc)}
-                      className={`group bg-white rounded-2xl p-4 transition-all flex flex-col sm:flex-row gap-5 relative cursor-pointer border ${
-                        // ชมพู 10% เมื่อถูกคลิกเลือก
+                      className={`group bg-white rounded-xl p-4 shadow-sm transition-colors flex flex-col sm:flex-row gap-5 relative cursor-pointer border ${
                         isSelected
-                          ? "border-pink-500 shadow-md ring-1 ring-pink-500/20 bg-pink-50/40"
-                          : "border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300"
+                          ? "border-blue-600 ring-1 ring-blue-600/10 bg-blue-50/40"
+                          : "border-zinc-200 hover:border-zinc-300"
                       }`}
                     >
                       {/* ─── THUMBNAIL BLOCK ─── */}
-                      <div className="relative w-full sm:w-60 aspect-16/10 shrink-0 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/50 flex items-center justify-center">
+                      <div className="relative w-full sm:w-60 aspect-16/10 shrink-0 rounded-lg overflow-hidden bg-zinc-100 border border-zinc-100 flex items-center justify-center">
                         {acc.images && acc.images.length > 0 ? (
                           <>
                             <img
                               src={acc.images[0]}
                               alt={acc.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                              className="w-full h-full object-cover"
                               loading="lazy"
                             />
                             {acc.images.length > 1 && (
-                              <div className="absolute bottom-2 right-2 bg-slate-900/70 backdrop-blur-md text-white text-[11px] font-medium px-2 py-0.5 rounded-md">
+                              <div className="absolute bottom-2 right-2 bg-zinc-900/70 text-white text-[10px] font-medium px-1.5 py-0.5 rounded">
                                 +{acc.images.length - 1}
                               </div>
                             )}
                           </>
                         ) : (
-                          <ImageIcon size={28} className="text-slate-300" />
+                          <ImageIcon size={28} className="text-zinc-300" />
                         )}
 
-                        {/* ชมพู 10% ป้ายหมวดหมู่ดึงดูดสายตา */}
                         <div
-                          className="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10"
+                          className="absolute top-2 left-2 flex items-center gap-1.5 z-10"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <span className="bg-pink-400/75 border-[#EC4899] shadow-pink-200 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wider shadow-sm">
+                          <span className="bg-white/95 text-zinc-700 border border-zinc-200 text-[10px] font-medium px-1.5 py-0.5 rounded">
                             {acc.category || "ที่พัก"}
                           </span>
                         </div>
@@ -585,32 +533,32 @@ export default function AdminAccommodationsPage() {
                           >
                             <button
                               onClick={(e) => handleMenuToggle(e, acc.id)}
-                              className="p-1 text-slate-400 hover:text-blue-600 rounded-md transition-colors"
+                              className="p-1 text-zinc-400 hover:text-blue-600 rounded-md transition-colors"
                             >
                               <MoreHorizontal size={18} />
                             </button>
                             <AnimatePresence>
                               {openCardMenuId === acc.id && (
                                 <motion.div
-                                  initial={{ opacity: 0, scale: 0.95, y: 5 }}
+                                  initial={{ opacity: 0, scale: 0.98, y: 4 }}
                                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                                  exit={{ opacity: 0, scale: 0.95, y: 5 }}
-                                  className="absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-slate-200 py-1 z-50 text-left overflow-hidden"
+                                  exit={{ opacity: 0, scale: 0.98, y: 4 }}
+                                  className="absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-lg border border-zinc-200 py-1 z-50 text-left overflow-hidden"
                                 >
                                   <button
                                     onClick={() => {
                                       handleEdit(acc);
                                       setOpenCardMenuId(null);
                                     }}
-                                    className="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-blue-600 flex items-center gap-2 font-medium"
+                                    className="w-full text-left px-3 py-1.5 text-xs text-zinc-700 hover:bg-zinc-50 hover:text-blue-600 flex items-center gap-2 font-medium"
                                   >
                                     <Edit3
                                       size={13}
-                                      className="text-slate-400"
+                                      className="text-zinc-400"
                                     />{" "}
                                     แก้ไขข้อมูล
                                   </button>
-                                  <div className="h-px bg-slate-100 my-1" />
+                                  <div className="h-px bg-zinc-100 my-1" />
                                   <button
                                     onClick={() => {
                                       handleDeleteClick(acc.id, acc.name);
@@ -629,7 +577,7 @@ export default function AdminAccommodationsPage() {
                             </AnimatePresence>
                           </div>
 
-                          <div className="flex items-center gap-2 text-xs text-slate-500 font-medium truncate mb-1.5 pr-6">
+                          <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium truncate mb-1.5 pr-6">
                             <span
                               className={`font-semibold ${acc.status === "published" ? "text-emerald-600" : "text-amber-500"}`}
                             >
@@ -637,8 +585,8 @@ export default function AdminAccommodationsPage() {
                                 ? "🟢 เผยแพร่แล้ว"
                                 : "🟡 แบบร่าง"}
                             </span>
-                            <span className="text-slate-300">•</span>
-                            <span className="flex items-center gap-1 truncate text-slate-400">
+                            <span className="text-zinc-300">•</span>
+                            <span className="flex items-center gap-1 truncate text-zinc-400">
                               <MapPin size={12} className="shrink-0" />
                               <span className="truncate">
                                 {acc.address || "ไม่ได้ระบุตำแหน่งที่ตั้ง"}
@@ -646,24 +594,24 @@ export default function AdminAccommodationsPage() {
                             </span>
                           </div>
 
-                          <h3 className="text-lg font-bold text-slate-900 tracking-tight truncate leading-tight group-hover:text-blue-700 transition-colors">
+                          <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight truncate leading-snug">
                             {acc.name}
                           </h3>
 
-                          <p className="text-sm text-slate-500 mt-2 line-clamp-2 leading-relaxed pr-4">
+                          <p className="text-sm text-zinc-500 mt-1.5 line-clamp-2 leading-relaxed pr-4">
                             {acc.description || "ไม่มีคำอธิบายเพิ่มเติม"}
                           </p>
                         </div>
 
-                        <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                        <div className="mt-4 pt-3 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-400">
                           <div className="flex items-center gap-3 truncate">
                             {acc.contact_phone ? (
-                              <span className="flex items-center gap-1 font-medium text-slate-600">
-                                <Phone size={11} className="text-slate-400" />{" "}
+                              <span className="flex items-center gap-1 font-medium text-zinc-600">
+                                <Phone size={11} className="text-zinc-400" />{" "}
                                 {acc.contact_phone}
                               </span>
                             ) : (
-                              <span className="italic text-slate-300">
+                              <span className="italic text-zinc-300">
                                 ไม่มีข้อมูลเบอร์ติดต่อ
                               </span>
                             )}
@@ -672,8 +620,7 @@ export default function AdminAccommodationsPage() {
                             )}
                           </div>
 
-                          {/* น้ำเงิน 30% ราคา */}
-                          <div className="font-bold text-blue-700 text-sm shrink-0 pl-2">
+                          <div className="font-semibold text-zinc-900 text-sm shrink-0 pl-2">
                             {acc.price_range
                               ? `${acc.price_range} บ./เดือน`
                               : "-"}
@@ -688,32 +635,32 @@ export default function AdminAccommodationsPage() {
           </AnimatePresence>
         </div>
 
-        {/* ─── Premium Pagination ─── */}
+        {/* ─── Pagination ─── */}
         {!loading && totalPages > 1 && (
           <div className="flex items-center justify-between mt-8 px-1">
-            <p className="hidden sm:block text-xs text-slate-400 font-medium">
-              Showing{" "}
-              <span className="text-slate-900">
+            <p className="hidden sm:block text-xs text-zinc-500">
+              แสดง{" "}
+              <span className="font-medium text-zinc-900">
                 {(page - 1) * itemsPerPage + 1}
-              </span>{" "}
-              to{" "}
-              <span className="text-slate-900">
+              </span>
+              –
+              <span className="font-medium text-zinc-900">
                 {Math.min(page * itemsPerPage, filteredAccommodations.length)}
               </span>{" "}
-              of{" "}
-              <span className="text-slate-900">
+              จาก{" "}
+              <span className="font-medium text-zinc-900">
                 {filteredAccommodations.length}
               </span>{" "}
-              entries
+              รายการ
             </p>
-            <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50 hover:text-blue-700 disabled:opacity-30 transition-all"
+                className="inline-flex items-center gap-1 h-8 px-2.5 text-xs font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
               >
                 <ChevronLeft size={14} />
-                <span>Previous</span>
+                <span>ก่อนหน้า</span>
               </button>
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -721,11 +668,10 @@ export default function AdminAccommodationsPage() {
                     <button
                       key={pNum}
                       onClick={() => setPage(pNum)}
-                      className={`w-7 h-7 rounded-md text-xs font-medium transition-all flex items-center justify-center ${
-                        // น้ำเงิน 30% Active Page
+                      className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors flex items-center justify-center ${
                         page === pNum
-                          ? "bg-blue-600 text-white font-semibold shadow-sm"
-                          : "text-slate-500 hover:bg-slate-100 hover:text-blue-600"
+                          ? "bg-blue-600 text-white"
+                          : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
                       }`}
                     >
                       {pNum}
@@ -736,47 +682,47 @@ export default function AdminAccommodationsPage() {
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50 hover:text-blue-700 disabled:opacity-30 transition-all"
+                className="inline-flex items-center gap-1 h-8 px-2.5 text-xs font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
               >
-                <span>Next</span>
+                <span>ถัดไป</span>
                 <ChevronRight size={14} />
               </button>
             </div>
           </div>
         )}
 
-        {/* ─── Floating Command Bar ─── */}
+        {/* ─── Floating bulk-action bar ─── */}
         <AnimatePresence>
           {selectedIds.size > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 40, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 40, scale: 0.95 }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.15 }}
               className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
             >
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-900 text-white rounded-full shadow-2xl border border-slate-800 text-xs font-medium">
-                {/* ชมพู 10% เพื่อเน้นย้ำความสนใจใน Action Bar */}
-                <span className="text-slate-300">
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-zinc-900 text-white rounded-xl shadow-lg border border-zinc-800 text-xs font-medium">
+                <span className="text-zinc-300">
                   เลือกแล้ว{" "}
-                  <span className="text-pink-400 font-bold">
+                  <span className="text-white font-semibold">
                     {selectedIds.size}
                   </span>{" "}
                   รายการ
                 </span>
-                <div className="w-px h-4 bg-slate-700" />
+                <div className="w-px h-4 bg-zinc-700" />
                 <button
                   onClick={() =>
                     setBulkDialog({
                       type: "status",
                       ids: Array.from(selectedIds),
                       newStatus: "published",
-                      title: "Publish Listings",
+                      title: "เผยแพร่ที่พัก",
                       message: `ยืนยันการเปิดเผยแพร่ที่พัก ${selectedIds.size} รายการ?`,
                     })
                   }
-                  className="text-slate-300 hover:text-white hover:bg-slate-800 px-2 py-1 rounded transition-colors"
+                  className="text-zinc-300 hover:text-white hover:bg-zinc-800 px-2 py-1 rounded-md transition-colors"
                 >
-                  Publish
+                  เผยแพร่
                 </button>
                 <button
                   onClick={() =>
@@ -784,26 +730,26 @@ export default function AdminAccommodationsPage() {
                       type: "status",
                       ids: Array.from(selectedIds),
                       newStatus: "draft",
-                      title: "Set to Draft",
+                      title: "ตั้งเป็นแบบร่าง",
                       message: `ยืนยันการซ่อนเป็นแบบร่าง ${selectedIds.size} รายการ?`,
                     })
                   }
-                  className="text-slate-300 hover:text-white hover:bg-slate-800 px-2 py-1 rounded transition-colors"
+                  className="text-zinc-300 hover:text-white hover:bg-zinc-800 px-2 py-1 rounded-md transition-colors"
                 >
-                  Draft
+                  แบบร่าง
                 </button>
                 <button
                   onClick={() =>
                     setBulkDialog({
                       type: "delete",
                       ids: Array.from(selectedIds),
-                      title: "Delete Listings",
+                      title: "ลบที่พัก",
                       message: `ยืนยันการลบที่พัก ${selectedIds.size} รายการอย่างถาวร?`,
                     })
                   }
-                  className="text-pink-400 hover:text-pink-300 hover:bg-pink-400/10 px-2 py-1 rounded transition-colors"
+                  className="text-red-400 hover:text-red-300 hover:bg-red-400/10 px-2 py-1 rounded-md transition-colors"
                 >
-                  Delete
+                  ลบ
                 </button>
               </div>
             </motion.div>
@@ -821,13 +767,13 @@ export default function AdminAccommodationsPage() {
           open={!!deleteConfirm}
           danger={true}
           loading={!!deletingId}
-          title="Delete Listing"
+          title="ลบข้อมูลที่พัก"
           message={
-            <span className="text-slate-500 text-xs block mt-1">
-              ยืนยันการลบ "{deleteConfirm?.name}" อย่างถาวร?
+            <span className="block">
+              ยืนยันการลบ &quot;{deleteConfirm?.name}&quot; อย่างถาวร?
             </span>
           }
-          confirmText="ลบข้อมูลถาวร"
+          confirmText="ลบถาวร"
           cancelText="ยกเลิก"
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeleteConfirm(null)}
@@ -838,14 +784,8 @@ export default function AdminAccommodationsPage() {
           danger={bulkDialog?.type === "delete"}
           loading={isBulkProcessing}
           title={bulkDialog?.title || ""}
-          message={
-            <span className="text-slate-500 text-xs block mt-1">
-              {bulkDialog?.message}
-            </span>
-          }
-          confirmText={
-            bulkDialog?.type === "delete" ? "ลบข้อมูลถาวร" : "ยืนยัน"
-          }
+          message={<span className="block">{bulkDialog?.message}</span>}
+          confirmText={bulkDialog?.type === "delete" ? "ลบถาวร" : "ยืนยัน"}
           cancelText="ยกเลิก"
           onConfirm={handleBulkActionConfirm}
           onCancel={() => setBulkDialog(null)}

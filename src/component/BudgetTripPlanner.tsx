@@ -80,7 +80,7 @@ function LoginPromptModal({
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.88, y: 20, opacity: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 28 }}
-        className="relative z-10 bg-white rounded-3xl p-8 shadow-2xl max-w-sm w-full text-center"
+        className="relative z-10 bg-white rounded-2xl p-8 shadow-xl max-w-sm w-full text-center"
       >
         {/* Close */}
         <button
@@ -91,8 +91,8 @@ function LoginPromptModal({
         </button>
 
         {/* Icon */}
-        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-5">
-          <Lock className="w-7 h-7 text-blue-500" />
+        <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-5">
+          <Lock className="w-7 h-7 text-sky-600" />
         </div>
 
         <h3 className="text-xl font-bold text-neutral-900 mb-2">
@@ -119,7 +119,7 @@ function LoginPromptModal({
 
         <button
           onClick={onLogin}
-          className="w-full bg-black text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-neutral-800 active:scale-[0.98] transition-all mb-3"
+          className="w-full bg-black text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-neutral-800 transition-all mb-3"
         >
           <LogIn className="w-4.5 h-4.5" />
           ไปล็อกอิน
@@ -183,7 +183,7 @@ function BudgetBar({
             disabled={count === 0}
             className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-all ${
               count > 0
-                ? "bg-black text-white hover:bg-neutral-800 active:scale-95"
+                ? "bg-black text-white hover:bg-neutral-800"
                 : "bg-neutral-100 text-neutral-400 cursor-not-allowed"
             }`}
           >
@@ -264,7 +264,7 @@ function OverBudgetModal({
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.88, y: 20, opacity: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 28 }}
-        className="relative z-10 bg-white rounded-3xl p-8 shadow-2xl max-w-sm w-full text-center"
+        className="relative z-10 bg-white rounded-2xl p-8 shadow-xl max-w-sm w-full text-center"
       >
         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-5">
           <AlertTriangle className="w-8 h-8 text-red-500" />
@@ -307,7 +307,7 @@ function OverBudgetModal({
 
         <button
           onClick={onClose}
-          className="w-full bg-neutral-900 text-white py-3.5 rounded-xl font-semibold hover:bg-neutral-800 active:scale-[0.98] transition-all"
+          className="w-full bg-neutral-900 text-white py-3.5 rounded-xl font-semibold hover:bg-neutral-800 transition-all"
         >
           เข้าใจแล้ว
         </button>
@@ -323,20 +323,20 @@ const CATEGORY_CONFIG = {
   destination: {
     label: "สถานที่ท่องเที่ยว",
     icon: MapPin,
-    accent: "text-blue-500",
-    badgeBg: "bg-blue-50",
-    badgeText: "text-blue-700",
-    headerBg: "bg-blue-50/60",
-    bar: "bg-blue-400",
+    accent: "text-sky-600",
+    badgeBg: "bg-sky-50",
+    badgeText: "text-sky-700",
+    headerBg: "bg-sky-50/60",
+    bar: "bg-sky-500",
   },
   restaurant: {
     label: "ร้านอาหาร",
     icon: Utensils,
-    accent: "text-orange-500",
-    badgeBg: "bg-orange-50",
-    badgeText: "text-orange-700",
-    headerBg: "bg-orange-50/60",
-    bar: "bg-orange-400",
+    accent: "text-amber-600",
+    badgeBg: "bg-amber-50",
+    badgeText: "text-amber-700",
+    headerBg: "bg-amber-50/60",
+    bar: "bg-amber-500",
   },
   accommodation: {
     label: "ที่พัก",
@@ -375,12 +375,12 @@ function SummaryItemCard({
         <img
           src={getImageUrl(item)}
           alt={item.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:brightness-95"
         />
         {/* linear overlay for text legibility */}
         <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
         {/* price chip on image */}
-        <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-neutral-900 shadow-sm">
+        <div className="absolute bottom-2 right-2 bg-white/90 px-2.5 py-1 rounded-full text-xs font-bold text-neutral-900 shadow-sm">
           ฿{item.min_price.toLocaleString()}
         </div>
       </div>
@@ -400,7 +400,7 @@ function SummaryItemCard({
       {/* Remove button — top-right corner */}
       <button
         onClick={onRemove}
-        className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all shadow-sm"
+        className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all shadow-sm"
         aria-label="ลบรายการนี้"
       >
         <X className="w-3.5 h-3.5 text-neutral-500 hover:text-red-500 transition-colors" />
@@ -531,7 +531,7 @@ export function TripSummaryModal({
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: "100%", opacity: 0 }}
         transition={{ type: "spring", stiffness: 320, damping: 35 }}
-        className="relative z-10 bg-white w-full sm:max-w-2xl rounded-t-[2.5rem] sm:rounded-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] flex flex-col max-h-[92vh] sm:max-h-[88vh] overflow-hidden border border-neutral-100"
+        className="relative z-10 bg-white w-full sm:max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col max-h-[92vh] sm:max-h-[88vh] overflow-hidden border border-neutral-100"
       >
         {/* Mobile drag handle */}
         <div className="sm:hidden flex justify-center pt-3 pb-1 shrink-0">
@@ -673,7 +673,7 @@ export function TripSummaryModal({
           <div className="min-w-0 flex-1">
             <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">ยอดรวมสุทธิ</span>
             <div className="flex items-baseline gap-1.5 truncate">
-              <span className="text-xl sm:text-2xl font-black text-emerald-900 tracking-tight">
+              <span className="text-xl sm:text-2xl font-black text-neutral-900 tracking-tight">
                 ฿{totalPrice.toLocaleString()}
               </span>
               {totalBudget > 0 && isOver && (
@@ -687,7 +687,7 @@ export function TripSummaryModal({
               <button
                 onClick={onSave}
                 disabled={items.length === 0 || isLoading}
-                className="w-full bg-emerald-900 hover:bg-black text-white py-2.5 px-5 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-neutral-900/15 active:scale-[0.98] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="w-full bg-neutral-900 hover:bg-black text-white py-2.5 px-5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <RefreshCcw className="w-5 h-5 animate-spin" />
@@ -734,7 +734,7 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        className="relative z-10 bg-white rounded-3xl p-8 shadow-2xl max-w-xs w-full text-center"
+        className="relative z-10 bg-white rounded-2xl p-8 shadow-xl max-w-xs w-full text-center"
       >
         <motion.div
           initial={{ scale: 0 }}
@@ -752,7 +752,7 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
         </p>
         <button
           onClick={onClose}
-          className="w-full bg-emerald-500 text-white py-3.5 rounded-xl font-semibold hover:bg-emerald-600 active:scale-[0.98] transition-all"
+          className="w-full bg-emerald-500 text-white py-3.5 rounded-xl font-semibold hover:bg-emerald-600 transition-all"
         >
           เยี่ยม!
         </button>
@@ -930,7 +930,7 @@ export default function BudgetTripPlanner({
     <div className="w-full max-w-5xl mx-auto py-12 px-4 sm:px-6 pb-16 relative">
 
       {/* ── Header & Input ─────────────────────────────────────── */}
-      <div className="bg-white rounded-4xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-neutral-100 mb-10">
+      <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-neutral-100 mb-10">
         <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-neutral-900 mb-6 flex items-center gap-2">
           <Sparkles className="w-6 h-6 text-black" />
           จัดทริปตามงบประมาณ
@@ -1022,7 +1022,7 @@ export default function BudgetTripPlanner({
                     className={`w-full px-4 py-3 bg-neutral-50 border rounded-xl focus:bg-white focus:ring-2 focus:ring-black/5 transition-all outline-none ${
                       !Number(customBudgets[key as keyof typeof customBudgets])
                         ? "border-neutral-200"
-                        : "border-emerald-300 focus:border-emerald-400"
+                        : "border-neutral-300 focus:border-amber-500"
                     }`}
                   />
                 </div>
@@ -1039,7 +1039,7 @@ export default function BudgetTripPlanner({
             title={!budgetValid ? budgetHint : undefined}
             className={`bg-black text-white px-8 py-3.5 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${
               budgetValid && !isLoading
-                ? "hover:bg-neutral-800 active:scale-[0.98]"
+                ? "hover:bg-neutral-800"
                 : "opacity-40 cursor-not-allowed"
             }`}
           >
@@ -1086,7 +1086,7 @@ export default function BudgetTripPlanner({
             <div className="space-y-12">
               <TripRow
                 title="สถานที่ท่องเที่ยวแนะนำ"
-                icon={<MapPin className="w-5 h-5 text-blue-500" />}
+                icon={<MapPin className="w-5 h-5 text-sky-600" />}
                 items={tripData.destinations}
                 type="destination"
                 selectedItems={selectedItems}
@@ -1231,7 +1231,7 @@ function TripRow({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => scroll("left")}
-              className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/95 backdrop-blur shadow-lg border border-neutral-100 rounded-full hidden sm:flex items-center justify-center text-neutral-700 hover:text-black hover:scale-105 transition-all"
+              className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/95 backdrop-blur shadow-lg border border-neutral-100 rounded-full hidden sm:flex items-center justify-center text-neutral-700 hover:text-black transition-all"
             >
               <ChevronLeft className="w-6 h-6 -ml-1" />
             </motion.button>
@@ -1245,7 +1245,7 @@ function TripRow({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => scroll("right")}
-              className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/95 backdrop-blur shadow-lg border border-neutral-100 rounded-full hidden sm:flex items-center justify-center text-neutral-700 hover:text-black hover:scale-105 transition-all"
+              className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/95 backdrop-blur shadow-lg border border-neutral-100 rounded-full hidden sm:flex items-center justify-center text-neutral-700 hover:text-black transition-all"
             >
               <ChevronRight className="w-6 h-6 ml-1" />
             </motion.button>
@@ -1285,17 +1285,17 @@ function TripRow({
                   whileHover={{ y: wouldExceed ? 0 : -4, transition: { duration: 0.2 } }}
                   className={`snap-start shrink-0 w-70 bg-white rounded-2xl overflow-hidden cursor-pointer group transition-all duration-300 ${
                     isSelected
-                      ? "ring-2 ring-blue-500 shadow-[0_8px_25px_rgba(59,130,246,0.18)]"
+                      ? "ring-2 ring-amber-500"
                       : wouldExceed
                       ? "border border-neutral-100 opacity-50 cursor-not-allowed"
-                      : "border border-neutral-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-md"
+                      : "border border-neutral-100 shadow-sm hover:shadow-md"
                   }`}
                 >
                   <div className="relative h-40 w-full overflow-hidden bg-neutral-100">
                     <img
                       src={getImageUrl(item)}
                       alt={item.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:brightness-95"
                     />
                     <div
                       className={`absolute inset-0 transition-opacity duration-300 ${
@@ -1305,7 +1305,7 @@ function TripRow({
 
                     {wouldExceed && (
                       <div className="absolute inset-0 bg-neutral-900/30 flex items-center justify-center">
-                        <span className="bg-white/90 backdrop-blur-sm text-neutral-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow">
+                        <span className="bg-white/90 text-neutral-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow">
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                           เกินงบ
                         </span>
@@ -1320,14 +1320,14 @@ function TripRow({
                           exit={{ scale: 0, opacity: 0 }}
                           className="absolute top-3 left-3 z-10 bg-white rounded-full p-0.5 shadow-md"
                         >
-                          <CheckCircle2 className="w-6 h-6 text-blue-600 fill-blue-50" />
+                          <CheckCircle2 className="w-6 h-6 text-amber-600 fill-amber-50" />
                         </motion.div>
                       )}
                     </AnimatePresence>
 
                     {item.min_price != null && (
                       <div
-                        className={`absolute top-3 right-3 z-10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
+                        className={`absolute top-3 right-3 z-10 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
                           wouldExceed
                             ? "bg-red-50/90 text-red-600"
                             : "bg-white/90 text-neutral-900"

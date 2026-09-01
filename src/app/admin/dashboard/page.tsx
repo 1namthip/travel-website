@@ -114,24 +114,22 @@ export const calculatePercentage = (part: number, total: number): number => {
 // ─── UI Components ────────────────────────────────────────────────────────────
 
 export const SectionHeader = ({ title, action }: { title: string; action?: React.ReactNode }) => (
-  <div className="mb-4 flex items-end justify-between border-b border-slate-200 pb-3">
-    <h2 className="text-[15px] font-bold tracking-tight text-slate-800">{title}</h2>
+  <div className="mb-4 flex items-end justify-between border-b border-zinc-200 pb-3">
+    <h2 className="text-[15px] font-semibold tracking-tight text-zinc-900">{title}</h2>
     {action && <div className="text-[13px]">{action}</div>}
   </div>
 );
 
 export const KpiCard = ({ label, value, loading, context }: { label: string; value: number | string; loading: boolean; context?: string }) => (
-  // โทนขาว (60%)
-  <div className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-blue-300 hover:shadow-md">
-    <span className="text-[13px] font-medium text-slate-500">{label}</span>
+  <div className="flex flex-col rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+    <span className="text-[13px] font-medium text-zinc-500">{label}</span>
     <div className="mt-2.5 flex items-baseline gap-2">
-      {/* ข้อความหลักตัวเข้ม */}
-      <span className="text-xl font-bold tracking-tight text-slate-900 tabular-nums">
+      <span className="text-xl font-semibold tracking-tight text-zinc-900 tabular-nums">
         {loading ? "—" : value.toLocaleString("th-TH")}
       </span>
     </div>
     {context && (
-      <span className="mt-1.5 text-[12px] font-medium text-slate-400">{context}</span>
+      <span className="mt-1.5 text-[12px] font-medium text-zinc-400">{context}</span>
     )}
   </div>
 );
@@ -188,14 +186,13 @@ export default function AdminDashboardPage() {
   const recentReviews = stats?.recentReviews ?? [];
 
   return (
-    // โทนขาว/สว่าง (60%) เป็นพื้นหลังหลัก สีชมพู (10%) ตอน Selection
-    <div className="min-h-screen bg-slate-50 font-sans selection:bg-pink-100 selection:text-pink-900">
+    <div className="min-h-screen bg-zinc-50 font-sans selection:bg-blue-100 selection:text-blue-900">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        
+
         {/* 1. Executive Overview */}
         <header className="mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">ภาพรวมระบบ</h1>
-          <p className="mt-1.5 text-[14px] text-slate-500">
+          <h1 className="text-xl font-semibold tracking-tight text-zinc-900">ภาพรวมระบบ</h1>
+          <p className="mt-1 text-sm text-zinc-500">
             {loading ? "กำลังโหลดสถานะระบบ..." : `ดูแลและจัดการข้อมูลทั้งหมด ${totalContent.toLocaleString("th-TH")} รายการในระบบ`}
           </p>
         </header>
@@ -219,42 +216,42 @@ export default function AdminDashboardPage() {
               <SectionHeader title="รายการที่ต้องดำเนินการ" />
               <div className="grid gap-4 sm:grid-cols-2">
                 {pendingCount > 0 ? (
-                  // ไฮไลท์สีชมพู (10%) ดึงดูดสายตาให้แอดมินจัดการ
-                  <div className="flex flex-col rounded-xl border-y border-r border-pink-100 bg-linear-to-tl from-pink-200/50 to-pink-50/50 p-5 shadow-sm">
+                  // ชมพู = งานที่ต้องดำเนินการด่วน (ใช้เป็นเส้นขอบ ไม่ใช่พื้นตกแต่ง)
+                  <div className="flex flex-col rounded-xl border border-pink-200 bg-white p-5 shadow-sm">
                     <div className="flex items-center gap-2 text-pink-600">
                       <AlertCircle className="h-4 w-4" strokeWidth={2.5} />
                       <span className="text-[13px] font-semibold tracking-tight">คิวงานรอการตรวจสอบ</span>
                     </div>
-                    <p className="mt-2 text-3xl font-bold tracking-tight text-pink-600">{pendingCount}</p>
-                    <p className="mt-1 text-[13px] text-pink-500/80">รีวิวที่รอการอนุมัติก่อนเผยแพร่</p>
-                    <Link href="/admin/reviews" className="mt-4 flex w-fit items-center gap-1.5 rounded-md bg-pink-100 px-3 py-1.5 text-[12px] font-semibold text-pink-600 transition-colors hover:bg-pink-200">
+                    <p className="mt-2 text-2xl font-semibold tracking-tight text-pink-600 tabular-nums">{pendingCount}</p>
+                    <p className="mt-1 text-[13px] text-zinc-500">รีวิวที่รอการอนุมัติก่อนเผยแพร่</p>
+                    <Link href="/admin/reviews" className="mt-4 flex w-fit items-center gap-1.5 rounded-md bg-pink-50 px-3 py-1.5 text-[12px] font-semibold text-pink-700 transition-colors hover:bg-pink-100">
                       จัดการรีวิว <ChevronRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
                 ) : (
-                  <div className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <div className="flex items-center gap-2 text-slate-500">
+                  <div className="flex flex-col rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+                    <div className="flex items-center gap-2 text-zinc-500">
                       <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                       <span className="text-[13px] font-medium">จัดการเรียบร้อย</span>
                     </div>
-                    <p className="mt-2 text-[13px] text-slate-400">ไม่มีรีวิวที่รอการตรวจสอบในขณะนี้</p>
+                    <p className="mt-2 text-[13px] text-zinc-400">ไม่มีรีวิวที่รอการตรวจสอบในขณะนี้</p>
                   </div>
                 )}
                 
                 {/* Content Health Architecture Prototype */}
-                <div className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                   <div className="flex items-center gap-2 text-slate-800">
-                      <Activity className="h-4 w-4 text-slate-400" />
+                <div className="flex flex-col rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+                   <div className="flex items-center gap-2 text-zinc-900">
+                      <Activity className="h-4 w-4 text-zinc-400" />
                       <span className="text-[13px] font-semibold tracking-tight">ความสมบูรณ์ของข้อมูล</span>
                     </div>
                     <div className="mt-4 flex flex-col gap-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-[13px] text-slate-500">สถานที่ที่มีรูปภาพประกอบ</span>
+                        <span className="text-[13px] text-zinc-500">สถานที่ที่มีรูปภาพประกอบ</span>
                         {/* โทนน้ำเงิน (30%) สำหรับสถานะปกติที่ดี */}
                         <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[12px] font-semibold text-blue-600">100%</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-[13px] text-slate-500">ร้านอาหารที่ระบุราคา</span>
+                        <span className="text-[13px] text-zinc-500">ร้านอาหารที่ระบุราคา</span>
                         {/* โทนชมพู (10%) สำหรับจุดที่ต้องจัดการต่อ */}
                         <span className="rounded-md bg-pink-50 px-2 py-0.5 text-[12px] font-semibold text-pink-600">ต้องตรวจสอบ</span>
                       </div>
@@ -278,23 +275,23 @@ export default function AdminDashboardPage() {
             <section>
               <SectionHeader title="ข้อมูลเชิงลึก (Insights)" />
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <p className="text-[14px] leading-relaxed text-slate-600">
-                    สถานที่ท่องเที่ยวหมวด <strong className="font-semibold text-slate-900">ธรรมชาติ</strong> เป็นหมวดหมู่หลักในระบบ คิดเป็นสัดส่วนถึง <strong className="font-semibold text-blue-600">{naturePercentage}%</strong> ({natureCount} แห่ง) ของสถานที่ทั้งหมด
+                <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+                  <p className="text-[14px] leading-relaxed text-zinc-600">
+                    สถานที่ท่องเที่ยวหมวด <strong className="font-semibold text-zinc-900">ธรรมชาติ</strong> เป็นหมวดหมู่หลักในระบบ คิดเป็นสัดส่วนถึง <strong className="font-semibold text-blue-600">{naturePercentage}%</strong> ({natureCount} แห่ง) ของสถานที่ทั้งหมด
                   </p>
-                  <div className="mt-5 flex h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div className="mt-5 flex h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
                     {/* โทนน้ำเงิน (30%) ในกราฟ */}
-                    <div className="bg-blue-500 transition-all duration-1000 ease-out" style={{ width: `${naturePercentage}%` }} />
+                    <div className="bg-blue-500 transition-all duration-500 ease-out" style={{ width: `${naturePercentage}%` }} />
                   </div>
                 </div>
                 
-                <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <p className="text-[14px] leading-relaxed text-slate-600">
-                    หมวดหมู่ <strong className="font-semibold text-slate-900">อาหารไทย</strong> เป็นประเภทที่พบมากที่สุด คิดเป็นสัดส่วน <strong className="font-semibold text-blue-600">{thaiFoodPercentage}%</strong> ของฐานข้อมูลร้านอาหารทั้งหมดในขณะนี้
+                <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+                  <p className="text-[14px] leading-relaxed text-zinc-600">
+                    หมวดหมู่ <strong className="font-semibold text-zinc-900">อาหารไทย</strong> เป็นประเภทที่พบมากที่สุด คิดเป็นสัดส่วน <strong className="font-semibold text-blue-600">{thaiFoodPercentage}%</strong> ของฐานข้อมูลร้านอาหารทั้งหมดในขณะนี้
                   </p>
-                  <div className="mt-5 flex h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div className="mt-5 flex h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
                      {/* โทนน้ำเงิน (30%) ในกราฟ */}
-                    <div className="bg-blue-500 transition-all duration-1000 ease-out" style={{ width: `${thaiFoodPercentage}%` }} />
+                    <div className="bg-blue-500 transition-all duration-500 ease-out" style={{ width: `${thaiFoodPercentage}%` }} />
                   </div>
                 </div>
               </div>
@@ -306,45 +303,44 @@ export default function AdminDashboardPage() {
             
             {/* 6. Recent Activity */}
             <section>
-              <SectionHeader 
-                title="ความเคลื่อนไหวล่าสุด" 
+              <SectionHeader
+                title="ความเคลื่อนไหวล่าสุด"
                 action={
-                  // โทนชมพู (10%) กระตุ้น Call to action ย่อยๆ
-                  <Link href="/admin/reviews" className="flex items-center gap-1 font-semibold text-pink-500 transition-colors hover:text-pink-600">
+                  <Link href="/admin/reviews" className="flex items-center gap-1 font-medium text-blue-600 transition-colors hover:text-blue-700">
                     ดูทั้งหมด <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
-                } 
+                }
               />
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
                 {loading ? (
                   <div className="p-5 space-y-4">
                      {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="h-12 animate-pulse rounded-md bg-slate-100" />
+                      <div key={i} className="h-12 animate-pulse rounded-md bg-zinc-100" />
                     ))}
                   </div>
                 ) : recentReviews.length > 0 ? (
-                  <ul className="divide-y divide-slate-100">
+                  <ul className="divide-y divide-zinc-100">
                     {recentReviews.map((review) => (
-                      <li key={review.id} className="p-5 transition-colors hover:bg-slate-50/80">
+                      <li key={review.id} className="p-5 transition-colors hover:bg-zinc-50">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5 text-[13px] font-bold text-slate-900">
+                          <div className="flex items-center gap-1.5 text-[13px] font-bold text-zinc-900">
                             {review.rating} <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                           </div>
-                          <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
+                          <span className="flex items-center gap-1 text-[11px] font-medium text-zinc-400">
                             <Clock className="h-3 w-3" /> {formatRelativeTime(review.created_at)}
                           </span>
                         </div>
-                        <p className="mt-2.5 text-[13px] font-semibold text-slate-900">
+                        <p className="mt-2.5 text-[13px] font-semibold text-zinc-900">
                           {resolveReviewTarget(review, destinations)}
                         </p>
-                        <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-slate-500">
+                        <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-zinc-500">
                           {review.comment || "ไม่มีการระบุข้อความรีวิว"}
                         </p>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                   <div className="p-8 text-center text-[13px] text-slate-400">ยังไม่มีความเคลื่อนไหวล่าสุด</div>
+                   <div className="p-8 text-center text-[13px] text-zinc-400">ยังไม่มีความเคลื่อนไหวล่าสุด</div>
                 )}
               </div>
             </section>
@@ -361,22 +357,19 @@ export default function AdminDashboardPage() {
                   <Link
                     key={action.href}
                     href={action.href}
-                    // พื้นขาว (60%) โฮเวอร์แล้วขอบเป็นโทนน้ำเงินอ่อน
-                    className="group flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3.5 transition-all hover:border-blue-300 hover:shadow-sm"
+                    className="group flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
                   >
-                    <div className="flex items-center gap-3 text-[13px] font-medium text-slate-700 transition-colors group-hover:text-blue-700">
-                      {/* ไอคอนโทนน้ำเงิน (30%) */}
-                      <action.icon className="h-4 w-4 text-blue-500 transition-colors group-hover:text-blue-600" />
+                    <div className="flex items-center gap-3 text-[13px] font-medium text-zinc-700">
+                      <action.icon className="h-4 w-4 text-zinc-400" />
                       {action.name}
                     </div>
-                    <ArrowUpRight className="h-4 w-4 text-slate-300 transition-colors group-hover:text-blue-400" />
+                    <ArrowUpRight className="h-4 w-4 text-zinc-300 transition-colors group-hover:text-zinc-500" />
                   </Link>
                 ))}
-                
+
                 <Link
                   href="/admin/destinations/new"
-                  // ปุ่ม Call to Action หลักใช้สีน้ำเงิน (30%)
-                  className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3.5 text-[13px] font-medium text-white transition-all hover:bg-blue-700 hover:shadow-md"
+                  className="mt-2 inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
                 >
                   <Plus className="h-4 w-4" /> เพิ่มข้อมูลใหม่
                 </Link>

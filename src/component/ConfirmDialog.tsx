@@ -52,7 +52,7 @@ export default function ConfirmDialog({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-md"
+            className="absolute inset-0 bg-zinc-950/40 backdrop-blur-sm"
             onClick={!loading ? onCancel : undefined}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -65,124 +65,55 @@ export default function ConfirmDialog({
             aria-modal="true"
             aria-labelledby="confirm-title"
             aria-describedby="confirm-description"
-            initial={{
-              opacity: 0,
-              y: 20,
-              scale: 0.95,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              scale: 1,
-            }}
-            exit={{
-              opacity: 0,
-              y: 20,
-              scale: 0.95,
-            }}
-            transition={{
-              duration: 0.2,
-              ease: "easeOut",
-            }}
-            className="
-              relative
-              w-full
-              max-w-md
-              overflow-hidden
-              rounded-3xl
-              border
-              border-white/20
-              bg-white
-              shadow-[0_20px_80px_rgba(0,0,0,0.25)]
-            "
+            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+            className="relative w-full max-w-md overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-xl"
           >
             {/* Close Button */}
             <button
               onClick={onCancel}
               disabled={loading}
-              className="
-                absolute
-                right-4
-                top-4
-                rounded-full
-                p-2
-                text-gray-400
-                transition-all
-                hover:bg-gray-100
-                hover:text-gray-700
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-              "
+              aria-label="ปิด"
+              className="absolute right-3 top-3 rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <X size={18} />
+              <X size={16} />
             </button>
 
             {/* Content */}
-            <div className="p-8">
-              {/* Icon */}
-              <div
-                className={`
-                  mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl
-                  ${
-                    danger
-                      ? "bg-red-50 text-red-600"
-                      : "bg-blue-50 text-blue-600"
-                  }
-                `}
-              >
-                <AlertTriangle size={30} />
+            <div className="p-6">
+              <div className="flex items-start gap-3.5">
+                <div
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+                    danger ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-600"
+                  }`}
+                >
+                  <AlertTriangle size={18} />
+                </div>
+
+                <div className="min-w-0 flex-1 pr-6">
+                  <h2
+                    id="confirm-title"
+                    className="text-[15px] font-semibold tracking-tight text-zinc-900"
+                  >
+                    {title}
+                  </h2>
+                  <div
+                    id="confirm-description"
+                    className="mt-1 text-sm leading-6 text-zinc-500"
+                  >
+                    {message}
+                  </div>
+                </div>
               </div>
 
-              {/* Title */}
-              <h2
-                id="confirm-title"
-                className="
-                  text-center
-                  text-xl
-                  font-bold
-                  tracking-tight
-                  text-gray-900
-                "
-              >
-                {title}
-              </h2>
-
-              {/* Message */}
-              <p
-                id="confirm-description"
-                className="
-                  mt-3
-                  text-center
-                  text-sm
-                  leading-6
-                  text-gray-500
-                "
-              >
-                {message}
-              </p>
-
               {/* Actions */}
-              <div className="mt-8 flex gap-3">
+              <div className="mt-6 flex justify-end gap-2.5">
                 <button
                   onClick={onCancel}
                   disabled={loading}
-                  className="
-                    flex-1
-                    rounded-xl
-                    border
-                    border-gray-200
-                    px-4
-                    py-3
-                    font-medium
-                    text-gray-700
-                    transition-all
-                    hover:bg-gray-50
-                    focus:outline-none
-                    focus:ring-4
-                    focus:ring-gray-200
-                    disabled:cursor-not-allowed
-                    disabled:opacity-50
-                  "
+                  className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {cancelText}
                 </button>
@@ -190,33 +121,11 @@ export default function ConfirmDialog({
                 <button
                   onClick={onConfirm}
                   disabled={loading}
-                  className={`
-                    flex-1
-                    rounded-xl
-                    px-4
-                    py-3
-                    font-medium
-                    text-white
-                    transition-all
-                    focus:outline-none
-                    focus:ring-4
-                    disabled:cursor-not-allowed
-                    disabled:opacity-70
-
-                    ${
-                      danger
-                        ? `
-                        bg-red-600
-                        hover:bg-red-700
-                        focus:ring-red-200
-                      `
-                        : `
-                        bg-blue-600
-                        hover:bg-blue-700
-                        focus:ring-blue-200
-                      `
-                    }
-                  `}
+                  className={`inline-flex h-9 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium text-white transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-70 ${
+                    danger
+                      ? "bg-red-600 hover:bg-red-700 focus-visible:ring-red-500/40"
+                      : "bg-blue-600 hover:bg-blue-700 focus-visible:ring-blue-500/40"
+                  }`}
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
@@ -247,18 +156,6 @@ export default function ConfirmDialog({
                 </button>
               </div>
             </div>
-
-            {/* Bottom Accent */}
-            <div
-              className={`
-                h-1 w-full
-                ${
-                  danger
-                    ? "bg-linear-to-r from-red-500 to-red-600"
-                    : "bg-linear-to-r from-blue-500 to-blue-600"
-                }
-              `}
-            />
           </motion.div>
         </motion.div>
       )}

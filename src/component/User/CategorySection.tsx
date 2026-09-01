@@ -28,7 +28,7 @@ const searchItems = [
 
 export default function SearchBar() {
   return (
-    <div className="w-full max-w-5xl mx-auto bg-white/90 backdrop-blur-2xl border border-white/60 rounded-4xl md:rounded-full shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] p-2.5 flex flex-col md:flex-row items-center justify-between gap-2 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.12)]">
+    <div className="w-full max-w-5xl mx-auto bg-white/90 backdrop-blur-sm border border-white/60 rounded-2xl md:rounded-full shadow-sm p-2.5 flex flex-col md:flex-row items-center justify-between gap-2 transition-all duration-500 ">
 
       {/* Search Fields */}
       <div className="flex-1 w-full flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-neutral-100">
@@ -60,7 +60,7 @@ export default function SearchBar() {
       {/* Search Action */}
       <Link
         href="/accommodations"
-        className="w-full md:w-16 md:h-16 py-4 md:py-0 rounded-full bg-neutral-900 text-white flex items-center justify-center hover:bg-black hover:scale-[1.03] active:scale-95 transition-all duration-300 shrink-0 shadow-lg"
+        className="w-full md:w-16 md:h-16 py-4 md:py-0 rounded-full bg-neutral-900 text-white flex items-center justify-center hover:bg-black transition-colors shrink-0 shadow-lg"
       >
         <span className="md:hidden font-medium mr-2">
           ค้นหาที่พัก

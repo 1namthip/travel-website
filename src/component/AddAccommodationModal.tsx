@@ -415,17 +415,17 @@ export const AddAccommodationModal = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 15 }}
             transition={{ duration: 0.23, ease: "easeOut" }}
-            className="relative w-full max-w-2xl bg-white rounded-xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-zinc-200/50 flex flex-col max-h-[85vh] overflow-hidden"
+            className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl border border-zinc-200 flex flex-col max-h-[85vh] overflow-hidden"
           >
             {/* Modal Sub-Header Node */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white z-10 shrink-0">
               <div>
-                <h2 className="text-[16px] font-semibold text-zinc-900 tracking-tight flex items-center gap-2">
-                  <Building2 size={16} className="text-zinc-500" />
-                  {editAccommodation ? "Edit Accommodation" : "Create New Listing"}
+                <h2 className="text-[15px] font-semibold text-zinc-900 tracking-tight flex items-center gap-2">
+                  <Building2 size={15} className="text-zinc-400" />
+                  {editAccommodation ? "แก้ไขข้อมูลที่พัก" : "เพิ่มที่พักใหม่"}
                 </h2>
                 <p className="text-xs text-zinc-400 mt-0.5">
-                  {editAccommodation ? "แก้ไขข้อมูลรายชื่อห้องพัก/หอพักหลังบ้าน" : "เพิ่มและจัดส่งข้อมูลรายชื่อหอพักใหม่เข้าสู่ระบบ"}
+                  {editAccommodation ? "ปรับปรุงรายละเอียดของที่พักในระบบ" : "เพิ่มข้อมูลที่พักใหม่เข้าสู่ระบบ"}
                 </p>
               </div>
               <button
@@ -564,7 +564,7 @@ export const AddAccommodationModal = ({
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
                       placeholder="ระบุชื่อหอพัก หรือชื่อโครงการที่พัก"
                     />
                   </div>
@@ -576,7 +576,7 @@ export const AddAccommodationModal = ({
                       <button
                         type="button"
                         onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                        className={`w-full pl-3 pr-3 py-2 text-sm border rounded-lg bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 ${
+                        className={`w-full pl-3 pr-3 py-2 text-sm border rounded-lg bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
                           isCategoryOpen ? "border-zinc-400 ring-4 ring-zinc-900/5" : "border-zinc-200 hover:border-zinc-300"
                         } text-zinc-900`}
                       >
@@ -591,7 +591,7 @@ export const AddAccommodationModal = ({
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 4, scale: 0.98 }}
                             transition={{ duration: 0.13 }}
-                            className="absolute synchronized-dropdown z-50 w-full mt-1 bg-white border border-zinc-200 rounded-lg shadow-[0_12px_30px_-10px_rgba(0,0,0,0.1)] py-1 overflow-hidden"
+                            className="absolute synchronized-dropdown z-50 w-full mt-1 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 overflow-hidden"
                           >
                             <div className="max-h-48 overflow-y-auto custom-scrollbar">
                               {categories.map((cat) => (
@@ -621,7 +621,7 @@ export const AddAccommodationModal = ({
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400 resize-none leading-relaxed"
+                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400 resize-none leading-relaxed"
                       placeholder="ระบุสิ่งอำนวยความสะดวก รายละเอียดค่าน้ำ/ค่าไฟ หรือจุดเด่นของโครงการ..."
                     />
                   </div>
@@ -634,7 +634,7 @@ export const AddAccommodationModal = ({
                       type="text"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
                       placeholder="บ้านเลขที่, ซอย, ถนน, ตำบล, อำเภอ..."
                     />
                   </div>
@@ -653,7 +653,7 @@ export const AddAccommodationModal = ({
                       required
                       value={formData.min_price}
                       onChange={(e) => setFormData({ ...formData, min_price: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
                       placeholder="0"
                     />
                   </div>
@@ -663,7 +663,7 @@ export const AddAccommodationModal = ({
                       type="number"
                       value={formData.max_price}
                       onChange={(e) => setFormData({ ...formData, max_price: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
                       placeholder="0"
                     />
                   </div>
@@ -681,7 +681,7 @@ export const AddAccommodationModal = ({
                       type="tel"
                       value={formData.contact_phone}
                       onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
                       placeholder="08X-XXX-XXXX"
                     />
                   </div>
@@ -691,7 +691,7 @@ export const AddAccommodationModal = ({
                       type="text"
                       value={formData.contact_line}
                       onChange={(e) => setFormData({ ...formData, contact_line: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
                       placeholder="@lineid"
                     />
                   </div>
@@ -701,7 +701,7 @@ export const AddAccommodationModal = ({
                       type="text"
                       value={formData.contact_facebook}
                       onChange={(e) => setFormData({ ...formData, contact_facebook: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
                       placeholder="ชื่อเพจ หรือลิงก์โฮมเพจ"
                     />
                   </div>
@@ -715,7 +715,7 @@ export const AddAccommodationModal = ({
                 type="button"
                 onClick={() => { resetForm(); onClose(); }}
                 disabled={submitting || uploading}
-                className="px-4 py-2 text-[13px] font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] transition-all disabled:opacity-50"
+                className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-50"
               >
                 ยกเลิก
               </button>
@@ -723,7 +723,7 @@ export const AddAccommodationModal = ({
                 form="accommodation-form"
                 type="submit"
                 disabled={submitting || uploading}
-                className="px-4 py-2 text-[13px] font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 shadow-sm active:scale-[0.98] transition-all disabled:opacity-70 flex items-center justify-center min-w-30"
+                className="inline-flex h-9 min-w-30 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:opacity-70"
               >
                 {uploading || submitting ? (
                   <span className="flex items-center gap-2">

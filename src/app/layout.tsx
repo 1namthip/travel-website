@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Prompt } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import ChatWidget from "@/component/ChatWidget";
+import { FavoritesProvider } from "@/component/FavoritesProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,8 +34,10 @@ export default function RootLayout({
   return (
     <html lang="th" className={prompt.variable} suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <main className="font-sans">{children}</main>
-        <ChatWidget />
+        <FavoritesProvider>
+          <main className="font-sans">{children}</main>
+          <ChatWidget />
+        </FavoritesProvider>
         <Toaster position="top-right" />
       </body>
     </html>

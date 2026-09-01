@@ -38,15 +38,15 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
       className="fixed inset-0 bg-black/60 bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-fadeIn">
+      <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-xl animate-fadeIn">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-linear-to-r from-blue-50 to-white">
-          <h2 className="text-2xl font-bold text-gray-900">{accommodation.name}</h2>
+        <div className="flex items-center justify-between p-6 border-b border-neutral-200 bg-white">
+          <h2 className="text-2xl font-bold text-neutral-900">{accommodation.name}</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
           >
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -57,7 +57,7 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
           {/* Left: Images */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div className="relative h-96 bg-linear-to-br from-gray-200 to-gray-300 rounded-xl overflow-hidden">
+            <div className="relative h-96 bg-neutral-200 rounded-xl overflow-hidden">
               {accommodation.images && accommodation.images.length > 0 ? (
                 <img
                   src={accommodation.images[selectedImageIndex]}
@@ -70,7 +70,7 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
                   }}
                 />
               ) : (
-                <div className="absolute inset-0 bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                <div className="absolute inset-0 bg-neutral-200 flex items-center justify-center">
                   <svg className="w-20 h-20 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
@@ -94,8 +94,8 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
                     onClick={() => setSelectedImageIndex(index)}
                     className={`shrink-0 w-24 h-24 rounded-lg overflow-hidden border-2 transition-all ${
                       selectedImageIndex === index
-                        ? 'border-blue-600 ring-2 ring-blue-200'
-                        : 'border-gray-200 hover:border-gray-400'
+                        ? 'border-amber-500 ring-2 ring-amber-200'
+                        : 'border-neutral-200 hover:border-neutral-400'
                     }`}
                   >
                     <img
@@ -111,7 +111,7 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
             {/* Description under images */}
             {accommodation.description && (
               <div className="p-4 rounded-xl">
-                <p className="text-gray-900 leading-relaxed whitespace-pre-line">{accommodation.description}</p>
+                <p className="text-neutral-900 leading-relaxed whitespace-pre-line">{accommodation.description}</p>
               </div>
             )}
           </div>
@@ -120,22 +120,22 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
           <div className="space-y-4">
             {/* Category */}
             <div>
-              <p className="text-sm text-gray-500 mb-1">ประเภทที่พัก</p>
-              <p className="text-lg font-semibold text-gray-900">{accommodation.category}</p>
+              <p className="text-sm text-neutral-500 mb-1">ประเภทที่พัก</p>
+              <p className="text-lg font-semibold text-neutral-900">{accommodation.category}</p>
             </div>
 
-            <div className="border-t border-gray-200"></div>
+            <div className="border-t border-neutral-200"></div>
 
             {/* Price */}
             {accommodation.price_range && (
               <>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">ค่าเช่า</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {accommodation.price_range.toLocaleString()} ฿<span className="text-base font-medium text-gray-600">/เดือน</span>
+                  <p className="text-sm text-neutral-500 mb-1">ค่าเช่า</p>
+                  <p className="text-2xl font-bold text-amber-700">
+                    {accommodation.price_range.toLocaleString()} ฿<span className="text-base font-medium text-neutral-600">/เดือน</span>
                   </p>
                 </div>
-                <div className="border-t border-gray-200"></div>
+                <div className="border-t border-neutral-200"></div>
               </>
             )}
 
@@ -143,23 +143,23 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
             {accommodation.address && (
               <>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">ที่อยู่</p>
-                  <p className="text-gray-700 leading-relaxed">{accommodation.address}</p>
+                  <p className="text-sm text-neutral-500 mb-1">ที่อยู่</p>
+                  <p className="text-neutral-700 leading-relaxed">{accommodation.address}</p>
                 </div>
-                <div className="border-t border-gray-200"></div>
+                <div className="border-t border-neutral-200"></div>
               </>
             )}
 
             {/* Contact Information */}
             <div>
-              <p className="text-sm text-gray-500 mb-3">ช่องทางติดต่อ</p>
+              <p className="text-sm text-neutral-500 mb-3">ช่องทางติดต่อ</p>
               <div className="space-y-3">
                 {accommodation.contact_phone && (
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">โทรศัพท์</p>
+                    <p className="text-xs text-neutral-500 mb-1">โทรศัพท์</p>
                     <a
                       href={`tel:${accommodation.contact_phone}`}
-                      className="text-blue-600 hover:text-blue-700 font-medium hover:underline inline-flex items-center gap-2"
+                      className="text-amber-700 hover:text-amber-800 font-medium hover:underline inline-flex items-center gap-2"
                     >
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
@@ -171,7 +171,7 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
                 
                 {accommodation.contact_line && (
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">LINE ID</p>
+                    <p className="text-xs text-neutral-500 mb-1">LINE ID</p>
                     <a
                       href={`https://line.me/ti/p/${accommodation.contact_line}`}
                       target="_blank"
@@ -188,7 +188,7 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
                 
                 {accommodation.contact_facebook && (
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Facebook</p>
+                    <p className="text-xs text-neutral-500 mb-1">Facebook</p>
                     <a
                       href={accommodation.contact_facebook}
                       target="_blank"

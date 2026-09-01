@@ -52,14 +52,14 @@ const TYPE_CONFIG = {
   destination: {
     label: "ที่เที่ยว",
     icon: <MapPin className="w-3.5 h-3.5" />,
-    color: "bg-blue-50 text-blue-700 border-blue-100",
-    dot: "bg-blue-400",
+    color: "bg-sky-50 text-sky-700 border-sky-100",
+    dot: "bg-sky-500",
   },
   restaurant: {
     label: "ร้านอาหาร",
     icon: <Utensils className="w-3.5 h-3.5" />,
-    color: "bg-orange-50 text-orange-700 border-orange-100",
-    dot: "bg-orange-400",
+    color: "bg-amber-50 text-amber-700 border-amber-100",
+    dot: "bg-amber-500",
   },
   accommodation: {
     label: "ที่พัก",
@@ -195,7 +195,7 @@ export function EditTripModal({
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: "100%", opacity: 0, scale: 0.95 }}
         transition={{ type: "spring", stiffness: 320, damping: 35 }}
-        className="relative z-10 bg-white w-full sm:max-w-4xl rounded-t-[2.5rem] sm:rounded-3xl shadow-[0_-20px_60px_rgba(0,0,0,0.2)] flex flex-col max-h-[92vh] sm:max-h-[85vh] overflow-hidden border border-neutral-100"
+        className="relative z-10 bg-white w-full sm:max-w-4xl rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col max-h-[92vh] sm:max-h-[85vh] overflow-hidden border border-neutral-100"
       >
         <div className="sm:hidden flex justify-center pt-3 pb-1 shrink-0">
           <div className="w-12 h-1.5 bg-neutral-200 rounded-full" />
@@ -227,7 +227,7 @@ export function EditTripModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="ตั้งชื่อทริปของคุณ..."
-              className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-neutral-900/5 focus:border-neutral-400 transition-all outline-none text-neutral-900 font-semibold placeholder:text-neutral-400 text-lg"
+              className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all outline-none text-neutral-900 font-semibold placeholder:text-neutral-400 text-lg"
             />
           </div>
 
@@ -241,7 +241,7 @@ export function EditTripModal({
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center py-16 text-center bg-neutral-50/50 rounded-3xl border border-dashed border-neutral-200 mt-4"
+                className="flex flex-col items-center justify-center py-16 text-center bg-neutral-50/50 rounded-2xl border border-dashed border-neutral-200 mt-4"
               >
                 <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-neutral-100 flex items-center justify-center mb-4 text-neutral-300">
                   <Luggage className="w-8 h-8" />
@@ -288,14 +288,14 @@ export function EditTripModal({
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ duration: 0.2 }}
-                                className="group relative flex flex-col bg-white border border-neutral-100 rounded-2xl overflow-hidden hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:border-neutral-200 transition-all duration-300"
+                                className="group relative flex flex-col bg-white border border-neutral-100 rounded-2xl overflow-hidden hover:shadow-md hover:border-neutral-200 transition-all duration-300"
                               >
                                 {/* Image Section */}
                                 <div className="relative aspect-4/3 w-full overflow-hidden bg-neutral-100 shrink-0">
                                   <img
                                     src={getImageUrl(detail)}
                                     alt={detail.name}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                                    className="w-full h-full object-cover transition-[filter] duration-300 group-hover:brightness-95"
                                   />
                                   <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                   
@@ -337,7 +337,7 @@ export function EditTripModal({
         </div>
 
         {/* ── Footer ──────────────────────────────────────── */}
-        <div className="p-4 sm:px-6 sm:py-5 bg-white border-t border-neutral-100 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_-4px_24px_rgba(0,0,0,0.02)]">
+        <div className="p-4 sm:px-6 sm:py-5 bg-white border-t border-neutral-100 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
           
           <div className="min-w-0 flex-1 hidden sm:block">
             <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-0.5">ยอดรวมโดยประมาณ</span>
@@ -356,7 +356,7 @@ export function EditTripModal({
             <button
               onClick={handleSave}
               disabled={isSaving || !name.trim()}
-              className="flex-2 sm:flex-none px-8 py-3 rounded-2xl text-sm font-bold text-white bg-neutral-900 hover:bg-black active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-neutral-900/20"
+              className="flex-2 sm:flex-none px-8 py-3 rounded-2xl text-sm font-bold text-white bg-neutral-900 hover:bg-black transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isSaving ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -402,7 +402,7 @@ export function TripCard({
   // ── Helper: Render Grid รูปภาพที่เนี้ยบที่สุดตามจำนวนรูป ──
   const renderImages = () => {
     const total = previewImages.length;
-    const imgClass = "w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105";
+    const imgClass = "w-full h-full object-cover transition-[filter] duration-300 group-hover:brightness-95";
 
     if (total === 0) {
       return (
@@ -455,7 +455,7 @@ export function TripCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ type: "spring", stiffness: 320, damping: 25 }}
-      className="bg-white rounded-3xl border border-neutral-200/70 shadow-[0_4px_20px_rgb(0,0,0,0.03)] overflow-hidden group hover:shadow-[0_12px_30px_rgb(0,0,0,0.08)] hover:border-neutral-300/80 transition-all duration-300 flex flex-col"
+      className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden group hover:shadow-md hover:border-neutral-300 transition-all duration-300 flex flex-col"
     >
       {/* ── 1. Image Strip (Hero Section) ── */}
       <div 
@@ -477,7 +477,7 @@ export function TripCard({
               }
             }}
             title="ลบทริปนี้"
-            className="w-8 h-8 bg-neutral-900/70 hover:bg-rose-600 text-white backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm"
+            className="w-8 h-8 bg-neutral-900/70 hover:bg-rose-600 text-white backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-200 shadow-sm"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -538,7 +538,7 @@ export function TripCard({
         <div className="pt-5 mt-4 border-t border-neutral-100">
           <button
             onClick={() => onEdit(trip)}
-            className="w-full py-2.5 px-4 rounded-2xl bg-neutral-50 hover:bg-neutral-900 text-neutral-700 hover:text-white text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 group/btn border border-neutral-200/60 hover:border-transparent active:scale-[0.98]"
+            className="w-full py-2.5 px-4 rounded-2xl bg-neutral-50 hover:bg-neutral-900 text-neutral-700 hover:text-white text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 group/btn border border-neutral-200 hover:border-transparent"
           >
             <span>จัดการทริปนี้</span>
             <ChevronRight className="w-3.5 h-3.5 text-neutral-400 group-hover/btn:text-white transition-transform group-hover/btn:translate-x-0.5" />
@@ -558,7 +558,7 @@ function EmptyState() {
       animate={{ opacity: 1, y: 0 }}
       className="col-span-full flex flex-col items-center justify-center py-24 text-center"
     >
-      <div className="w-24 h-24 bg-neutral-100 rounded-3xl flex items-center justify-center mb-6">
+      <div className="w-24 h-24 bg-neutral-100 rounded-2xl flex items-center justify-center mb-6">
         <Luggage className="w-12 h-12 text-neutral-300" />
       </div>
       <h3 className="text-xl font-bold text-neutral-800 mb-2">
@@ -569,7 +569,7 @@ function EmptyState() {
       </p>
       <Link
         href="/trips/plan"
-        className="bg-black text-white px-7 py-3.5 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-neutral-800 active:scale-[0.98] transition-all"
+        className="bg-black text-white px-7 py-3.5 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-neutral-800 transition-all"
       >
         <Plus className="w-4 h-4" />
         จัดทริปใหม่
@@ -639,23 +639,23 @@ export default function MyTripsPage() {
     <Navbar />
 
     {/* 🌟 Hero Banner Section */}
-    <div className="relative w-full min-h-100 md:min-h-125 bg-gray-900 flex flex-col items-center justify-center overflow-hidden pt-20 pb-12 group">
+    <div className="relative w-full min-h-100 md:min-h-125 bg-neutral-900 flex flex-col items-center justify-center overflow-hidden pt-20 pb-12 group">
       <div
-        className="absolute inset-0 bg-cover bg-center blur-xs scale-110 transition-transform duration-700 group-hover:scale-125"
+        className="absolute inset-0 bg-cover bg-center blur-xs scale-105"
         style={{ backgroundImage: "url('/images/banner-trip.png')" }}
       ></div>
 
       <div className="absolute inset-0 bg-black/60"></div>
 
-      <div className="relative z-10 text-center px-4 md:px-8 w-full max-w-4xl mx-auto mt-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 leading-tight drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">
+      <div className="relative z-10 text-center px-4 md:px-8 w-full max-w-4xl mx-auto mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 leading-tight drop-shadow-md">
           ทริปเที่ยว
-          <span className="text-amber-400 sm:ml-3 block sm:inline mt-2 sm:mt-0 drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">
+          <span className="text-amber-400 sm:ml-3 block sm:inline mt-2 sm:mt-0 drop-shadow-md">
             ของฉัน
           </span>
         </h1>
 
-        <p className="text-gray-200 text-lg md:text-xl max-w-2xl mx-auto font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+        <p className="text-neutral-200 text-lg md:text-xl max-w-2xl mx-auto font-medium drop-shadow-md">
           รวมทุกทริปที่คุณวางแผนไว้ในที่เดียว แก้ไข จัดการ และติดตามค่าใช้จ่ายได้ง่ายๆ
         </p>
       </div>
@@ -664,11 +664,11 @@ export default function MyTripsPage() {
     {/* 🌟 Breadcrumbs Navigation */}
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 mb-4">
       <nav aria-label="Breadcrumb" className="flex">
-        <ol className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-500 font-medium">
+        <ol className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-neutral-500 font-medium">
           <li>
             <Link
               href="/"
-              className="hover:text-emerald-600 transition-colors flex items-center gap-1.5 focus:outline-none focus:text-emerald-600"
+              className="hover:text-amber-600 transition-colors flex items-center gap-1.5 focus:outline-none focus:text-amber-600"
             >
               <Home className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span>หน้าแรก</span>
@@ -677,13 +677,13 @@ export default function MyTripsPage() {
 
           <li>
             <ChevronRight
-              className="h-4 w-4 text-gray-400 shrink-0"
+              className="h-4 w-4 text-neutral-400 shrink-0"
               aria-hidden="true"
             />
           </li>
 
           <li aria-current="page">
-            <span className="text-gray-900 font-semibold">ทริปของฉัน</span>
+            <span className="text-neutral-900 font-semibold">ทริปของฉัน</span>
           </li>
         </ol>
       </nav>
@@ -707,7 +707,7 @@ export default function MyTripsPage() {
 
         <Link
           href="/trips/plan"
-          className="bg-black text-white px-5 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-neutral-800 active:scale-[0.98] transition-all shadow-sm shrink-0"
+          className="bg-black text-white px-5 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-neutral-800 transition-all shadow-sm shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">จัดทริปใหม่</span>

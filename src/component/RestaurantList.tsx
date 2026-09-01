@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 import { Search, MapPin, Heart, Star } from "lucide-react";
+import { useFavorites } from "@/component/FavoritesProvider";
 
 interface Restaurant {
   id: string;
@@ -38,6 +39,7 @@ const itemVariants: Variants = {
 };
 
 export default function RestaurantList() {
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
@@ -132,7 +134,7 @@ export default function RestaurantList() {
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <div
               key={i}
-              className="bg-white rounded-3xl p-3 shadow-sm border border-neutral-100 animate-pulse"
+              className="bg-white rounded-2xl p-3 shadow-sm border border-neutral-100 animate-pulse"
             >
               <div className="w-full aspect-4/3 bg-neutral-200/60 rounded-[1.25rem] mb-4"></div>
               <div className="px-2 space-y-3">
@@ -158,7 +160,7 @@ export default function RestaurantList() {
         id="restaurants"
         className="mt-6 w-full flex justify-center px-6 pb-20"
       >
-        <div className="bg-red-50/50 border border-red-100 rounded-3xl p-10 text-center shadow-sm max-w-md w-full">
+        <div className="bg-red-50/50 border border-red-100 rounded-2xl p-10 text-center shadow-sm max-w-md w-full">
           <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
             🚨
           </div>
@@ -225,8 +227,8 @@ export default function RestaurantList() {
               <button
                 key={cat.value}
                 onClick={() => setCategory(cat.value)}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all active:scale-95 shrink-0 border flex items-center gap-2 ${isActive
-                    ? "bg-neutral-900 text-white border-neutral-900 shadow-md"
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors shrink-0 border flex items-center gap-2 ${isActive
+                    ? "bg-neutral-900 text-white border-neutral-900"
                     : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
                   }`}
               >
@@ -240,7 +242,7 @@ export default function RestaurantList() {
 
       {/* 🌟 Content Area */}
       {restaurants.length === 0 ? (
-        <div className="bg-white rounded-4xl p-16 text-center border border-neutral-100 shadow-sm flex flex-col items-center">
+        <div className="bg-white rounded-2xl p-16 text-center border border-neutral-100 shadow-sm flex flex-col items-center">
           <div className="text-4xl mb-4 opacity-50">🍳</div>
           <h4 className="text-lg font-medium text-neutral-900 mb-2">
             ไม่พบร้านอาหารที่คุณค้นหา
@@ -267,7 +269,7 @@ export default function RestaurantList() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative"
         >
           {loading && (
-            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 rounded-3xl" />
+            <div className="absolute inset-0 bg-white/50 z-10 rounded-2xl" />
           )}
 
           {restaurants.map((r) => {
@@ -280,7 +282,7 @@ export default function RestaurantList() {
                   href={`/restaurant/${r.id}`}
                   className="block outline-none group h-full"
                 >
-                  <div className="bg-white rounded-3xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.15)] border border-neutral-100 hover:shadow-[0_20px_40px_rgb(0,0,0,0.20)] hover:-translate-y-1.5 transition-all duration-500 ease-out h-full flex flex-col">
+                  <div className="bg-white rounded-2xl p-3 shadow-sm border border-neutral-100 hover:shadow-md hover:border-neutral-200 transition-all duration-300 h-full flex flex-col">
                     {/* Image Section */}
                     <div className="relative w-full aspect-4/3 rounded-[1.25rem] overflow-hidden mb-4 bg-neutral-100">
                       <Image
@@ -289,24 +291,34 @@ export default function RestaurantList() {
                         fill
                         unoptimized={true} // ป้องกัน Error หากดึงรูปจาก External URL ที่ไม่ได้ตั้งค่าใน next.config.js
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-[0.16,1,0.3,1]"
+                        className="object-cover transition-[filter] duration-300 group-hover:brightness-95"
                       />
                       <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                       {/* Badge Top Left */}
-                      <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold text-neutral-900 shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-white/20 flex items-center gap-1.5">
+                      <div className="absolute top-3 left-3 bg-white/95 px-3.5 py-1.5 rounded-full text-xs font-bold text-neutral-900 shadow-sm border border-white/20 flex items-center gap-1.5">
                         <span>{catInfo.icon}</span>
                         {r.category || "ทั่วไป"}
                       </div>
 
                       {/* Favorite Button Top Right */}
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
+                          toggleFavorite("restaurant", r.id);
                         }}
-                        className="absolute top-3 right-3 w-8 h-8 bg-white/95 backdrop-blur-md rounded-full flex items-center justify-center text-neutral-400 hover:text-red-500 hover:scale-110 active:scale-95 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-white/20 z-10"
+                        aria-label="เก็บไว้ในคอลเลคชั่น"
+                        className={`absolute top-3 right-3 w-8 h-8 bg-white/95 rounded-full flex items-center justify-center transition-colors shadow-sm border border-white/20 z-10 ${
+                          isFavorite("restaurant", r.id)
+                            ? "text-rose-500"
+                            : "text-neutral-400 hover:text-rose-500"
+                        }`}
                       >
-                        <Heart className="w-4 h-4" />
+                        <Heart
+                          className={`w-4 h-4 ${isFavorite("restaurant", r.id) ? "fill-rose-500" : ""}`}
+                        />
                       </button>
                     </div>
 
@@ -350,7 +362,7 @@ export default function RestaurantList() {
       {/* Mobile Load More Button */}
       {restaurants.length > 0 && (
         <div className="mt-10 flex justify-center lg:hidden">
-          <button className="px-8 py-3 rounded-full border border-neutral-200 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-all active:scale-95 shadow-sm">
+          <button className="px-8 py-3 rounded-full border border-neutral-200 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors shadow-sm">
             ดูเพิ่มเติม
           </button>
         </div>

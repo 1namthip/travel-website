@@ -286,7 +286,7 @@ export default function RestaurantModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 15 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="relative w-full max-w-2xl bg-white rounded-xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-zinc-200/50 flex flex-col max-h-[90vh] overflow-hidden"
+          className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl border border-zinc-200 flex flex-col max-h-[90vh] overflow-hidden"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100">
@@ -427,7 +427,7 @@ export default function RestaurantModal({
                     placeholder="เช่น The Coffee Club"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
                   />
                 </div>
 
@@ -440,7 +440,7 @@ export default function RestaurantModal({
                     <button
                       type="button"
                       onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                      className={`w-full pl-3 pr-3 py-2 text-sm border rounded-lg bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 ${
+                      className={`w-full pl-3 pr-3 py-2 text-sm border rounded-lg bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
                         isCategoryOpen
                           ? "border-zinc-400 ring-4 ring-zinc-900/5"
                           : "border-zinc-200 hover:border-zinc-300"
@@ -462,7 +462,7 @@ export default function RestaurantModal({
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 4, scale: 0.98 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute z-50 w-full mt-1.5 bg-white border border-zinc-200 rounded-lg shadow-[0_12px_30px_-10px_rgba(0,0,0,0.1)] py-1 overflow-hidden"
+                          className="absolute z-50 w-full mt-1.5 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 overflow-hidden"
                         >
                           <div className="max-h-56 overflow-y-auto custom-scrollbar">
                             {categories.map((cat) => (
@@ -499,7 +499,7 @@ export default function RestaurantModal({
                     placeholder="เช่น ชั้น G สยามพารากอน, ถ.สุขุมวิท"
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
                   />
                 </div>
 
@@ -512,7 +512,7 @@ export default function RestaurantModal({
                     placeholder="08X-XXX-XXXX"
                     value={form.phone || ""}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
                   />
                 </div>
 
@@ -525,7 +525,7 @@ export default function RestaurantModal({
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                     rows={3}
-                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400 resize-none leading-relaxed"
+                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400 resize-none leading-relaxed"
                   />
                 </div>
               </div>
@@ -538,7 +538,7 @@ export default function RestaurantModal({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 text-[13px] font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] transition-all disabled:opacity-50"
+              className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-50"
             >
               ยกเลิก
             </button>
@@ -546,7 +546,7 @@ export default function RestaurantModal({
               form="restaurant-form"
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 text-[13px] font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 shadow-sm active:scale-[0.98] transition-all disabled:opacity-70 flex items-center justify-center min-w-25"
+              className="inline-flex h-9 min-w-25 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:opacity-70"
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
