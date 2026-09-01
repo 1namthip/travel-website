@@ -59,7 +59,7 @@ export default function SearchBar() {
 
       {/* Search Action */}
       <Link
-        href="/mock/hotels"
+        href="/accommodations"
         className="w-full md:w-16 md:h-16 py-4 md:py-0 rounded-full bg-neutral-900 text-white flex items-center justify-center hover:bg-black hover:scale-[1.03] active:scale-95 transition-all duration-300 shrink-0 shadow-lg"
       >
         <span className="md:hidden font-medium mr-2">
