@@ -94,7 +94,7 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
-    const { name, description, image_url, location, category } = body as Record<string, any>;
+    const { name, description, image_url, location, category, phone } = body as Record<string, any>;
 
     // Validate ข้อมูลเบื้องต้น
     if (!name || !category) {
@@ -109,12 +109,13 @@ export const POST = async (req: NextRequest) => {
     const { data, error } = await supabaseAdmin
       .from("restaurants")
       .insert([
-        { 
-          name, 
-          description, 
-          image_url: image_url || null, 
-          location, 
-          category
+        {
+          name,
+          description,
+          image_url: image_url || null,
+          location,
+          category,
+          phone: phone || null
         }
       ])
       .select()

@@ -16,6 +16,7 @@ interface UpdateRestaurantBody {
   image_url?: string;
   location?: string;
   category?: string;
+  phone?: string;
 }
 
 const isNumeric = (val: string) => /^\d+$/.test(val);
@@ -118,6 +119,7 @@ export const PUT = async (req: NextRequest, { params }: RouteContext) => {
       image_url: body.image_url,
       location: body.location,
       category: body.category,
+      phone: body.phone,
     };
 
     // 🔥 ลบ key ที่เป็น undefined ออก เพื่อไม่ให้ไปเขียนทับค่าเดิมใน DB เป็น null โดยไม่ได้ตั้งใจ

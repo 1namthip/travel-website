@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Image as ImageIcon, Loader2, ChevronDown, Check, Trash2, Play } from "lucide-react";
+import { X, Image as ImageIcon, Loader2, ChevronDown, Check, Trash2, Play, Phone } from "lucide-react";
 import {
   MAX_IMAGES,
   MAX_VIDEOS,
@@ -241,6 +241,7 @@ export default function RestaurantModal({
         image_url: [],
         location: "",
         category: "",
+        phone: "",
       });
       onClose();
       refreshData();
@@ -489,7 +490,7 @@ export default function RestaurantModal({
                   </div>
                 </div>
 
-                <div className="sm:col-span-2 space-y-1.5">
+                <div className="sm:col-span-1 space-y-1.5">
                   <label className="text-[13px] font-medium text-zinc-700">
                     ตำแหน่งที่ตั้ง / พิกัด
                   </label>
@@ -498,6 +499,19 @@ export default function RestaurantModal({
                     placeholder="เช่น ชั้น G สยามพารากอน, ถ.สุขุมวิท"
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
+                  />
+                </div>
+
+                <div className="sm:col-span-1 space-y-1.5">
+                  <label className="text-[13px] font-medium text-zinc-700 flex items-center gap-1">
+                    <Phone size={13} className="text-zinc-400" /> เบอร์โทรติดต่อ
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="08X-XXX-XXXX"
+                    value={form.phone || ""}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-4 focus:ring-zinc-900/5 focus:border-zinc-400 transition-all placeholder:text-zinc-400"
                   />
                 </div>

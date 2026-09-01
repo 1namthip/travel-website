@@ -20,6 +20,7 @@ export default function AdminRestaurantsPage() {
     image_url: [],
     location: "",
     category: "",
+    phone: "",
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -69,6 +70,7 @@ export default function AdminRestaurantsPage() {
       location: "",
       category: "",
       image_url: [],
+      phone: "",
     });
     setIsModalOpen(true);
   };

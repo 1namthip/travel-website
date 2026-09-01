@@ -94,7 +94,8 @@ export default function RestaurantsTable({ restaurants, onEdit, onDelete }: Rest
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.2 }}
                 key={r.id}
-                className="group bg-white border border-zinc-200 shadow-sm hover:border-blue-300 transition-all p-4 rounded-xl flex flex-col sm:flex-row gap-5 relative"
+                onClick={() => onEdit(r)}
+                className="group bg-white border border-zinc-200 shadow-sm hover:border-blue-300 transition-all p-4 rounded-xl flex flex-col sm:flex-row gap-5 relative cursor-pointer"
               >
                 {/* Image Container Block */}
                 <div className="relative w-full sm:w-50 aspect-16/10 sm:h-32 shrink-0 overflow-hidden rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-center">
