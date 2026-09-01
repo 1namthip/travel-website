@@ -140,12 +140,10 @@ function LoginPromptModal({
 function BudgetBar({
   spent,
   total,
-  onOpenSummary,
   count,
 }: {
   spent: number;
   total: number;
-  onOpenSummary: () => void;
   count: number;
 }) {
   const pct = total > 0 ? Math.min((spent / total) * 100, 100) : 0;
@@ -178,23 +176,12 @@ function BudgetBar({
               งบประมาณของคุณ
             </span>
           </div>
-          <button
-            onClick={onOpenSummary}
-            disabled={count === 0}
-            className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-all ${
-              count > 0
-                ? "bg-amber-600 text-white hover:bg-amber-700"
-                : "bg-neutral-100 text-neutral-400 cursor-not-allowed"
-            }`}
-          >
-            <Luggage className="w-3.5 h-3.5" />
-            ดูสรุปทริป
-            {count > 0 && (
-              <span className="bg-white/20 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                {count}
-              </span>
-            )}
-          </button>
+          {count > 0 && (
+            <span className="text-xs font-medium text-neutral-500">
+              เลือกแล้ว{" "}
+              <span className="font-bold text-neutral-900">{count}</span> รายการ
+            </span>
+          )}
         </div>
 
         <div className="h-2 bg-neutral-100 rounded-full overflow-hidden mb-2.5">
@@ -227,6 +214,74 @@ function BudgetBar({
             </span>
           )}
         </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Sticky Trip Action Bar ───────────────────────────────────────────────────
+// Appears once the traveller has picked at least one item. Keeps the
+// "review & save my trip" action persistent and thumb-reachable instead of
+// buried in the budget bar.
+
+function TripActionBar({
+  count,
+  spent,
+  budget,
+  onOpenSummary,
+}: {
+  count: number;
+  spent: number;
+  budget: number;
+  onOpenSummary: () => void;
+}) {
+  const over = budget > 0 && spent > budget;
+  const remaining = budget - spent;
+
+  return (
+    <motion.div
+      initial={{ y: 120, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 120, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 320, damping: 32 }}
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur-md"
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-full bg-amber-600 text-white text-xs font-bold">
+              {count}
+            </span>
+            <span className="text-sm font-medium text-neutral-600">
+              รายการในทริป
+            </span>
+          </div>
+          <div className="mt-0.5 flex items-baseline gap-1.5 truncate">
+            <span className="text-lg font-bold tracking-tight text-neutral-900 tabular-nums">
+              ฿{spent.toLocaleString()}
+            </span>
+            {budget > 0 && (
+              <span
+                className={`text-xs font-semibold shrink-0 ${
+                  over ? "text-rose-600" : "text-emerald-600"
+                }`}
+              >
+                {over
+                  ? `เกินงบ ฿${Math.abs(remaining).toLocaleString()}`
+                  : `เหลือ ฿${remaining.toLocaleString()}`}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <button
+          onClick={onOpenSummary}
+          className="shrink-0 inline-flex items-center justify-center gap-2 h-12 px-5 sm:px-8 rounded-xl bg-amber-600 text-sm font-bold text-white transition-colors hover:bg-amber-700"
+        >
+          <Luggage className="w-4.5 h-4.5" />
+          <span>ดูสรุป &amp; บันทึกทริป</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
     </motion.div>
   );
@@ -929,7 +984,9 @@ export default function BudgetTripPlanner({
   return (
     <div
       id="planner"
-      className="w-full max-w-5xl mx-auto py-12 px-4 sm:px-6 pb-16 relative scroll-mt-24"
+      className={`w-full max-w-5xl mx-auto py-12 px-4 sm:px-6 relative scroll-mt-24 ${
+        selectedItems.length > 0 ? "pb-36" : "pb-16"
+      }`}
     >
 
       {/* ── Header & Input ─────────────────────────────────────── */}
@@ -1083,7 +1140,6 @@ export default function BudgetTripPlanner({
               spent={totalSpent}
               total={effectiveBudget}
               count={selectedItems.length}
-              onOpenSummary={() => setIsSummaryOpen(true)}
             />
 
             <div className="space-y-12">
@@ -1122,6 +1178,18 @@ export default function BudgetTripPlanner({
               />
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Sticky action bar (appears once items are picked) ──── */}
+      <AnimatePresence>
+        {tripData && !isLoading && selectedItems.length > 0 && !isSummaryOpen && (
+          <TripActionBar
+            count={selectedItems.length}
+            spent={totalSpent}
+            budget={effectiveBudget}
+            onOpenSummary={() => setIsSummaryOpen(true)}
+          />
         )}
       </AnimatePresence>
 
