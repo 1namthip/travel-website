@@ -135,96 +135,13 @@ function LoginPromptModal({
   );
 }
 
-// ─── Budget Bar ───────────────────────────────────────────────────────────────
+// ─── Floating Trip Dock ───────────────────────────────────────────────────────
+// A single modern control that combines the live budget gauge with the
+// "review & save trip" call-to-action. Docks to the bottom-right on desktop and
+// to a floating card at the bottom edge on mobile, so once the traveller has
+// picked items it's unmistakable where to go next.
 
-function BudgetBar({
-  spent,
-  total,
-  count,
-}: {
-  spent: number;
-  total: number;
-  count: number;
-}) {
-  const pct = total > 0 ? Math.min((spent / total) * 100, 100) : 0;
-  const over = spent > total && total > 0;
-  const remaining = total - spent;
-
-  const barColor = over
-    ? "bg-red-500"
-    : pct > 80
-    ? "bg-amber-400"
-    : "bg-emerald-500";
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -16 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="sticky top-4 z-30 mb-8"
-    >
-      <div
-        className={`rounded-2xl px-5 py-4 shadow-xl border backdrop-blur-md ${
-          over
-            ? "bg-red-50/95 border-red-200"
-            : "bg-white/95 border-neutral-200/60"
-        }`}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Wallet className={`w-4 h-4 ${over ? "text-red-500" : "text-neutral-500"}`} />
-            <span className="text-sm font-semibold text-neutral-700">
-              งบประมาณของคุณ
-            </span>
-          </div>
-          {count > 0 && (
-            <span className="text-xs font-medium text-neutral-500">
-              เลือกแล้ว{" "}
-              <span className="font-bold text-neutral-900">{count}</span> รายการ
-            </span>
-          )}
-        </div>
-
-        <div className="h-2 bg-neutral-100 rounded-full overflow-hidden mb-2.5">
-          <motion.div
-            className={`h-full rounded-full ${barColor} transition-colors duration-300`}
-            initial={{ width: 0 }}
-            animate={{ width: `${pct}%` }}
-            transition={{ type: "spring", stiffness: 200, damping: 25 }}
-          />
-        </div>
-
-        <div className="flex justify-between items-center text-xs">
-          <span className={over ? "text-red-600 font-bold" : "text-neutral-500"}>
-            ใช้ไป{" "}
-            <span className="font-bold text-sm">฿{spent.toLocaleString()}</span>
-          </span>
-          {total > 0 && (
-            <span
-              className={`font-semibold ${
-                over
-                  ? "text-red-600"
-                  : remaining < total * 0.2
-                  ? "text-amber-600"
-                  : "text-emerald-600"
-              }`}
-            >
-              {over
-                ? `เกินงบ ฿${(spent - total).toLocaleString()}`
-                : `เหลือ ฿${remaining.toLocaleString()}`}
-            </span>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── Sticky Trip Action Bar ───────────────────────────────────────────────────
-// Appears once the traveller has picked at least one item. Keeps the
-// "review & save my trip" action persistent and thumb-reachable instead of
-// buried in the budget bar.
-
-function TripActionBar({
+function TripDock({
   count,
   spent,
   budget,
@@ -235,52 +152,79 @@ function TripActionBar({
   budget: number;
   onOpenSummary: () => void;
 }) {
+  const pct = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
   const over = budget > 0 && spent > budget;
   const remaining = budget - spent;
+  const near = !over && budget > 0 && remaining < budget * 0.2;
+
+  const barColor = over
+    ? "bg-rose-500"
+    : near
+    ? "bg-amber-400"
+    : "bg-emerald-500";
 
   return (
     <motion.div
-      initial={{ y: 120, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: 120, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 320, damping: 32 }}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur-md"
+      initial={{ y: 140, opacity: 0, scale: 0.96 }}
+      animate={{ y: 0, opacity: 1, scale: 1 }}
+      exit={{ y: 140, opacity: 0, scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="fixed z-40 inset-x-3 bottom-3 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[368px] pb-[env(safe-area-inset-bottom)]"
     >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center justify-between gap-4">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-full bg-amber-600 text-white text-xs font-bold">
-              {count}
+      <div className="rounded-2xl border border-neutral-200/70 bg-white/85 backdrop-blur-xl shadow-2xl shadow-neutral-900/10 p-4">
+        {/* Header: budget label + live status */}
+        <div className="flex items-center justify-between mb-2.5">
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-neutral-500">
+            <Wallet className="w-3.5 h-3.5" />
+            งบประมาณ
+          </span>
+          {budget > 0 && (
+            <span
+              className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                over
+                  ? "bg-rose-50 text-rose-600"
+                  : near
+                  ? "bg-amber-50 text-amber-700"
+                  : "bg-emerald-50 text-emerald-700"
+              }`}
+            >
+              {over
+                ? `เกินงบ ฿${Math.abs(remaining).toLocaleString()}`
+                : `เหลือ ฿${remaining.toLocaleString()}`}
             </span>
-            <span className="text-sm font-medium text-neutral-600">
-              รายการในทริป
-            </span>
-          </div>
-          <div className="mt-0.5 flex items-baseline gap-1.5 truncate">
-            <span className="text-lg font-bold tracking-tight text-neutral-900 tabular-nums">
-              ฿{spent.toLocaleString()}
-            </span>
-            {budget > 0 && (
-              <span
-                className={`text-xs font-semibold shrink-0 ${
-                  over ? "text-rose-600" : "text-emerald-600"
-                }`}
-              >
-                {over
-                  ? `เกินงบ ฿${Math.abs(remaining).toLocaleString()}`
-                  : `เหลือ ฿${remaining.toLocaleString()}`}
-              </span>
-            )}
-          </div>
+          )}
         </div>
 
+        {/* Progress */}
+        {budget > 0 && (
+          <div className="h-1.5 rounded-full bg-neutral-100 overflow-hidden mb-2.5">
+            <motion.div
+              className={`h-full rounded-full ${barColor}`}
+              initial={{ width: 0 }}
+              animate={{ width: `${pct}%` }}
+              transition={{ type: "spring", stiffness: 200, damping: 25 }}
+            />
+          </div>
+        )}
+
+        {/* Count + amount spent */}
+        <div className="flex items-baseline justify-between mb-3">
+          <span className="text-xs text-neutral-500">
+            <span className="font-bold text-neutral-900">{count}</span> รายการในทริป
+          </span>
+          <span className="text-base font-bold tracking-tight text-neutral-900 tabular-nums">
+            ฿{spent.toLocaleString()}
+          </span>
+        </div>
+
+        {/* Primary CTA */}
         <button
           onClick={onOpenSummary}
-          className="shrink-0 inline-flex items-center justify-center gap-2 h-12 px-5 sm:px-8 rounded-xl bg-amber-600 text-sm font-bold text-white transition-colors hover:bg-amber-700"
+          className="group w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-amber-600 text-sm font-bold text-white transition-colors hover:bg-amber-700"
         >
-          <Luggage className="w-4.5 h-4.5" />
-          <span>ดูสรุป &amp; บันทึกทริป</span>
-          <ChevronRight className="w-4 h-4" />
+          <Luggage className="w-4 h-4" />
+          ดูสรุปทริป
+          <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
     </motion.div>
@@ -985,7 +929,7 @@ export default function BudgetTripPlanner({
     <div
       id="planner"
       className={`w-full max-w-5xl mx-auto py-12 px-4 sm:px-6 relative scroll-mt-24 ${
-        selectedItems.length > 0 ? "pb-36" : "pb-16"
+        selectedItems.length > 0 ? "pb-44 sm:pb-32" : "pb-16"
       }`}
     >
 
@@ -1136,12 +1080,6 @@ export default function BudgetTripPlanner({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
           >
-            <BudgetBar
-              spent={totalSpent}
-              total={effectiveBudget}
-              count={selectedItems.length}
-            />
-
             <div className="space-y-12">
               <TripRow
                 title="สถานที่ท่องเที่ยวแนะนำ"
@@ -1181,10 +1119,10 @@ export default function BudgetTripPlanner({
         )}
       </AnimatePresence>
 
-      {/* ── Sticky action bar (appears once items are picked) ──── */}
+      {/* ── Floating trip dock (appears once items are picked) ─── */}
       <AnimatePresence>
         {tripData && !isLoading && selectedItems.length > 0 && !isSummaryOpen && (
-          <TripActionBar
+          <TripDock
             count={selectedItems.length}
             spent={totalSpent}
             budget={effectiveBudget}
