@@ -3,9 +3,16 @@
 import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Image as ImageIcon, Loader2, ChevronDown, Check, Trash2 } from "lucide-react";
-
-const MAX_IMAGES = 15;
+import { X, Image as ImageIcon, Loader2, ChevronDown, Check, Trash2, Play } from "lucide-react";
+import {
+  MAX_IMAGES,
+  MAX_VIDEOS,
+  MAX_IMAGE_BYTES,
+  MAX_VIDEO_BYTES,
+  splitMedia,
+  isImageFile,
+  isVideoFile,
+} from "@/lib/media";
 
 interface Props {
   form: any;
@@ -36,10 +43,14 @@ export default function RestaurantModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Image State (existing saved URLs + newly selected files)
-  const [existingImages, setExistingImages] = useState<string[]>(() => parseImages(form.image_url));
+  // Media State — สื่อเดิมถูกแยกเป็นรูป/วิดีโอ, ไฟล์ใหม่แยกอีกสองก้อน
+  const initialMedia = splitMedia(parseImages(form.image_url));
+  const [existingImages, setExistingImages] = useState<string[]>(initialMedia.images);
+  const [existingVideos, setExistingVideos] = useState<string[]>(initialMedia.videos);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [videoFiles, setVideoFiles] = useState<File[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
 
   // Custom Dropdown State
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
@@ -53,6 +64,14 @@ export default function RestaurantModal({
     return () => {
       document.body.style.overflow = "unset";
     };
+  }, []);
+
+  // เก็บกวาด object URL ของวิดีโอตอนปิด modal
+  useEffect(() => {
+    return () => {
+      videoPreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle clicking outside of the custom dropdown to close it
@@ -82,32 +101,58 @@ export default function RestaurantModal({
   ];
 
   const totalImages = existingImages.length + imageFiles.length;
-  const canAddMoreImages = totalImages < MAX_IMAGES;
+  const totalVideos = existingVideos.length + videoFiles.length;
+  const canAddMore = totalImages < MAX_IMAGES || totalVideos < MAX_VIDEOS;
 
   const processFiles = (incoming: File[]) => {
-    const total = existingImages.length + imageFiles.length + incoming.length;
-    if (total > MAX_IMAGES) {
-      toast.error(`สามารถอัปโหลดได้สูงสุด ${MAX_IMAGES} รูปเท่านั้น`);
-      return;
+    const imgs = incoming.filter(isImageFile);
+    const vids = incoming.filter(isVideoFile);
+
+    if (imgs.length + vids.length < incoming.length) {
+      toast.error("รองรับเฉพาะไฟล์รูปภาพหรือวิดีโอเท่านั้น");
     }
 
-    const validFiles: File[] = [];
-    for (const f of incoming) {
-      if (!f.type.startsWith("image/")) {
-        toast.error("กรุณาเลือกไฟล์รูปภาพเท่านั้น");
+    if (imgs.length > 0) {
+      if (totalImages + imgs.length > MAX_IMAGES) {
+        toast.error(`อัปโหลดรูปได้สูงสุด ${MAX_IMAGES} รูป`);
         return;
       }
-      validFiles.push(f);
+      if (imgs.some((f) => f.size > MAX_IMAGE_BYTES)) {
+        toast.error("แต่ละรูปต้องมีขนาดไม่เกิน 5MB");
+        return;
+      }
     }
 
-    setImageFiles((prev) => [...prev, ...validFiles]);
-    validFiles.forEach((f) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviews((prev) => [...prev, reader.result as string]);
-      };
-      reader.readAsDataURL(f);
-    });
+    if (vids.length > 0) {
+      if (totalImages === 0 && imgs.length === 0) {
+        toast.error("กรุณาเพิ่มรูปภาพอย่างน้อย 1 รูปก่อนแนบวิดีโอ");
+        return;
+      }
+      if (totalVideos + vids.length > MAX_VIDEOS) {
+        toast.error(`อัปโหลดวิดีโอได้สูงสุด ${MAX_VIDEOS} คลิป`);
+        return;
+      }
+      if (vids.some((f) => f.size > MAX_VIDEO_BYTES)) {
+        toast.error("แต่ละวิดีโอต้องมีขนาดไม่เกิน 50MB");
+        return;
+      }
+    }
+
+    if (imgs.length > 0) {
+      setImageFiles((prev) => [...prev, ...imgs]);
+      imgs.forEach((f) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews((prev) => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(f);
+      });
+    }
+
+    if (vids.length > 0) {
+      setVideoFiles((prev) => [...prev, ...vids]);
+      setVideoPreviews((prev) => [...prev, ...vids.map((f) => URL.createObjectURL(f))]);
+    }
   };
 
   const removeExistingImage = (index: number) => {
@@ -119,6 +164,19 @@ export default function RestaurantModal({
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const removeExistingVideo = (index: number) => {
+    setExistingVideos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeNewVideo = (index: number) => {
+    setVideoPreviews((prev) => {
+      const url = prev[index];
+      if (url) URL.revokeObjectURL(url);
+      return prev.filter((_, i) => i !== index);
+    });
+    setVideoFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const uploadFileViaApi = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -128,30 +186,37 @@ export default function RestaurantModal({
       body: formData,
     });
 
-    if (!res.ok) throw new Error("Upload failed");
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      throw new Error(data?.error || "Upload failed");
+    }
     const data = await res.json();
-    return data.url;
+    return data.url as string;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    let newUrls: string[] = [];
-    if (imageFiles.length > 0) {
-      try {
-        for (const f of imageFiles) {
-          newUrls.push(await uploadFileViaApi(f));
-        }
-      } catch {
-        toast.error("อัปโหลดรูปภาพไม่สำเร็จ");
-        setIsSubmitting(false);
-        return;
-      }
+    let newImageUrls: string[] = [];
+    let newVideoUrls: string[] = [];
+    try {
+      for (const f of imageFiles) newImageUrls.push(await uploadFileViaApi(f));
+      for (const f of videoFiles) newVideoUrls.push(await uploadFileViaApi(f));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "อัปโหลดไฟล์ไม่สำเร็จ");
+      setIsSubmitting(false);
+      return;
     }
 
     try {
-      const allImages = [...existingImages, ...newUrls];
+      // เรียงรูปก่อนวิดีโอเสมอ เพื่อให้ media[0] เป็นรูปสำหรับ thumbnail หน้า list
+      const allMedia = [
+        ...existingImages,
+        ...newImageUrls,
+        ...existingVideos,
+        ...newVideoUrls,
+      ];
       const method = form.id ? "PUT" : "POST";
       const url = form.id ? `/api/restaurants/${form.id}` : "/api/restaurants";
 
@@ -160,7 +225,7 @@ export default function RestaurantModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          image_url: allImages,
+          image_url: allMedia,
         }),
       });
 
@@ -246,17 +311,23 @@ export default function RestaurantModal({
           <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
             <form id="restaurant-form" onSubmit={handleSubmit} className="space-y-6">
 
-              {/* Image Upload Zone */}
+              {/* Media Upload Zone */}
               <div>
                 <label className="block text-[13px] font-medium text-zinc-700 mb-2">
-                  รูปภาพหน้าร้าน <span className="text-zinc-400 font-normal">({totalImages}/{MAX_IMAGES} รูป)</span>
+                  รูปภาพ / วิดีโอหน้าร้าน{" "}
+                  <span className="text-zinc-400 font-normal">
+                    ({totalImages}/{MAX_IMAGES} รูป · {totalVideos}/{MAX_VIDEOS} วิดีโอ)
+                  </span>
                 </label>
 
-                {/* Grid of existing + newly selected images */}
-                {(existingImages.length > 0 || imagePreviews.length > 0) && (
+                {/* Grid of existing + newly selected media */}
+                {(existingImages.length > 0 ||
+                  imagePreviews.length > 0 ||
+                  existingVideos.length > 0 ||
+                  videoPreviews.length > 0) && (
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-3">
                     {existingImages.map((image, index) => (
-                      <div key={`existing-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-50">
+                      <div key={`existing-img-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-50">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={image} alt="" className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -267,7 +338,7 @@ export default function RestaurantModal({
                       </div>
                     ))}
                     {imagePreviews.map((preview, index) => (
-                      <div key={`new-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-50">
+                      <div key={`new-img-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-50">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={preview} alt="" className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -278,11 +349,42 @@ export default function RestaurantModal({
                         <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-zinc-900 text-white px-1 py-0.5 rounded">NEW</span>
                       </div>
                     ))}
+                    {existingVideos.map((video, index) => (
+                      <div key={`existing-vid-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-900">
+                        <video src={video} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="w-8 h-8 rounded-full bg-zinc-950/55 flex items-center justify-center">
+                            <Play size={13} className="text-white fill-white ml-0.5" />
+                          </div>
+                        </div>
+                        <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button type="button" onClick={() => removeExistingVideo(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {videoPreviews.map((preview, index) => (
+                      <div key={`new-vid-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-900">
+                        <video src={preview} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="w-8 h-8 rounded-full bg-zinc-950/55 flex items-center justify-center">
+                            <Play size={13} className="text-white fill-white ml-0.5" />
+                          </div>
+                        </div>
+                        <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button type="button" onClick={() => removeNewVideo(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                        <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-zinc-900 text-white px-1 py-0.5 rounded">NEW</span>
+                      </div>
+                    ))}
                   </div>
                 )}
 
                 {/* Dropzone */}
-                {canAddMoreImages && (
+                {canAddMore && (
                   <div
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
@@ -294,7 +396,7 @@ export default function RestaurantModal({
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="image/*"
+                      accept="image/*,video/*"
                       multiple
                       onChange={handleFileInputChange}
                       className="hidden"
@@ -303,10 +405,10 @@ export default function RestaurantModal({
                       <ImageIcon size={18} strokeWidth={1.8} />
                     </div>
                     <p className="text-xs font-medium text-zinc-900">
-                      คลิกเพื่อเลือกไฟล์รูปภาพ <span className="font-normal text-zinc-400">หรือลากรูปมาวางที่นี่ (เลือกได้หลายรูป)</span>
+                      คลิกเพื่อเลือกไฟล์ <span className="font-normal text-zinc-400">หรือลากไฟล์มาวางที่นี่ (เลือกได้หลายไฟล์)</span>
                     </p>
                     <p className="text-[10px] text-zinc-400 mt-0.5">
-                      รองรับ JPG, PNG, WEBP · เพิ่มได้อีก {MAX_IMAGES - totalImages} รูป
+                      รูป JPG/PNG/WEBP ≤ 5MB · วิดีโอ MP4/WEBM ≤ 50MB (สูงสุด {MAX_VIDEOS} คลิป) · ต้องมีรูปอย่างน้อย 1 รูปก่อนแนบวิดีโอ
                     </p>
                   </div>
                 )}

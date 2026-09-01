@@ -3,11 +3,50 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, LayoutGrid, ImageOff } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, LayoutGrid, ImageOff, Play } from "lucide-react";
+import { isVideoUrl } from "@/lib/media";
 
 interface ImageGalleryProps {
+  /** รายการสื่อรวม (รูป + วิดีโอ) แยกประเภทด้วยนามสกุลไฟล์ */
   images: string[];
   alt: string;
+}
+
+/** รูปหรือวิดีโอหนึ่งช่อง ใช้ทั้งในกริดและ hero */
+function MediaTile({
+  src,
+  alt,
+  className,
+  showPlayBadge = true,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  showPlayBadge?: boolean;
+}) {
+  if (isVideoUrl(src)) {
+    return (
+      <>
+        <video
+          src={src}
+          muted
+          playsInline
+          preload="metadata"
+          className={className}
+        />
+        {showPlayBadge && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-12 h-12 rounded-full bg-neutral-950/55 flex items-center justify-center">
+              <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
+  return (
+    <Image src={src} alt={alt} fill unoptimized className={className} />
+  );
 }
 
 export default function ImageGallery({ images, alt }: ImageGalleryProps) {
@@ -64,6 +103,8 @@ export default function ImageGallery({ images, alt }: ImageGalleryProps) {
           ? "grid-cols-1 grid-rows-2"
           : "grid-cols-1 grid-rows-1";
 
+  const activeIsVideo = isVideoUrl(images[activeIndex]);
+
   return (
     <>
       <div className="w-full h-[40vh] md:h-[50vh] lg:h-[60vh] relative rounded-3xl overflow-hidden mb-12 flex gap-2">
@@ -72,12 +113,10 @@ export default function ImageGallery({ images, alt }: ImageGalleryProps) {
           onClick={() => openLightbox(0)}
           className={`relative h-full cursor-pointer group ${rightImages.length > 0 ? "w-full md:w-1/2" : "w-full"}`}
         >
-          <Image
+          <MediaTile
             src={images[0]}
             alt={alt}
-            fill
-            unoptimized
-            className="object-cover group-hover:brightness-95 transition-all duration-300"
+            className="object-cover w-full h-full group-hover:brightness-95 transition-all duration-300"
           />
         </div>
 
@@ -93,12 +132,10 @@ export default function ImageGallery({ images, alt }: ImageGalleryProps) {
                   onClick={() => openLightbox(realIndex)}
                   className="relative w-full h-full cursor-pointer group overflow-hidden bg-neutral-100"
                 >
-                  <Image
+                  <MediaTile
                     src={img}
                     alt={`${alt} ${realIndex + 1}`}
-                    fill
-                    unoptimized
-                    className="object-cover group-hover:scale-105 group-hover:brightness-95 transition-all duration-500"
+                    className="object-cover w-full h-full group-hover:scale-105 group-hover:brightness-95 transition-all duration-500"
                   />
                   {isLastVisible && extraCount > 0 && (
                     <div className="absolute inset-0 bg-neutral-950/55 flex flex-col items-center justify-center text-white pointer-events-none">
@@ -166,13 +203,24 @@ export default function ImageGallery({ images, alt }: ImageGalleryProps) {
                 </button>
               )}
               <div className="relative w-full h-full max-w-5xl">
-                <Image
-                  src={images[activeIndex]}
-                  alt={`${alt} ${activeIndex + 1}`}
-                  fill
-                  unoptimized
-                  className="object-contain"
-                />
+                {activeIsVideo ? (
+                  <video
+                    key={images[activeIndex]}
+                    src={images[activeIndex]}
+                    controls
+                    autoPlay
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-contain"
+                  />
+                ) : (
+                  <Image
+                    src={images[activeIndex]}
+                    alt={`${alt} ${activeIndex + 1}`}
+                    fill
+                    unoptimized
+                    className="object-contain"
+                  />
+                )}
               </div>
               {images.length > 1 && (
                 <button
@@ -202,7 +250,7 @@ export default function ImageGallery({ images, alt }: ImageGalleryProps) {
                         : "border-transparent opacity-50 hover:opacity-80"
                     }`}
                   >
-                    <Image src={img} alt="" fill unoptimized className="object-cover" />
+                    <MediaTile src={img} alt="" className="object-cover w-full h-full" />
                   </button>
                 ))}
               </div>

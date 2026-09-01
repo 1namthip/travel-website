@@ -5,22 +5,30 @@ import { createBrowserClient } from "@supabase/ssr";
 import type { User } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import { 
-  X, 
-  Image as ImageIcon, 
-  Loader2, 
-  Building2, 
-  DollarSign, 
-  FileText, 
-  MapPin, 
-  Phone, 
-  ChevronDown, 
-  Check, 
-  AlertCircle, 
-  Trash2
+import {
+  X,
+  Image as ImageIcon,
+  Loader2,
+  Building2,
+  DollarSign,
+  FileText,
+  MapPin,
+  Phone,
+  ChevronDown,
+  Check,
+  AlertCircle,
+  Trash2,
+  Play
 } from "lucide-react";
-
-const MAX_IMAGES = 15;
+import {
+  MAX_IMAGES,
+  MAX_VIDEOS,
+  MAX_IMAGE_BYTES,
+  MAX_VIDEO_BYTES,
+  splitMedia,
+  isImageFile,
+  isVideoFile,
+} from "@/lib/media";
 
 interface Accommodation {
   id: string;
@@ -85,6 +93,9 @@ export const AddAccommodationModal = ({
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [videoFiles, setVideoFiles] = useState<File[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
+  const [existingVideos, setExistingVideos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -133,7 +144,9 @@ export const AddAccommodationModal = ({
         contact_line: editAccommodation.contact_line || "",
         contact_facebook: editAccommodation.contact_facebook || "",
       });
-      setExistingImages(editAccommodation.images || []);
+      const media = splitMedia(editAccommodation.images || []);
+      setExistingImages(media.images);
+      setExistingVideos(media.videos);
     } else {
       resetForm();
     }
@@ -154,6 +167,12 @@ export const AddAccommodationModal = ({
     setImageFiles([]);
     setImagePreviews([]);
     setExistingImages([]);
+    setVideoFiles([]);
+    setVideoPreviews((prev) => {
+      prev.forEach((url) => URL.revokeObjectURL(url));
+      return [];
+    });
+    setExistingVideos([]);
     setError(null);
     setIsCategoryOpen(false);
   };
@@ -162,36 +181,58 @@ export const AddAccommodationModal = ({
 
   // ─── Image Processing ───
   const processFiles = useCallback((files: File[]) => {
-    const totalImages = existingImages.length + imageFiles.length + files.length;
-    if (totalImages > MAX_IMAGES) {
-      setError(`สามารถอัปโหลดได้สูงสุด ${MAX_IMAGES} รูปเท่านั้น`);
+    const imgs = files.filter(isImageFile);
+    const vids = files.filter(isVideoFile);
+
+    if (imgs.length + vids.length < files.length) {
+      setError("รองรับเฉพาะไฟล์รูปภาพหรือวิดีโอเท่านั้น");
       return;
     }
 
-    const validFiles: File[] = [];
-    for (const file of files) {
-      if (file.size > 5 * 1024 * 1024) {
-        setError("แต่ละไฟล์ต้องมีขนาดไม่เกิน 5MB");
+    if (imgs.length > 0) {
+      if (existingImages.length + imageFiles.length + imgs.length > MAX_IMAGES) {
+        setError(`อัปโหลดรูปได้สูงสุด ${MAX_IMAGES} รูปเท่านั้น`);
         return;
       }
-      if (!file.type.startsWith("image/")) {
-        setError("กรุณาเลือกไฟล์รูปภาพเท่านั้น");
+      if (imgs.some((f) => f.size > MAX_IMAGE_BYTES)) {
+        setError("แต่ละรูปต้องมีขนาดไม่เกิน 5MB");
         return;
       }
-      validFiles.push(file);
+    }
+
+    if (vids.length > 0) {
+      if (existingImages.length + imageFiles.length + imgs.length === 0) {
+        setError("กรุณาเพิ่มรูปภาพอย่างน้อย 1 รูปก่อนแนบวิดีโอ");
+        return;
+      }
+      if (existingVideos.length + videoFiles.length + vids.length > MAX_VIDEOS) {
+        setError(`อัปโหลดวิดีโอได้สูงสุด ${MAX_VIDEOS} คลิปเท่านั้น`);
+        return;
+      }
+      if (vids.some((f) => f.size > MAX_VIDEO_BYTES)) {
+        setError("แต่ละวิดีโอต้องมีขนาดไม่เกิน 50MB");
+        return;
+      }
     }
 
     setError(null);
-    setImageFiles((prev) => [...prev, ...validFiles]);
 
-    validFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviews((prev) => [...prev, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
-  }, [existingImages.length, imageFiles.length]);
+    if (imgs.length > 0) {
+      setImageFiles((prev) => [...prev, ...imgs]);
+      imgs.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews((prev) => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (vids.length > 0) {
+      setVideoFiles((prev) => [...prev, ...vids]);
+      setVideoPreviews((prev) => [...prev, ...vids.map((f) => URL.createObjectURL(f))]);
+    }
+  }, [existingImages.length, imageFiles.length, existingVideos.length, videoFiles.length]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -224,26 +265,47 @@ export const AddAccommodationModal = ({
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const uploadImages = async (): Promise<string[]> => {
-    if (imageFiles.length === 0) return [];
+  const removeNewVideo = (index: number) => {
+    setVideoPreviews((prev) => {
+      const url = prev[index];
+      if (url) URL.revokeObjectURL(url);
+      return prev.filter((_, i) => i !== index);
+    });
+    setVideoFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingVideo = (index: number) => {
+    setExistingVideos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadFiles = async (files: File[]): Promise<string[]> => {
+    const uploadedUrls: string[] = [];
+    for (const file of files) {
+      const fd = new FormData();
+      fd.append("file", file);
+      const response = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || "การอัปโหลดไฟล์ล้มเหลว");
+      }
+      const data = await response.json();
+      uploadedUrls.push(data.url);
+    }
+    return uploadedUrls;
+  };
+
+  const uploadMedia = async (): Promise<{ images: string[]; videos: string[] }> => {
+    if (imageFiles.length === 0 && videoFiles.length === 0) {
+      return { images: [], videos: [] };
+    }
     try {
       setUploading(true);
-      const uploadedUrls: string[] = [];
-      for (const file of imageFiles) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        if (!response.ok) throw new Error("การอัปโหลดรูปล้มเหลว");
-        const data = await response.json();
-        uploadedUrls.push(data.url);
-      }
-      return uploadedUrls;
+      const images = await uploadFiles(imageFiles);
+      const videos = await uploadFiles(videoFiles);
+      return { images, videos };
     } catch (err) {
       console.error("Upload error:", err);
-      throw new Error("ไม่สามารถอัปโหลดรูปภาพได้");
+      throw err instanceof Error ? err : new Error("ไม่สามารถอัปโหลดไฟล์ได้");
     } finally {
       setUploading(false);
     }
@@ -275,8 +337,14 @@ export const AddAccommodationModal = ({
       setSubmitting(true);
       setError(null);
 
-      const newImageUrls = await uploadImages();
-      const allImages = [...existingImages, ...newImageUrls];
+      const uploaded = await uploadMedia();
+      // เรียงรูปก่อนวิดีโอเสมอ เพื่อให้ media[0] เป็นรูปสำหรับ thumbnail หน้า list
+      const allImages = [
+        ...existingImages,
+        ...uploaded.images,
+        ...existingVideos,
+        ...uploaded.videos,
+      ];
 
       const payload = {
         name: formData.name,
@@ -325,7 +393,8 @@ export const AddAccommodationModal = ({
   };
 
   const totalImages = existingImages.length + imageFiles.length;
-  const canAddMoreImages = totalImages < MAX_IMAGES;
+  const totalVideos = existingVideos.length + videoFiles.length;
+  const canAddMore = totalImages < MAX_IMAGES || totalVideos < MAX_VIDEOS;
 
   return (
     <AnimatePresence>
@@ -388,17 +457,23 @@ export const AddAccommodationModal = ({
                   )}
                 </AnimatePresence>
 
-                {/* MODULE LAYER: IMAGE MANAGEMENT DECK */}
+                {/* MODULE LAYER: MEDIA MANAGEMENT DECK */}
                 <div className="space-y-2">
                   <label className="block text-[13px] font-medium text-zinc-700">
-                    รูปภาพที่พักประกอบการตัดสินใจ <span className="text-zinc-400 font-normal">({totalImages}/{MAX_IMAGES} รูป)</span>
+                    รูปภาพ / วิดีโอที่พักประกอบการตัดสินใจ{" "}
+                    <span className="text-zinc-400 font-normal">
+                      ({totalImages}/{MAX_IMAGES} รูป · {totalVideos}/{MAX_VIDEOS} วิดีโอ)
+                    </span>
                   </label>
-                  
+
                   {/* Grid Assets Stream */}
-                  {(existingImages.length > 0 || imagePreviews.length > 0) && (
+                  {(existingImages.length > 0 ||
+                    imagePreviews.length > 0 ||
+                    existingVideos.length > 0 ||
+                    videoPreviews.length > 0) && (
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-2">
                       {existingImages.map((image, index) => (
-                        <div key={`existing-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-50">
+                        <div key={`existing-img-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-50">
                           <img src={image} alt="" className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <button type="button" onClick={() => removeExistingImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
@@ -408,10 +483,41 @@ export const AddAccommodationModal = ({
                         </div>
                       ))}
                       {imagePreviews.map((preview, index) => (
-                        <div key={`new-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-50">
+                        <div key={`new-img-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-50">
                           <img src={preview} alt="" className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <button type="button" onClick={() => removeNewImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                          <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-zinc-900 text-white px-1 py-0.5 rounded">NEW</span>
+                        </div>
+                      ))}
+                      {existingVideos.map((video, index) => (
+                        <div key={`existing-vid-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-900">
+                          <video src={video} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="w-8 h-8 rounded-full bg-zinc-950/55 flex items-center justify-center">
+                              <Play size={13} className="text-white fill-white ml-0.5" />
+                            </div>
+                          </div>
+                          <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button type="button" onClick={() => removeExistingVideo(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {videoPreviews.map((preview, index) => (
+                        <div key={`new-vid-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-900">
+                          <video src={preview} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="w-8 h-8 rounded-full bg-zinc-950/55 flex items-center justify-center">
+                              <Play size={13} className="text-white fill-white ml-0.5" />
+                            </div>
+                          </div>
+                          <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button type="button" onClick={() => removeNewVideo(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
                               <Trash2 size={13} />
                             </button>
                           </div>
@@ -422,7 +528,7 @@ export const AddAccommodationModal = ({
                   )}
 
                   {/* Dropzone Controller */}
-                  {canAddMoreImages && (
+                  {canAddMore && (
                     <div
                       onDragOver={onDragOver}
                       onDragLeave={onDragLeave}
@@ -431,15 +537,15 @@ export const AddAccommodationModal = ({
                       className={`relative flex flex-col items-center justify-center w-full min-h-35 p-4 transition-all border border-dashed rounded-lg cursor-pointer
                         ${isDragging ? "border-zinc-500 bg-zinc-100/70" : "border-zinc-300 hover:border-zinc-400 bg-zinc-50/50 hover:bg-zinc-50"}`}
                     >
-                      <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageChange} className="hidden" />
+                      <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={handleImageChange} className="hidden" />
                       <div className="p-2 bg-white shadow-sm border border-zinc-200/80 rounded-md text-zinc-400 mb-2">
                         <ImageIcon size={18} strokeWidth={1.8} />
                       </div>
                       <p className="text-xs font-medium text-zinc-900">
-                        คลิกเพื่อเลือกไฟล์รูปภาพ <span className="font-normal text-zinc-400">หรือลากรูปมาวางที่นี่</span>
+                        คลิกเพื่อเลือกไฟล์ <span className="font-normal text-zinc-400">หรือลากไฟล์มาวางที่นี่</span>
                       </p>
                       <p className="text-[10px] text-zinc-400 mt-0.5">
-                        รองรับ JPG, PNG, WEBP (ไม่เกิน 5MB) · เพิ่มได้อีก {MAX_IMAGES - totalImages} รูป
+                        รูป JPG/PNG/WEBP ≤ 5MB · วิดีโอ MP4/WEBM ≤ 50MB (สูงสุด {MAX_VIDEOS} คลิป) · ต้องมีรูปอย่างน้อย 1 รูปก่อนแนบวิดีโอ
                       </p>
                     </div>
                   )}

@@ -26,7 +26,18 @@ import {
   Check,
   ChevronDown,
   Loader2,
+  Play,
 } from "lucide-react";
+import {
+  MAX_IMAGES,
+  MAX_VIDEOS,
+  MAX_IMAGE_BYTES,
+  MAX_VIDEO_BYTES,
+  splitMedia,
+  isImageFile,
+  isVideoFile,
+  isVideoUrl,
+} from "@/lib/media";
 
 // ==================== TYPES & CONSTANTS ====================
 interface DestinationFormData {
@@ -38,8 +49,6 @@ interface DestinationFormData {
   max_price: number | string;
   image_file?: File[];
 }
-
-const MAX_IMAGES = 15;
 
 const CATEGORIES = [
   "ทั้งหมด",
@@ -273,37 +282,52 @@ export default function AdminDestinationsPage() {
       : "/api/destinations";
 
     try {
-      let finalImageUrl = formData.image_url; // เก็บ URL รูปเดิมไว้ก่อน (เป็น Array ตาม State)
+      // สื่อเดิมถูกแยกเป็นรูป/วิดีโอ เพื่อคุมลำดับตอนบันทึก (รูปก่อนวิดีโอเสมอ)
+      const { images: existingImages, videos: existingVideos } = splitMedia(
+        formData.image_url,
+      );
+      let finalImageUrl: string[] = [...existingImages, ...existingVideos];
 
       // ==========================================
-      // 1. อัปโหลดรูปภาพใหม่ทั้งหมด (ถ้ามี) แล้วรวมกับรูปเดิมที่เหลืออยู่
+      // 1. อัปโหลดไฟล์ใหม่ทั้งหมด (ถ้ามี) — รูปก่อน แล้วค่อยวิดีโอ
       // ==========================================
-      if (formData.image_file && formData.image_file.length > 0) {
-        const uploadedUrls: string[] = [];
-
-        for (const file of formData.image_file) {
-          const fileExt = file.name.split('.').pop();
+      const newFiles = formData.image_file || [];
+      if (newFiles.length > 0) {
+        const uploadOne = async (file: File) => {
+          const fileExt = file.name.split(".").pop();
           const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
           const filePath = `destinations/${fileName}`;
 
-          // ⚠️ เปลี่ยน 'images' เป็นชื่อ Bucket ของคุณใน Supabase
           const { error: uploadError } = await supabase.storage
-            .from('Images')
+            .from("Images")
             .upload(filePath, file);
 
           if (uploadError) {
             throw new Error(`Upload failed: ${uploadError.message}`);
           }
 
-          // ดึง Public URL ของรูปที่เพิ่งอัปโหลด
           const { data: { publicUrl } } = supabase.storage
-            .from('Images')
+            .from("Images")
             .getPublicUrl(filePath);
 
-          uploadedUrls.push(publicUrl);
+          return publicUrl as string;
+        };
+
+        const uploadedImageUrls: string[] = [];
+        const uploadedVideoUrls: string[] = [];
+        for (const file of newFiles.filter(isImageFile)) {
+          uploadedImageUrls.push(await uploadOne(file));
+        }
+        for (const file of newFiles.filter(isVideoFile)) {
+          uploadedVideoUrls.push(await uploadOne(file));
         }
 
-        finalImageUrl = [...formData.image_url, ...uploadedUrls];
+        finalImageUrl = [
+          ...existingImages,
+          ...uploadedImageUrls,
+          ...existingVideos,
+          ...uploadedVideoUrls,
+        ];
       }
 
       // ==========================================
@@ -384,25 +408,51 @@ export default function AdminDestinationsPage() {
 
 
   const processImageFiles = (files: File[]) => {
-    const currentCount =
-      formData.image_url.length + (formData.image_file?.length || 0);
-    const validFiles = files.filter((f) => f.type.startsWith("image/"));
+    const existing = splitMedia(formData.image_url);
+    const newFiles = formData.image_file || [];
+    const currentImages = existing.images.length + newFiles.filter(isImageFile).length;
+    const currentVideos = existing.videos.length + newFiles.filter(isVideoFile).length;
 
-    if (validFiles.length < files.length) {
-      toast.error("กรุณาเลือกไฟล์รูปภาพเท่านั้น");
+    const imgs = files.filter(isImageFile);
+    const vids = files.filter(isVideoFile);
+
+    if (imgs.length + vids.length < files.length) {
+      toast.error("รองรับเฉพาะไฟล์รูปภาพหรือวิดีโอเท่านั้น");
     }
-    if (validFiles.length === 0) return;
+    if (imgs.length + vids.length === 0) return;
 
-    if (currentCount + validFiles.length > MAX_IMAGES) {
-      toast.error(`สามารถอัปโหลดได้สูงสุด ${MAX_IMAGES} รูปเท่านั้น`);
-      return;
+    if (imgs.length > 0) {
+      if (currentImages + imgs.length > MAX_IMAGES) {
+        toast.error(`อัปโหลดรูปได้สูงสุด ${MAX_IMAGES} รูปเท่านั้น`);
+        return;
+      }
+      if (imgs.some((f) => f.size > MAX_IMAGE_BYTES)) {
+        toast.error("แต่ละรูปต้องมีขนาดไม่เกิน 5MB");
+        return;
+      }
     }
 
-    const newPreviews = validFiles.map((f) => URL.createObjectURL(f));
+    if (vids.length > 0) {
+      if (currentImages + imgs.length === 0) {
+        toast.error("กรุณาเพิ่มรูปภาพอย่างน้อย 1 รูปก่อนแนบวิดีโอ");
+        return;
+      }
+      if (currentVideos + vids.length > MAX_VIDEOS) {
+        toast.error(`อัปโหลดวิดีโอได้สูงสุด ${MAX_VIDEOS} คลิปเท่านั้น`);
+        return;
+      }
+      if (vids.some((f) => f.size > MAX_VIDEO_BYTES)) {
+        toast.error("แต่ละวิดีโอต้องมีขนาดไม่เกิน 50MB");
+        return;
+      }
+    }
+
+    const accepted = [...imgs, ...vids];
+    const newPreviews = accepted.map((f) => URL.createObjectURL(f));
     setImagePreview((prev) => [...prev, ...newPreviews]);
     setFormData((prev) => ({
       ...prev,
-      image_file: [...(prev.image_file || []), ...validFiles],
+      image_file: [...(prev.image_file || []), ...accepted],
     }));
   };
 
@@ -487,8 +537,13 @@ export default function AdminDestinationsPage() {
     ).length,
   };
 
-  const totalImages = formData.image_url.length + (formData.image_file?.length || 0);
-  const canAddMoreImages = totalImages < MAX_IMAGES;
+  const mediaExisting = splitMedia(formData.image_url);
+  const mediaNewFiles = formData.image_file || [];
+  const totalImages =
+    mediaExisting.images.length + mediaNewFiles.filter(isImageFile).length;
+  const totalVideos =
+    mediaExisting.videos.length + mediaNewFiles.filter(isVideoFile).length;
+  const canAddMore = totalImages < MAX_IMAGES || totalVideos < MAX_VIDEOS;
 
   // ==================== RENDER ====================
   if (authLoaded && !user) {
@@ -1047,21 +1102,32 @@ export default function AdminDestinationsPage() {
                     onSubmit={handleSubmit}
                     className="space-y-6"
                   >
-                    {/* Image Area */}
+                    {/* Media Area (รูป + วิดีโอ) */}
                     <div>
                       <label className="block text-[13px] font-medium text-zinc-700 mb-2">
-                        รูปภาพแลนด์มาร์ค{" "}
+                        รูปภาพ / วิดีโอแลนด์มาร์ค{" "}
                         <span className="text-zinc-400 font-normal">
-                          ({totalImages}/{MAX_IMAGES} รูป)
+                          ({totalImages}/{MAX_IMAGES} รูป · {totalVideos}/{MAX_VIDEOS} วิดีโอ)
                         </span>
                       </label>
 
                       {(formData.image_url.length > 0 || imagePreview.length > 0) && (
                         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-3">
-                          {formData.image_url.map((image, index) => (
-                            <div key={`existing-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-50">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={image} alt="" className="w-full h-full object-cover" />
+                          {formData.image_url.map((media, index) => (
+                            <div key={`existing-${index}`} className={`relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm ${isVideoUrl(media) ? "bg-zinc-900" : "bg-zinc-50"}`}>
+                              {isVideoUrl(media) ? (
+                                <>
+                                  <video src={media} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+                                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div className="w-8 h-8 rounded-full bg-zinc-950/55 flex items-center justify-center">
+                                      <Play size={13} className="text-white fill-white ml-0.5" />
+                                    </div>
+                                  </div>
+                                </>
+                              ) : (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img src={media} alt="" className="w-full h-full object-cover" />
+                              )}
                               <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <button type="button" onClick={() => removeExistingImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
                                   <Trash2 size={13} />
@@ -1069,22 +1135,36 @@ export default function AdminDestinationsPage() {
                               </div>
                             </div>
                           ))}
-                          {imagePreview.map((preview, index) => (
-                            <div key={`new-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-50">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={preview} alt="" className="w-full h-full object-cover" />
-                              <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <button type="button" onClick={() => removeNewImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
-                                  <Trash2 size={13} />
-                                </button>
+                          {imagePreview.map((preview, index) => {
+                            const isVid = isVideoFile((formData.image_file || [])[index] ?? new File([], ""));
+                            return (
+                              <div key={`new-${index}`} className={`relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm ${isVid ? "bg-zinc-900" : "bg-zinc-50"}`}>
+                                {isVid ? (
+                                  <>
+                                    <video src={preview} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                      <div className="w-8 h-8 rounded-full bg-zinc-950/55 flex items-center justify-center">
+                                        <Play size={13} className="text-white fill-white ml-0.5" />
+                                      </div>
+                                    </div>
+                                  </>
+                                ) : (
+                                  /* eslint-disable-next-line @next/next/no-img-element */
+                                  <img src={preview} alt="" className="w-full h-full object-cover" />
+                                )}
+                                <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <button type="button" onClick={() => removeNewImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                                    <Trash2 size={13} />
+                                  </button>
+                                </div>
+                                <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-zinc-900 text-white px-1 py-0.5 rounded">NEW</span>
                               </div>
-                              <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-zinc-900 text-white px-1 py-0.5 rounded">NEW</span>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
 
-                      {canAddMoreImages && (
+                      {canAddMore && (
                         <div
                           onDragOver={(e) => {
                             e.preventDefault();
@@ -1111,7 +1191,7 @@ export default function AdminDestinationsPage() {
                               if (files.length > 0) processImageFiles(files);
                               e.target.value = "";
                             }}
-                            accept="image/*"
+                            accept="image/*,video/*"
                             className="hidden"
                           />
                           <div className="p-2.5 bg-white shadow-sm border border-zinc-200 rounded-lg text-zinc-400 mb-1">
@@ -1120,11 +1200,11 @@ export default function AdminDestinationsPage() {
                           <p className="text-[13px] font-medium text-zinc-900">
                             คลิกเพื่อเลือกไฟล์{" "}
                             <span className="font-normal text-zinc-500">
-                              หรือลากรูปมาวางที่นี่ (เลือกได้หลายรูป)
+                              หรือลากไฟล์มาวางที่นี่ (เลือกได้หลายไฟล์)
                             </span>
                           </p>
                           <p className="text-[11px] text-zinc-400 mt-1">
-                            รองรับไฟล์ JPG, PNG, WEBP · เพิ่มได้อีก {MAX_IMAGES - totalImages} รูป
+                            รูป JPG/PNG/WEBP ≤ 5MB · วิดีโอ MP4/WEBM ≤ 50MB (สูงสุด {MAX_VIDEOS} คลิป) · ต้องมีรูปอย่างน้อย 1 รูปก่อนแนบวิดีโอ
                           </p>
                         </div>
                       )}
