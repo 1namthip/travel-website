@@ -72,17 +72,17 @@ const priceRanges = [
 
 // 📸 ฟังก์ชันจัดการรูปภาพตามที่คุณกำหนด
 const getFirstImageUrl = (data: any): string => {
-  if (!data) return "/images/default.jpg";
+  if (!data) return "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=70";
   
   try {
     // 1. ถ้าเป็น String JSON เช่น '["url1", "url2"]'
     if (typeof data === 'string' && data.startsWith('[')) {
       const parsed = JSON.parse(data);
-      return Array.isArray(parsed) ? (parsed[0] || "/images/default.jpg") : data;
+      return Array.isArray(parsed) ? (parsed[0] || "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=70") : data;
     }
     // 2. ถ้าเป็น Array ปกติ ['url1', 'url2']
     if (Array.isArray(data)) {
-      return data[0] || "/images/default.jpg";
+      return data[0] || "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=70";
     }
     // 3. ถ้าเป็น String URL ปกติ (ข้อมูลเก่า)
     return data;

@@ -203,11 +203,17 @@ export function EditTripModal({
 
         {/* ── Header ──────────────────────────────────────── */}
         <div className="flex items-center justify-between px-6 pt-5 pb-4 shrink-0 border-b border-neutral-100">
-          <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight">
-            แก้ไขทริป
-          </h2>
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-neutral-900 tracking-tight">
+              แก้ไขทริป
+            </h2>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              เปลี่ยนชื่อทริป หรือเอาสถานที่ที่ไม่ต้องการออก
+            </p>
+          </div>
           <button
             onClick={onClose}
+            aria-label="ปิด"
             className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 flex items-center justify-center transition-colors shrink-0"
           >
             <X className="w-4 h-4" />
@@ -219,7 +225,7 @@ export function EditTripModal({
           
           {/* Trip Name Input */}
           <div>
-            <label className="block text-sm font-bold text-neutral-700 mb-2.5">
+            <label className="block text-sm font-semibold text-neutral-700 mb-2">
               ชื่อทริป
             </label>
             <input
@@ -227,27 +233,28 @@ export function EditTripModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="ตั้งชื่อทริปของคุณ..."
-              className="w-full px-5 py-4 bg-neutral-50/50 border border-neutral-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all outline-none text-neutral-900 font-semibold placeholder:text-neutral-400 text-lg"
+              className="w-full h-12 px-4 bg-white border border-neutral-200 rounded-xl outline-none text-neutral-900 font-semibold placeholder:text-neutral-400 transition-colors focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
             />
           </div>
 
           {/* Grouped Items Sections */}
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-bold text-neutral-700">รายการในทริปทั้งหมด ({items.length})</h3>
-            </div>
-            
+            <h3 className="text-sm font-semibold text-neutral-700 mb-2">
+              รายการในทริป{" "}
+              <span className="text-neutral-400 font-normal">({items.length})</span>
+            </h3>
+
             {items.length === 0 ? (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center py-16 text-center bg-neutral-50/50 rounded-2xl border border-dashed border-neutral-200 mt-4"
+                className="flex flex-col items-center justify-center py-14 text-center bg-neutral-50 rounded-xl border border-dashed border-neutral-200 mt-3"
               >
-                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-neutral-100 flex items-center justify-center mb-4 text-neutral-300">
-                  <Luggage className="w-8 h-8" />
+                <div className="w-14 h-14 bg-white rounded-xl border border-neutral-200 flex items-center justify-center mb-3 text-neutral-300">
+                  <Luggage className="w-7 h-7" />
                 </div>
-                <p className="text-base font-bold text-neutral-700">ไม่มีรายการแล้ว</p>
-                <p className="text-sm text-neutral-400 mt-1">คุณสามารถเพิ่มสถานที่ใหม่ได้ในหน้าค้นหา</p>
+                <p className="text-sm font-bold text-neutral-700">ไม่มีรายการแล้ว</p>
+                <p className="text-xs text-neutral-400 mt-1">เพิ่มสถานที่ใหม่ได้จากหน้าค้นหา</p>
               </motion.div>
             ) : (
               <div className="space-y-8 mt-6">
@@ -295,30 +302,30 @@ export function EditTripModal({
                                   <img
                                     src={getImageUrl(detail)}
                                     alt={detail.name}
-                                    className="w-full h-full object-cover transition-[filter] duration-300 group-hover:brightness-95"
+                                    className="w-full h-full object-cover"
                                   />
-                                  <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                  
+
                                   {/* Floating Delete Button */}
                                   <button
                                     onClick={() => removeItem(tripItem.id)}
-                                    className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/95 backdrop-blur-md shadow-sm border border-black/5 flex items-center justify-center text-neutral-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/95 shadow-sm border border-neutral-200 flex items-center justify-center text-neutral-400 hover:text-rose-500 hover:bg-rose-50 transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                                     title="ลบรายการ"
+                                    aria-label="ลบรายการ"
                                   >
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="w-3.5 h-3.5" />
                                   </button>
                                 </div>
 
                                 {/* Content Section */}
-                                <div className="p-3.5 flex flex-col flex-1">
-                                  <p className="text-sm font-bold text-neutral-800 leading-snug line-clamp-2 mb-2 group-hover:text-black transition-colors">
+                                <div className="p-3 flex flex-col flex-1">
+                                  <p className="text-sm font-semibold text-neutral-900 leading-snug line-clamp-2 mb-2">
                                     {detail.name}
                                   </p>
                                   <div className="mt-auto flex items-end justify-between pt-1">
-                                    <p className="text-neutral-500 font-semibold text-[11px] uppercase tracking-wider">
-                                      ราคาเริ่มต้น
+                                    <p className="text-neutral-400 font-medium text-[11px]">
+                                      เริ่มต้น
                                     </p>
-                                    <p className="text-neutral-900 font-bold text-sm">
+                                    <p className="text-neutral-900 font-bold text-sm tabular-nums">
                                       ฿{detail.min_price.toLocaleString()}
                                     </p>
                                   </div>
@@ -337,32 +344,34 @@ export function EditTripModal({
         </div>
 
         {/* ── Footer ──────────────────────────────────────── */}
-        <div className="p-4 sm:px-6 sm:py-5 bg-white border-t border-neutral-100 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-          
-          <div className="min-w-0 flex-1 hidden sm:block">
-            <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-0.5">ยอดรวมโดยประมาณ</span>
-            <div className="text-xl font-black text-neutral-900 tracking-tight">
+        <div className="p-4 sm:px-6 sm:py-4 bg-white border-t border-neutral-100 shrink-0 flex items-center justify-between gap-4">
+
+          <div className="min-w-0">
+            <span className="text-[11px] font-medium text-neutral-400 block">
+              ยอดรวมโดยประมาณ
+            </span>
+            <div className="text-lg font-bold text-neutral-900 tracking-tight tabular-nums">
               ฿{spend.toLocaleString()}
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto ">
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none px-6 py-3 rounded-2xl text-sm font-bold text-neutral-600 bg-neutral-100 hover:bg-neutral-200 hover:text-neutral-900 transition-colors"
+              className="h-11 px-5 rounded-xl text-sm font-bold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 transition-colors"
             >
               ยกเลิก
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving || !name.trim()}
-              className="flex-2 sm:flex-none px-8 py-3 rounded-2xl text-sm font-bold text-white bg-neutral-900 hover:bg-black transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="h-11 px-6 rounded-xl text-sm font-bold text-white bg-neutral-900 hover:bg-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             >
               {isSaving ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <>
-                  <Save className="w-5 h-5 text-emerald-400" />
+                  <Save className="w-4 h-4" />
                   บันทึกทริป
                 </>
               )}
@@ -465,7 +474,7 @@ export function TripCard({
         {renderImages()}
 
         {/* Subtle Inner Shadow กันรูปสีขาวกลืนกับขอบการ์ด */}
-        <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-t-3xl pointer-events-none" />
+        <div className="absolute inset-0 ring-1 ring-inset ring-black/5 pointer-events-none" />
 
         {/* Top-Right: Delete Button (แก้ปัญหา Hover บนมือถือ) */}
         <div className="absolute top-3 right-3 z-10 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -496,14 +505,14 @@ export function TripCard({
         <div>
           {/* Header Row: Title & Spend */}
           <div className="flex items-start justify-between gap-3 mb-2">
-            <h3 
+            <h3
               onClick={() => onEdit(trip)}
-              className="text-base font-extrabold text-neutral-900 leading-snug line-clamp-1 cursor-pointer hover:text-neutral-600 transition-colors"
+              className="text-[15px] font-bold text-neutral-900 leading-snug line-clamp-1 cursor-pointer hover:text-neutral-600 transition-colors"
             >
               {trip.name}
             </h3>
             <div className="text-right shrink-0">
-              <span className="text-sm font-black text-neutral-900">
+              <span className="text-sm font-bold text-neutral-900 tabular-nums">
                 ฿{spend.toLocaleString()}
               </span>
             </div>
@@ -535,13 +544,13 @@ export function TripCard({
         </div>
 
         {/* ── 3. Action Footer ── */}
-        <div className="pt-5 mt-4 border-t border-neutral-100">
+        <div className="pt-4 mt-4 border-t border-neutral-100">
           <button
             onClick={() => onEdit(trip)}
-            className="w-full py-2.5 px-4 rounded-2xl bg-neutral-50 hover:bg-neutral-900 text-neutral-700 hover:text-white text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 group/btn border border-neutral-200 hover:border-transparent"
+            className="w-full h-10 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 group/btn border border-neutral-200 hover:border-neutral-300"
           >
             <span>จัดการทริปนี้</span>
-            <ChevronRight className="w-3.5 h-3.5 text-neutral-400 group-hover/btn:text-white transition-transform group-hover/btn:translate-x-0.5" />
+            <ChevronRight className="w-3.5 h-3.5 text-neutral-400 transition-transform group-hover/btn:translate-x-0.5" />
           </button>
         </div>
       </div>
@@ -568,8 +577,8 @@ function EmptyState() {
         เริ่มจัดทริปแรกของคุณแล้วกดบันทึกไว้ที่นี่ได้เลย
       </p>
       <Link
-        href="/trips/plan"
-        className="bg-black text-white px-7 py-3.5 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-neutral-800 transition-all"
+        href="/dashboard#planner"
+        className="bg-neutral-900 text-white px-7 h-11 inline-flex items-center rounded-xl font-semibold text-sm gap-2 hover:bg-black transition-colors"
       >
         <Plus className="w-4 h-4" />
         จัดทริปใหม่
@@ -596,8 +605,6 @@ export default function MyTripsPage() {
       const res = await fetch("/api/trips");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
-
-      console.log("ข้อมูลที่ได้จาก API:", data);
       setTrips(data.trips || []);
     } catch (err) {
       console.error(err);
@@ -639,7 +646,7 @@ export default function MyTripsPage() {
     <Navbar />
 
     {/* 🌟 Hero Banner Section */}
-    <div className="relative w-full min-h-100 md:min-h-125 bg-neutral-900 flex flex-col items-center justify-center overflow-hidden pt-20 pb-12 group">
+    <div className="relative w-full min-h-72 md:min-h-80 bg-neutral-900 flex flex-col items-center justify-center overflow-hidden pt-20 pb-10">
       <div
         className="absolute inset-0 bg-cover bg-center blur-xs scale-105"
         style={{ backgroundImage: "url('/images/banner-trip.png')" }}
@@ -647,15 +654,11 @@ export default function MyTripsPage() {
 
       <div className="absolute inset-0 bg-black/60"></div>
 
-      <div className="relative z-10 text-center px-4 md:px-8 w-full max-w-4xl mx-auto mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 leading-tight drop-shadow-md">
-          ทริปเที่ยว
-          <span className="text-amber-400 sm:ml-3 block sm:inline mt-2 sm:mt-0 drop-shadow-md">
-            ของฉัน
-          </span>
+      <div className="relative z-10 text-center px-4 md:px-8 w-full max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight drop-shadow-md">
+          ทริปเที่ยว<span className="text-amber-400">ของฉัน</span>
         </h1>
-
-        <p className="text-neutral-200 text-lg md:text-xl max-w-2xl mx-auto font-medium drop-shadow-md">
+        <p className="mt-3 text-neutral-200 text-sm sm:text-base max-w-xl mx-auto drop-shadow-md">
           รวมทุกทริปที่คุณวางแผนไว้ในที่เดียว แก้ไข จัดการ และติดตามค่าใช้จ่ายได้ง่ายๆ
         </p>
       </div>
@@ -690,24 +693,25 @@ export default function MyTripsPage() {
     </div>
 
     {/* 🌟 Main Content */}
-    <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-16 pt-2">
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-16 pt-2">
       {/* Action bar */}
-      <div className="flex items-start justify-between mb-10 flex-wrap gap-4">
+      <div className="flex items-center justify-between mb-8 gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight flex items-center gap-3">
-            <Luggage className="w-7 h-7" />
+          <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
             ทริปที่บันทึกไว้
           </h2>
-          {!isLoading && trips.length > 0 && (
-            <p className="text-neutral-400 mt-2 text-sm">
-              {trips.length} ทริปที่บันทึกไว้
-            </p>
-          )}
+          <p className="text-neutral-500 mt-1 text-sm">
+            {isLoading
+              ? "กำลังโหลด…"
+              : trips.length > 0
+                ? `ทั้งหมด ${trips.length} ทริป`
+                : "ยังไม่มีทริปที่บันทึก"}
+          </p>
         </div>
 
         <Link
-          href="/trips/plan"
-          className="bg-black text-white px-5 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-neutral-800 transition-all shadow-sm shrink-0"
+          href="/dashboard#planner"
+          className="bg-neutral-900 text-white px-5 h-11 inline-flex items-center rounded-xl font-semibold text-sm gap-2 hover:bg-black transition-colors shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">จัดทริปใหม่</span>
@@ -740,10 +744,10 @@ export default function MyTripsPage() {
       {/* Error */}
       {!isLoading && error && (
         <div className="text-center py-20">
-          <p className="text-red-400 mb-4">{error}</p>
+          <p className="text-rose-600 mb-4 text-sm font-medium">{error}</p>
           <button
             onClick={fetchTrips}
-            className="text-sm font-medium text-neutral-600 flex items-center gap-2 mx-auto hover:text-neutral-900 transition-colors"
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-neutral-300 bg-white text-sm font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors"
           >
             <RefreshCcw className="w-4 h-4" />
             โหลดใหม่

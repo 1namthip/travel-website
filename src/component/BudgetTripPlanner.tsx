@@ -927,7 +927,10 @@ export default function BudgetTripPlanner({
 
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="w-full max-w-5xl mx-auto py-12 px-4 sm:px-6 pb-16 relative">
+    <div
+      id="planner"
+      className="w-full max-w-5xl mx-auto py-12 px-4 sm:px-6 pb-16 relative scroll-mt-24"
+    >
 
       {/* ── Header & Input ─────────────────────────────────────── */}
       <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-neutral-100 mb-10">

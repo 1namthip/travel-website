@@ -125,15 +125,15 @@ export default function DestinationList() {
   };
 
   const getFirstImageUrl = (data: any): string => {
-    if (!data) return "/images/default.jpg";
+    if (!data) return "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=70";
     
     try {
       if (typeof data === 'string' && data.startsWith('[')) {
         const parsed = JSON.parse(data);
-        return Array.isArray(parsed) ? (parsed[0] || "/images/default.jpg") : data;
+        return Array.isArray(parsed) ? (parsed[0] || "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=70") : data;
       }
       if (Array.isArray(data)) {
-        return data[0] || "/images/default.jpg";
+        return data[0] || "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=70";
       }
       return data;
     } catch {

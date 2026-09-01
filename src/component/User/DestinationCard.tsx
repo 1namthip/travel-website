@@ -7,7 +7,7 @@ export default function DestinationCard({ destination }: { destination: Destinat
     <Link href={`/destinations/${destination.id}`}>
       <div className="bg-white rounded-xl shadow hover:shadow-md transition overflow-hidden">
         <Image
-            src={destination.image_url ?? "/images/default.jpg"} // ✅ ถ้าไม่มี image_url ใช้รูป default
+            src={destination.image_url ?? "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=70"} // ✅ ถ้าไม่มี image_url ใช้รูป default
             alt={destination.name}
             width={400}
             height={300}
