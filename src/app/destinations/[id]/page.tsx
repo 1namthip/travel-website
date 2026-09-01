@@ -22,6 +22,8 @@ interface Review {
   rating: number;
   comment: string;
   created_at: string;
+  user_name?: string | null;
+  user_avatar?: string | null;
 }
 
 interface DestinationDetailData {
@@ -416,11 +418,20 @@ export default function DestinationDetail() {
                       )}
 
                       <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 bg-neutral-900 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
-                          U
-                        </div>
+                        {review.user_avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={review.user_avatar}
+                            alt={review.user_name || "นักท่องเที่ยว"}
+                            className="w-12 h-12 rounded-full object-cover shadow-sm"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 bg-neutral-900 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                            {(review.user_name || "นักท่องเที่ยวไม่ระบุนาม").charAt(0).toUpperCase()}
+                          </div>
+                        )}
                         <div>
-                          <div className="font-bold text-neutral-900">นักท่องเที่ยวไม่ระบุนาม</div>
+                          <div className="font-bold text-neutral-900">{review.user_name || "นักท่องเที่ยวไม่ระบุนาม"}</div>
                           <div className="text-sm text-neutral-500">
                             {new Date(review.created_at).toLocaleDateString("th-TH", { month: "long", year: "numeric" })}
                           </div>

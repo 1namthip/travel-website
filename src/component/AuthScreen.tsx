@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Loader2, Eye, EyeOff, User } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { signInAction, signUpAction, verifyOtpAction } from "@/actions/auth";
 import Link from "next/link";
@@ -49,7 +49,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RESEND_SECONDS = 30;
 const OTP_LENGTH = 6;
 
-type FieldErrors = { email?: string; password?: string; agreed?: string };
+type FieldErrors = { email?: string; password?: string; agreed?: string; fullName?: string };
 
 export const AuthScreen = ({
   defaultView = "login",
@@ -60,6 +60,7 @@ export const AuthScreen = ({
   const [view, setView] = useState<AuthState>(defaultView);
   const [loading, setLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
@@ -92,6 +93,7 @@ export const AuthScreen = ({
   const switchView = (next: AuthState) => {
     setFieldErrors({});
     setPassword("");
+    setFullName("");
     setShowPassword(false);
     setView(next);
   };
@@ -104,6 +106,17 @@ export const AuthScreen = ({
   const validate = (email: string, pass: string) => {
     const errors: FieldErrors = {};
     const emailValue = email.trim().toLowerCase();
+
+    if (view === "signup") {
+      const nameValue = fullName.trim();
+      if (!nameValue) {
+        errors.fullName = "กรุณากรอกชื่อที่จะแสดง";
+      } else if (nameValue.length < 2) {
+        errors.fullName = "ชื่อสั้นเกินไป";
+      } else if (nameValue.length > 60) {
+        errors.fullName = "ชื่อยาวเกินไป (ไม่เกิน 60 ตัวอักษร)";
+      }
+    }
 
     if (!emailValue) {
       errors.email = "กรุณากรอกอีเมล";
@@ -477,6 +490,54 @@ export const AuthScreen = ({
               ) : (
                 <>
                   <form action={handleAction} className="space-y-5">
+                    {view === "signup" && (
+                      <div>
+                        <label
+                          htmlFor="full_name"
+                          className="mb-2 block text-sm font-medium text-zinc-700"
+                        >
+                          ชื่อที่จะแสดง
+                        </label>
+                        <div className="relative">
+                          <User
+                            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400"
+                            aria-hidden="true"
+                          />
+                          <input
+                            id="full_name"
+                            name="full_name"
+                            type="text"
+                            required
+                            maxLength={60}
+                            disabled={loading}
+                            value={fullName}
+                            placeholder="ชื่อที่จะแสดงในรีวิวและโปรไฟล์"
+                            aria-invalid={!!fieldErrors.fullName}
+                            aria-describedby={
+                              fieldErrors.fullName ? "full_name-error" : undefined
+                            }
+                            onChange={(e) => {
+                              setFullName(e.target.value.slice(0, 60));
+                              if (fieldErrors.fullName) clearFieldError("fullName");
+                            }}
+                            className={`w-full rounded-xl border py-3.5 pl-12 pr-4 outline-none transition-all focus:border-transparent focus:ring-2 disabled:opacity-60 ${
+                              fieldErrors.fullName
+                                ? "border-red-400 focus:ring-red-500"
+                                : "border-zinc-200 focus:ring-zinc-900"
+                            }`}
+                          />
+                        </div>
+                        {fieldErrors.fullName && (
+                          <p
+                            id="full_name-error"
+                            className="mt-1.5 text-sm text-red-600"
+                          >
+                            {fieldErrors.fullName}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
                     <div>
                       <label
                         htmlFor="email"

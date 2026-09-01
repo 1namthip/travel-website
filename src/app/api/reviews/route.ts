@@ -35,6 +35,19 @@ export const getSessionUserWithRole = async () => {
   return { user, role: profile?.role ?? "user" };
 };
 
+// ─── Helper: ประกอบชื่อที่จะแสดงจากข้อมูล auth user ─────────────────────────
+
+const displayNameFromUser = (user: any): string => {
+  const meta = user?.user_metadata ?? {};
+  return (
+    meta.full_name ||
+    meta.name ||
+    meta.user_name ||
+    meta.preferred_username ||
+    (user?.email ? String(user.email).split("@")[0] : "ผู้ใช้งาน")
+  );
+};
+
 // ─── GET /api/reviews (Public) ───────────────────────────────────────────────
 
 export const GET = async (req: Request) => {
@@ -64,7 +77,41 @@ export const GET = async (req: Request) => {
 
     if (error) throw error;
 
-    return NextResponse.json(data, { status: 200 });
+    const reviews = data ?? [];
+
+    // ─── แนบชื่อ/รูปโปรไฟล์ของผู้รีวิว (ดึงจาก auth.users ด้วย service role) ───
+    const userIds = [
+      ...new Set(
+        reviews
+          .map((r) => r.created_by)
+          .filter((v): v is string => typeof v === "string" && v.length > 0),
+      ),
+    ];
+
+    const identityMap = new Map<string, { name: string; avatar: string | null }>();
+    await Promise.all(
+      userIds.map(async (id) => {
+        try {
+          const { data: found } = await supabaseAdmin.auth.admin.getUserById(id);
+          const u = found?.user ?? null;
+          if (!u) return;
+          identityMap.set(id, {
+            name: displayNameFromUser(u),
+            avatar: u.user_metadata?.avatar_url || u.user_metadata?.picture || null,
+          });
+        } catch {
+          /* ผู้ใช้ถูกลบไปแล้ว หรือดึงข้อมูลไม่ได้ — ใช้ค่า fallback ที่ฝั่งหน้าเว็บ */
+        }
+      }),
+    );
+
+    const enriched = reviews.map((r) => ({
+      ...r,
+      user_name: identityMap.get(r.created_by)?.name ?? null,
+      user_avatar: identityMap.get(r.created_by)?.avatar ?? null,
+    }));
+
+    return NextResponse.json(enriched, { status: 200 });
   } catch (error: any) {
     console.error("GET /api/reviews error:", error);
     return NextResponse.json({ error: error.message || "Failed to fetch reviews" }, { status: 400 });

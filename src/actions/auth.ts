@@ -38,11 +38,18 @@ export const signUpAction = async (formData: FormData) => {
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const fullName = ((formData.get("full_name") as string) ?? "").trim();
   const supabase = await createClient();
+
+  if (!fullName) return { error: "กรุณากรอกชื่อที่จะแสดง" };
 
   const { error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      // เก็บชื่อไว้ใน user_metadata เพื่อให้ระบบรีวิว/โปรไฟล์ดึงไปแสดงได้
+      data: { full_name: fullName },
+    },
   });
 
   if (error) return { error: error.message };
