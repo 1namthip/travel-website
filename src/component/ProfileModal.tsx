@@ -81,13 +81,13 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
       const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from('Images')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
+        .from('Images')
         .getPublicUrl(filePath);
 
       const { error: updateError } = await supabase.auth.updateUser({
@@ -99,7 +99,7 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
       setUser({ ...user, avatarUrl: publicUrl });
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert("เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ โปรดตรวจสอบว่ามี Bucket 'avatars' (Public) ใน Supabase แล้วหรือไม่");
+      alert("เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ โปรดตรวจสอบว่ามี Bucket 'Images' (Public) ใน Supabase แล้วหรือไม่");
     } finally {
       setIsSaving(false);
     }
