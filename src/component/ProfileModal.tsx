@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { 
   UserRound, 
@@ -29,6 +29,10 @@ export interface ProfileModalProps {
 export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
   const [user, setUser] = useState<UserProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -45,14 +49,16 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          setUser({
+          const userData = {
             id: user.id,
             email: user.email || "",
             fullName: user.user_metadata?.full_name || "ผู้ใช้งานระบบ",
             avatarUrl: user.user_metadata?.avatar_url || "",
             role: user.app_metadata?.role || "user",
             provider: user.app_metadata?.provider || "email",
-          });
+          };
+          setUser(userData);
+          setEditName(userData.fullName);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -63,6 +69,61 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
 
     fetchUser();
   }, [supabase, isOpen]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    try {
+      setIsSaving(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl }
+      });
+
+      if (updateError) throw updateError;
+
+      setUser({ ...user, avatarUrl: publicUrl });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ โปรดตรวจสอบว่ามี Bucket 'avatars' (Public) ใน Supabase แล้วหรือไม่");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    try {
+      setIsSaving(true);
+      const { error } = await supabase.auth.updateUser({
+        data: { full_name: editName }
+      });
+
+      if (error) throw error;
+      
+      setUser({ ...user, fullName: editName });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -114,13 +175,45 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
           </div>
         ) : (
           <>
-            <div className="mb-8 pr-12">
-              <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">
-                {isAdmin ? "การจัดการบัญชีผู้ดูแลระบบ" : "บัญชีส่วนตัว"}
-              </h2>
-              <p className="mt-1.5 text-sm text-neutral-500">
-                จัดการข้อมูลส่วนตัวและตั้งค่าความปลอดภัยของบัญชีคุณ
-              </p>
+            <div className="mb-8 flex items-start justify-between pr-12">
+              <div>
+                <h2 className="text-2xl font-semibold tracking-tight text-neutral-900">
+                  {isAdmin ? "การจัดการบัญชีผู้ดูแลระบบ" : "บัญชีส่วนตัว"}
+                </h2>
+                <p className="mt-1.5 text-sm text-neutral-500">
+                  จัดการข้อมูลส่วนตัวและตั้งค่าความปลอดภัยของบัญชีคุณ
+                </p>
+              </div>
+              
+              {!isEditing ? (
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                >
+                  แก้ไขข้อมูล
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditName(user.fullName);
+                    }}
+                    className="rounded-lg px-4 py-2 text-sm font-medium text-neutral-500 transition-colors hover:bg-neutral-100"
+                    disabled={isSaving}
+                  >
+                    ยกเลิก
+                  </button>
+                  <button 
+                    onClick={handleSaveProfile}
+                    className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-600 disabled:opacity-70"
+                    disabled={isSaving}
+                  >
+                    {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    บันทึก
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
@@ -138,9 +231,20 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                       <UserRound className="h-10 w-10 text-neutral-400" />
                     )}
                   </div>
-                  <button className="absolute bottom-0 right-0 rounded-full border border-neutral-200 bg-white p-2 text-neutral-600 shadow-sm transition-all hover:bg-neutral-50 hover:text-amber-600">
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isSaving}
+                    className="absolute bottom-0 right-0 rounded-full border border-neutral-200 bg-white p-2 text-neutral-600 shadow-sm transition-all hover:bg-neutral-50 hover:text-amber-600 disabled:opacity-50"
+                  >
                     <Camera className="h-4 w-4" />
                   </button>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleImageUpload} 
+                    accept="image/*" 
+                    className="hidden" 
+                  />
                 </div>
                 
                 <h3 className="text-lg font-medium text-neutral-900">{user.fullName}</h3>
@@ -170,9 +274,10 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                       </label>
                       <input 
                         type="text" 
-                        disabled
-                        defaultValue={user.fullName}
-                        className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 disabled:opacity-70"
+                        disabled={!isEditing || isSaving}
+                        value={isEditing ? editName : user.fullName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className={`w-full rounded-lg border border-neutral-200 px-4 py-2.5 text-sm text-neutral-900 outline-none transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 disabled:opacity-70 ${isEditing ? 'bg-white' : 'bg-neutral-50'}`}
                       />
                     </div>
 
