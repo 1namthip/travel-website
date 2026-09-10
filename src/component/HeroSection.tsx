@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, ArrowRight, ArrowLeft, Play, Loader2 } from "lucide-react";
 
@@ -58,7 +59,7 @@ export default function HeroSection() {
         const response = await fetch("/api/destinations");
         const data = await response.json();
         const formattedData: DestinationUI[] = data.map((item: any) => ({
-          id: String(item.id).padStart(2, "0"),
+          id: String(item.id),
           title: item.name,
           subtitle: item.category || "จุดหมายปลายทาง",
           location: "นครราชสีมา",
@@ -174,8 +175,8 @@ export default function HeroSection() {
               </p>
 
               <div className="flex items-center gap-6 mt-6">
-                <a
-                  href="#destinations"
+                <Link
+                  href={`/destinations/${activeData.id}`}
                   className="group relative px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm overflow-hidden"
                 >
                   <span className="relative z-10 flex items-center gap-2">
@@ -183,7 +184,7 @@ export default function HeroSection() {
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
                   <div className="absolute inset-0 bg-amber-500 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0" />
-                </a>
+                </Link>
                 <button className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group">
                   <Play className="w-4 h-4 ml-1 group-hover:scale-110 transition-transform" />
                 </button>

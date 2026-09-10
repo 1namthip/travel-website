@@ -1,8 +1,7 @@
 // src/app/accommodations/[id]/page.tsx
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { createSupabaseClient } from "@/lib/supabaseClient";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
@@ -14,6 +13,8 @@ import PlaceDetailSkeleton from "@/component/PlaceDetailSkeleton";
 import PlaceDetailError from "@/component/PlaceDetailError";
 import DetailStickyBar from "@/component/DetailStickyBar";
 import { useFavorites } from "@/component/FavoritesProvider";
+import { mapsSearchUrl } from "@/lib/maps";
+import { facebookUrl, lineUrl } from "@/lib/social";
 import {
   MapPin,
   Phone,
@@ -63,6 +64,15 @@ const getParsedImages = (data: any): string[] => {
   }
 };
 
+/** decodeURIComponent ที่ไม่ throw เมื่อเจอ % ที่ไม่สมบูรณ์ */
+const safeDecode = (value: string): string => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 const FacebookIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +112,8 @@ export default function AccommodationDetail() {
   const pathname = usePathname();
   const rawId = params.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
-  const cleanId = id?.toString().trim();
+  // decode ก่อนใช้ กันกรณีเปิดลิงก์เก่าที่เป็นชื่อ (เว้นวรรค/ภาษาไทย) แล้วโดน encode ซ้อน
+  const cleanId = id ? safeDecode(id.toString()).trim() : undefined;
 
   // ─── Supabase Auth State ───────────────────────────────────────────────────
   const [user, setUser] = useState<User | null>(null);
@@ -121,74 +132,87 @@ export default function AccommodationDetail() {
   const { isFavorite, toggleFavorite } = useFavorites();
   const saved = !!cleanId && isFavorite("accommodation", cleanId);
 
-  // ================= 1. ดึงข้อมูล Auth & ที่พัก =================
+  // id จริงของที่พัก (uuid) — ได้จากข้อมูลที่โหลดสำเร็จเท่านั้น ใช้เป็น key ของรีวิว
+  const accId = accommodation?.id != null ? String(accommodation.id) : null;
+
+  // ================= Auth session =================
   useEffect(() => {
-    const fetchSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-    };
-    fetchSession();
+    });
+  }, [supabase]);
 
+  // ================= โหลดข้อมูลที่พัก + รีวิวของมัน =================
+  useEffect(() => {
     if (!cleanId) return;
+    let alive = true;
 
-    const fetchAccommodationDetail = async () => {
+    (async () => {
       try {
         setLoading(true);
-        const { data, error: supaError } = await createSupabaseClient()
-          .from("accommodations")
-          .select("*")
-          .eq("id", cleanId)
-          .single();
+        setError(null);
 
-        if (supaError) throw new Error("ไม่พบข้อมูลที่พัก หรือเกิดข้อผิดพลาด");
-        setAccommodation(data);
-      } catch (err: unknown) {
-        setError(
-          err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ",
+        const res = await fetch(
+          `/api/accomodations/${encodeURIComponent(cleanId)}`,
         );
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(
+            errData.error || "ไม่พบข้อมูลที่พัก หรือเกิดข้อผิดพลาด",
+          );
+        }
+
+        const data: AccommodationDetailData = await res.json();
+        if (!alive) return;
+        setAccommodation(data);
+
+        // ดึงรีวิวด้วย id จริง (uuid) — ลิงก์เก่าที่เป็นชื่อจะไม่มาถึงตรงนี้
+        const revRes = await fetch(
+          `/api/reviews?accommodation_id=${encodeURIComponent(String(data.id))}`,
+        );
+        if (alive && revRes.ok) {
+          const list = await revRes.json();
+          if (Array.isArray(list)) setReviews(list);
+        }
+      } catch (err: unknown) {
+        if (alive) {
+          setError(
+            err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ",
+          );
+        }
       } finally {
-        setLoading(false);
+        if (alive) setLoading(false);
       }
+    })();
+
+    return () => {
+      alive = false;
     };
-    fetchAccommodationDetail();
-  }, [cleanId, supabase.auth]);
-
-  // ================= 2. ดึงข้อมูลรีวิว =================
-  const fetchReviews = useCallback(async () => {
-    if (!cleanId) return null;
-    try {
-      const { data, error: supaError } = await createSupabaseClient()
-        .from("reviews")
-        .select("*")
-        .eq("accommodation_id", cleanId)
-        .order("created_at", { ascending: false });
-
-      if (supaError) throw supaError;
-      return data;
-    } catch (error) {
-      console.error("Failed to fetch reviews:", error);
-      return null;
-    }
   }, [cleanId]);
 
-  useEffect(() => {
-    const loadReviews = async () => {
-      const data = await fetchReviews();
-      if (data) setReviews(data);
-    };
-    loadReviews();
-  }, [fetchReviews]);
+  // ================= ส่ง / ลบ รีวิว =================
+  const reloadReviews = async () => {
+    if (!accId) return;
+    try {
+      const res = await fetch(
+        `/api/reviews?accommodation_id=${encodeURIComponent(accId)}`,
+      );
+      if (!res.ok) return;
+      const list = await res.json();
+      if (Array.isArray(list)) setReviews(list);
+    } catch {
+      /* รีวิวโหลดไม่ได้ไม่ใช่เรื่องคอขาดบาดตาย */
+    }
+  };
 
-  // ================= 3. ส่ง / ลบ รีวิว =================
   const submitReview = async (rating: number, comment: string) => {
     if (!user) throw new Error("กรุณาเข้าสู่ระบบก่อนทำการรีวิว");
+    if (!accId) throw new Error("ยังโหลดข้อมูลที่พักไม่เสร็จ");
     const res = await fetch("/api/reviews", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        accommodation_id: cleanId,
+        accommodation_id: accId,
         rating,
         comment,
         // API route อาจจะดึงจาก Token อยู่แล้ว แต่ส่งไปด้วยเพื่อความชัวร์หากใช้โครงสร้างเก่า
@@ -196,8 +220,7 @@ export default function AccommodationDetail() {
       }),
     });
     if (!res.ok) throw new Error("ไม่สามารถส่งรีวิวได้");
-    const newData = await fetchReviews();
-    if (newData) setReviews(newData);
+    await reloadReviews();
   };
 
   const handleDeleteReview = async (reviewId: number | string) => {
@@ -240,12 +263,10 @@ export default function AccommodationDetail() {
   const minP = accommodation.min_price ?? 0;
   const maxP = accommodation.max_price ?? 0;
   const noPrice = maxP === 0;
-  const mapsHref = `https://maps.google.com/?q=${encodeURIComponent(
-    accommodation.address || accommodation.name,
-  )}`;
-  const lineHref = accommodation.contact_line
-    ? `https://line.me/ti/p/${accommodation.contact_line}`
-    : null;
+  // ค้น Google Maps ด้วย "ชื่อที่พัก" (วิธีเดียวกับหน้าที่เที่ยวและร้านอาหาร)
+  const mapsHref = mapsSearchUrl(accommodation.name);
+  const lineHref = lineUrl(accommodation.contact_line);
+  const facebookHref = facebookUrl(accommodation.contact_facebook);
 
   const priceText = noPrice
     ? "สอบถามราคา"
@@ -465,9 +486,9 @@ export default function AccommodationDetail() {
                     <Phone className="w-4 h-4" /> โทร {accommodation.contact_phone}
                   </a>
                 )}
-                {accommodation.contact_facebook && (
+                {facebookHref && (
                   <a
-                    href={accommodation.contact_facebook}
+                    href={facebookHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl border border-neutral-200 text-sm font-bold text-neutral-700 transition-colors hover:bg-neutral-50"

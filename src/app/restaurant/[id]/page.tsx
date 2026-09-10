@@ -24,6 +24,7 @@ import PlaceDetailSkeleton from "@/component/PlaceDetailSkeleton";
 import PlaceDetailError from "@/component/PlaceDetailError";
 import DetailStickyBar from "@/component/DetailStickyBar";
 import { useFavorites } from "@/component/FavoritesProvider";
+import { mapsSearchUrl } from "@/lib/maps";
 
 interface RestaurantDetailData {
   id: string;
@@ -211,9 +212,8 @@ export default function RestaurantDetail() {
       : null;
 
   const images = getParsedImages(restaurant.image_url);
-  const mapsHref = `https://maps.google.com/?q=${encodeURIComponent(
-    restaurant.location || restaurant.name,
-  )}`;
+  // ค้น Google Maps ด้วย "ชื่อร้าน" ให้เหมือนหน้าที่เที่ยวและที่พัก
+  const mapsHref = mapsSearchUrl(restaurant.name);
 
   const priceNode = (
     <span className="text-sm font-semibold text-neutral-600">

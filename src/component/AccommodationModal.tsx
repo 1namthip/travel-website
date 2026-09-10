@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { facebookUrl, lineUrl } from '@/lib/social';
 
 interface Accommodation {
   id: string;
@@ -169,11 +170,11 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
                   </div>
                 )}
                 
-                {accommodation.contact_line && (
+                {accommodation.contact_line && lineUrl(accommodation.contact_line) && (
                   <div>
                     <p className="text-xs text-neutral-500 mb-1">LINE ID</p>
                     <a
-                      href={`https://line.me/ti/p/${accommodation.contact_line}`}
+                      href={lineUrl(accommodation.contact_line)!}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[#00B900] hover:text-[#00A000] font-medium hover:underline inline-flex items-center gap-2"
@@ -186,11 +187,11 @@ export default function AccommodationModal({ accommodation, isOpen, onClose }: A
                   </div>
                 )}
                 
-                {accommodation.contact_facebook && (
+                {facebookUrl(accommodation.contact_facebook) && (
                   <div>
                     <p className="text-xs text-neutral-500 mb-1">Facebook</p>
                     <a
-                      href={accommodation.contact_facebook}
+                      href={facebookUrl(accommodation.contact_facebook)!}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[#1877F2] hover:text-[#0C63D4] font-medium hover:underline inline-flex items-center gap-2"

@@ -24,6 +24,7 @@ import PlaceDetailSkeleton from "@/component/PlaceDetailSkeleton";
 import PlaceDetailError from "@/component/PlaceDetailError";
 import DetailStickyBar from "@/component/DetailStickyBar";
 import { useFavorites } from "@/component/FavoritesProvider";
+import { mapsSearchUrl } from "@/lib/maps";
 
 interface DestinationDetailData {
   id: string | number;
@@ -190,9 +191,8 @@ export default function DestinationDetail() {
   const minPrice = destination.min_price || 0;
   const maxPrice = destination.max_price || 0;
   const isFree = maxPrice === 0;
-  const mapsHref = `https://maps.google.com/?q=${encodeURIComponent(
-    destination.location || destination.name,
-  )}`;
+  // ค้น Google Maps ด้วย "ชื่อสถานที่" (วิธีเดียวกับหน้าร้านอาหารและที่พัก)
+  const mapsHref = mapsSearchUrl(destination.name);
 
   const priceNode = isFree ? (
     <span className="text-2xl font-extrabold text-emerald-600 tracking-tight">

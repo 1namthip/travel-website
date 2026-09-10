@@ -7,6 +7,12 @@
 
 import { Type, type FunctionDeclaration } from "@google/genai";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import {
+  getCachedCategories,
+  getCachedTool,
+  setCachedCategories,
+  setCachedTool,
+} from "./cache";
 import { getFestivalsByMonth, getFestivalsNear } from "./festivals";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -183,9 +189,30 @@ async function searchPlaces(
         ? "id, name, category, description, location, image_url, min_price, max_price"
         : "id, name, category, description, image_url, min_price, max_price";
 
+  const keyword = typeof input.keyword === "string" ? sanitizeKeyword(input.keyword) : "";
+  const category =
+    typeof input.category === "string" && input.category.trim()
+      ? input.category.trim()
+      : null;
+  const maxPrice =
+    input.max_price !== undefined && input.max_price !== null && !Number.isNaN(Number(input.max_price))
+      ? Number(input.max_price)
+      : null;
+  const minPrice =
+    input.min_price !== undefined && input.min_price !== null && !Number.isNaN(Number(input.min_price))
+      ? Number(input.min_price)
+      : null;
+
+  // คำค้นยอดนิยมซ้ำกันบ่อย (เช่น "งบ 500") แคชผลจาก Supabase ไว้ 10 นาที
+  const cacheKey = { kind, keyword, category, maxPrice, minPrice, limit };
+  const cached = await getCachedTool<{ result: unknown; places: PlaceCard[] }>(
+    "search_places",
+    cacheKey,
+  );
+  if (cached) return cached;
+
   let query = supabaseAdmin.from(table).select(columns).limit(limit);
 
-  const keyword = typeof input.keyword === "string" ? sanitizeKeyword(input.keyword) : "";
   if (keyword) {
     // destinations ไม่มีคอลัมน์ที่อยู่ จึงค้นได้แค่ชื่อกับคำอธิบาย
     const fields =
@@ -197,19 +224,13 @@ async function searchPlaces(
     query = query.or(fields.map((f) => `${f}.ilike.%${keyword}%`).join(","));
   }
 
-  if (typeof input.category === "string" && input.category.trim()) {
-    query = query.eq("category", input.category.trim());
+  if (category) {
+    query = query.eq("category", category);
   }
 
   // กรองด้วย min_price เพราะเป็น "ราคาเริ่มต้น" ซึ่งตรงกับความหมายของงบที่ผู้ใช้ตั้ง
-  if (input.max_price !== undefined && input.max_price !== null) {
-    const max = Number(input.max_price);
-    if (!Number.isNaN(max)) query = query.lte("min_price", max);
-  }
-  if (input.min_price !== undefined && input.min_price !== null) {
-    const min = Number(input.min_price);
-    if (!Number.isNaN(min)) query = query.gte("min_price", min);
-  }
+  if (maxPrice !== null) query = query.lte("min_price", maxPrice);
+  if (minPrice !== null) query = query.gte("min_price", minPrice);
 
   const { data, error } = await query;
 
@@ -233,7 +254,7 @@ async function searchPlaces(
     url: `${PATH_BY_KIND[kind]}/${row.id}`,
   }));
 
-  return {
+  const payload = {
     // ส่งให้โมเดลอ่านโดยตัด imageUrl ออก เพราะโมเดลไม่ต้องใช้และกิน token เปล่า
     result: {
       found: places.length,
@@ -253,44 +274,34 @@ async function searchPlaces(
     },
     places,
   };
+
+  await setCachedTool("search_places", cacheKey, payload);
+  return payload;
+}
+
+interface CategorySummary {
+  kind: PlaceKind;
+  total: number;
+  categories: { name: string; count: number }[];
+  priceRange: { lowest: number; highest: number; unit: string } | null;
 }
 
 async function listAvailableCategories(): Promise<{ result: unknown; places: PlaceCard[] }> {
-  const kinds: PlaceKind[] = ["destination", "restaurant", "accommodation"];
+  // หมวดหมู่แทบไม่เปลี่ยน แคชไว้ 1 ชม. เพื่อไม่ให้ยิง Supabase ทุกครั้งที่บอทถามภาพรวม
+  const cached = await getCachedCategories<CategorySummary[]>();
+  if (cached) return { result: { summaries: cached }, places: [] };
 
-  const summaries = await Promise.all(
-    kinds.map(async (kind) => {
-      const { data, error } = await supabaseAdmin
-        .from(TABLE_BY_KIND[kind])
-        .select("category, min_price, max_price");
+  // RPC รวมการนับหมวดหมู่ + ช่วงราคาของทั้ง 3 ตารางใน query เดียว
+  // (เดิมดึงทุกแถวของ 3 ตารางมานับใน JS — ช้าและเปลืองแบนด์วิดท์เมื่อข้อมูลโต)
+  const { data, error } = await supabaseAdmin.rpc("chat_category_summary");
 
-      if (error || !data) return { kind, total: 0, categories: [], priceRange: null };
+  if (error || !Array.isArray(data)) {
+    console.error("[chat] chat_category_summary error:", error?.message);
+    return { result: { summaries: [] }, places: [] };
+  }
 
-      const counts: Record<string, number> = {};
-      let lowest = Number.POSITIVE_INFINITY;
-      let highest = 0;
-
-      for (const row of data as { category: string | null; min_price: number | null; max_price: number | null }[]) {
-        const key = (row.category ?? "ไม่ระบุ").trim();
-        counts[key] = (counts[key] ?? 0) + 1;
-        if (typeof row.min_price === "number") lowest = Math.min(lowest, row.min_price);
-        if (typeof row.max_price === "number") highest = Math.max(highest, row.max_price);
-      }
-
-      return {
-        kind,
-        total: data.length,
-        categories: Object.entries(counts)
-          .sort((a, b) => b[1] - a[1])
-          .map(([name, count]) => ({ name, count })),
-        priceRange:
-          lowest === Number.POSITIVE_INFINITY
-            ? null
-            : { lowest, highest, unit: "บาท" },
-      };
-    }),
-  );
-
+  const summaries = data as CategorySummary[];
+  await setCachedCategories(summaries);
   return { result: { summaries }, places: [] };
 }
 

@@ -171,6 +171,12 @@ export default function ChatWidget() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  // ยกเลิกคำขอที่ค้างอยู่เมื่อคอมโพเนนต์ถูกถอด
+  useEffect(() => {
+    return () => abortRef.current?.abort();
+  }, []);
 
   // ─────────────────────────────────────────
   // Speech Bubble
@@ -254,6 +260,26 @@ export default function ChatWidget() {
       setInput("");
       setIsLoading(true);
 
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      // อัปเดตข้อความของบอทตัวล่าสุดแบบต่อเนื่องระหว่างสตรีม
+      let assistantStarted = false;
+      const patchAssistant = (patch: Partial<ChatMessage>) => {
+        setMessages((prev) => {
+          const copy = [...prev];
+          const last = copy[copy.length - 1];
+          if (!assistantStarted || !last || last.role !== "assistant") {
+            copy.push({ role: "assistant", content: "", places: [], ...patch });
+          } else {
+            copy[copy.length - 1] = { ...last, ...patch };
+          }
+          assistantStarted = true;
+          return copy;
+        });
+      };
+
       try {
         const response = await fetch("/api/chat", {
           method: "POST",
@@ -266,34 +292,82 @@ export default function ChatWidget() {
               content,
             })),
           }),
+          signal: controller.signal,
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
+        if (!response.ok || !response.body) {
+          let message = "เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ";
+          try {
+            const data = await response.json();
+            if (data?.error) message = data.error;
+          } catch {
+            // ไม่มี body เป็น JSON
+          }
           setMessages((prev) => [
             ...prev,
-            {
-              role: "assistant",
-              content:
-                data?.error ??
-                "เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ",
-              isError: true,
-            },
+            { role: "assistant", content: message, isError: true },
           ]);
-
           return;
         }
 
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: data.reply,
-            places: data.places ?? [],
-          },
-        ]);
-      } catch {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let places: PlaceCard[] = [];
+        let text = "";
+
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+
+          // แต่ละ event คั่นด้วยบรรทัดว่าง (\n\n)
+          let boundary: number;
+          while ((boundary = buffer.indexOf("\n\n")) !== -1) {
+            const rawEvent = buffer.slice(0, boundary).trim();
+            buffer = buffer.slice(boundary + 2);
+            if (!rawEvent.startsWith("data:")) continue;
+
+            let event: {
+              type: string;
+              text?: string;
+              error?: string;
+              places?: PlaceCard[];
+            };
+            try {
+              event = JSON.parse(rawEvent.slice(5).trim());
+            } catch {
+              continue;
+            }
+
+            if (event.type === "places") {
+              places = event.places ?? [];
+              patchAssistant({ places });
+            } else if (event.type === "delta") {
+              text += event.text ?? "";
+              patchAssistant({ content: text, places });
+            } else if (event.type === "error") {
+              patchAssistant({
+                content: text || (event.error ?? "เกิดข้อผิดพลาด"),
+                places,
+                isError: true,
+              });
+            }
+            // "done" — ไม่ต้องทำอะไร ปิด loop เมื่อ reader จบ
+          }
+        }
+
+        // สตรีมจบแต่ไม่มีข้อความเลย (เช่นโดนตัดกลางคัน)
+        if (!text.trim() && assistantStarted) {
+          patchAssistant({
+            content: "ขอโทษด้วย ตอบไม่สำเร็จ ลองถามใหม่อีกครั้งนะ",
+            places,
+            isError: true,
+          });
+        }
+      } catch (error) {
+        if ((error as Error)?.name === "AbortError") return;
         setMessages((prev) => [
           ...prev,
           {
@@ -304,6 +378,7 @@ export default function ChatWidget() {
           },
         ]);
       } finally {
+        if (abortRef.current === controller) abortRef.current = null;
         setIsLoading(false);
       }
     },
@@ -680,7 +755,11 @@ export default function ChatWidget() {
 
               {messages.length > 0 && (
                 <button
-                  onClick={() => setMessages([])}
+                  onClick={() => {
+                    abortRef.current?.abort();
+                    setIsLoading(false);
+                    setMessages([]);
+                  }}
                   aria-label="เริ่มบทสนทนาใหม่"
                   title="เริ่มบทสนทนาใหม่"
                   className="

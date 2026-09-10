@@ -1,12 +1,7 @@
 // src/lib/rate-limit.ts
 
 import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
-
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+import { redis } from "./redis";
 
 export const roleChangeRateLimit = new Ratelimit({
   redis,
@@ -23,10 +18,11 @@ export const generalApiRateLimit = new Ratelimit({
 });
 
 // แชทบอทเปิดให้คนทั่วไปใช้โดยไม่ต้องล็อกอิน จึงจำกัดตาม IP
-// ตั้งไว้ 12 ข้อความต่อนาที พอสำหรับการคุยปกติ แต่กันการยิงรัวเพื่อเผาโควตา API
+// 1 คำถามยิง Gemini ~2 ครั้ง (รอบเลือก tool + คำตอบ) ตั้ง 8 ข้อความ/นาที
+// พอสำหรับการคุยปกติ แต่กันการยิงรัวจนเบียดโควตา RPM ของ API key
 export const chatRateLimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(12, "1 m"),
+  limiter: Ratelimit.slidingWindow(8, "1 m"),
   prefix: "ratelimit:chat",
   analytics: true,
 });

@@ -225,24 +225,6 @@ export const Navbar = () => {
 
             {/* ── Right actions ──────────────────────────────────────────── */}
             <div className="flex items-center gap-2">
-              {/* Search */}
-              <button
-                type="button"
-                aria-label="ค้นหา"
-                className={`
-                  hidden h-9 w-9 items-center
-                  justify-center rounded-full transition-all
-                  duration-200 sm:flex
-                  ${
-                    isGlass
-                      ? "border border-white/20 bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
-                      : "border border-transparent bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-800"
-                  }
-                `}
-              >
-                <Search className="h-4 w-4" />
-              </button>
-
               {/* Auth capsule */}
               <div
                 className={`

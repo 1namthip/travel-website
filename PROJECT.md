@@ -170,10 +170,12 @@ Storage bucket: **`Images`** (public) — ใช้กับ `/api/upload` แ�
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| `src/component/ChatWidget.tsx` | UI ปุ่มลอย หน้าต่างแชท คำถามตัวอย่าง และการ์ดสถานที่ |
-| `src/app/api/chat/route.ts` | agentic loop เรียก Gemini วน function call สูงสุด 5 รอบ |
+| `src/component/ChatWidget.tsx` | UI ปุ่มลอย หน้าต่างแชท คำถามตัวอย่าง การ์ดสถานที่ และตัวอ่าน SSE stream |
+| `src/app/api/chat/route.ts` | agentic loop 2 โมเดล: รอบเลือก tool (flash-lite, สูงสุด 2 รอบ) + รอบตอบ (flash, streaming) |
 | `src/lib/chat/prompt.ts` | system prompt กำหนดบทบาทและกฎห้ามมั่วข้อมูล |
-| `src/lib/chat/tools.ts` | นิยาม tool 3 ตัว และโค้ดที่ไปดึงข้อมูลจริงจาก Supabase |
+| `src/lib/chat/tools.ts` | นิยาม tool 3 ตัว และโค้ดที่ไปดึงข้อมูลจริงจาก Supabase (มี tool cache) |
+| `src/lib/chat/cache.ts` | แคช 3 ชั้น (reply / tool / หมวดหมู่) + ตัวนับโควตา Gemini ต่อวัน บน Upstash Redis |
+| `sql/chat_search_optimization.sql` | pg_trgm + GIN index ให้ `ilike` เร็ว และ RPC `chat_category_summary()` |
 | `src/lib/chat/knowledge.ts` | ความรู้เรื่องโคราชที่ฐานข้อมูลไม่มี (โซนอำเภอ การเดินทาง อาหาร ฤดูกาล) + FAQ วิธีใช้เว็บ |
 | `src/lib/chat/festivals.ts` | ปฏิทินเทศกาลไทยและงานประจำจังหวัด เขียนเป็นข้อมูลจริง ไม่ให้โมเดลเดา |
 
@@ -181,8 +183,8 @@ Storage bucket: **`Images`** (public) — ใช้กับ `/api/upload` แ�
 
 | Tool | ทำอะไร |
 |---|---|
-| `search_places` | ค้น `destinations` / `restaurants` / `accommodations` ด้วย keyword, หมวดหมู่ และงบ (กรองจาก `min_price`) |
-| `list_available_categories` | ดูหมวดหมู่และช่วงราคาที่มีจริง กันโมเดลกรองด้วยค่าที่ไม่มีอยู่ |
+| `search_places` | ค้น `destinations` / `restaurants` / `accommodations` ด้วย keyword, หมวดหมู่ และงบ (กรองจาก `min_price`) — `ilike` ใช้ GIN trgm index, ผลแคช 10 นาที |
+| `list_available_categories` | ดูหมวดหมู่และช่วงราคาที่มีจริง — เรียก RPC `chat_category_summary()` (query เดียว) แคช 1 ชม. |
 | `get_festival_calendar` | ดูเทศกาลที่กำลังจัดและที่ใกล้ถึง อิงวันที่จริงของเซิร์ฟเวอร์ |
 
 **หลักการออกแบบที่สำคัญ**
@@ -195,6 +197,13 @@ Storage bucket: **`Images`** (public) — ใช้กับ `/api/upload` แ�
   เพื่อไม่ให้ค่าที่เปลี่ยนทุกวันทำให้แคชพัง
 - หมวดหมู่ที่เที่ยวในฐานข้อมูลมีแค่ 5 แบบ คำถามอย่าง "พิพิธภัณฑ์" หรือ "ปราสาท"
   จึงถูกออกแบบให้ค้นด้วย keyword ในชื่อและคำอธิบายแทนการกรองด้วย category
+- **คุมโควตา Gemini (มี key เดียว):** 1 คำถามทั่วไปยิง Gemini ~2 ครั้ง (รอบ tool + รอบตอบ);
+  ถ้าโมเดลตอบจบตั้งแต่รอบ tool จะเหลือ 1 ครั้ง; คำถามซ้ำอ่านจาก `chat:reply:*` = 0 ครั้ง
+- **งบต่อวัน:** `bumpDailyCall()` นับทุกครั้งที่ยิงจริง เกิน `GEMINI_ANSWER_DAILY_BUDGET` → รอบตอบลดชั้นไป flash-lite,
+  เกิน `GEMINI_TOOL_DAILY_BUDGET` ด้วย → ขึ้นข้อความ "ขอพักชาร์จแบตแป๊บ" (แคชยังตอบได้ปกติ)
+- **streaming:** `/api/chat` คืน `text/event-stream` ส่ง event `places` → `delta` (ทีละ chunk) → `done`;
+  error ก่อนเริ่มสตรีมยังตอบ JSON + status เดิม, error กลางสตรีมส่ง event `error`
+- retry 429 หนึ่งครั้ง (หน่วง 1.5 วิ) ต่อการเรียก Gemini แต่ละครั้ง
 
 **ข้อจำกัดที่บอทถูกสั่งให้บอกตามตรง**
 
