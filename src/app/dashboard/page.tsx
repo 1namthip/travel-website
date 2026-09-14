@@ -3,7 +3,6 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { Navbar } from "../../component/User/Navbar";
 import HeroSection from "../../component/HeroSection";
-import CategorySection from "../../component/User/CategorySection";
 import BudgetTripPlannerWrapper from "../../component/BudgetTripPlanner";
 import Footer from "../../component/Footer";
 
@@ -30,10 +29,7 @@ export default async function DashboardPage() {
       <Navbar />
       <HeroSection />
 
-      <section className="max-w-7xl mx-auto px-4 py-8 bg-amber-50/40">
-        {/* <CategorySection /> */}
-        { <BudgetTripPlannerWrapper isLoggedIn={!!user} /> }
-      </section>
+      <BudgetTripPlannerWrapper isLoggedIn={!!user} />
 
       <Footer />
     </main>

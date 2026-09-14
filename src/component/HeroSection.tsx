@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, ArrowRight, ArrowLeft, Play, Loader2 } from "lucide-react";
+import { MapPin, ArrowRight, ArrowLeft, Play, Loader2, Wallet } from "lucide-react";
 
 // สร้าง Interface สำหรับรับข้อมูลจาก API ให้ตรงกับโครงสร้างเดิมที่ UI ต้องการ
 interface DestinationUI {
@@ -175,16 +174,16 @@ export default function HeroSection() {
               </p>
 
               <div className="flex items-center gap-6 mt-6">
-                <Link
-                  href={`/destinations/${activeData.id}`}
+                <button
+                  onClick={() => window.dispatchEvent(new Event("open-trip-planner"))}
                   className="group relative px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm overflow-hidden"
                 >
                   <span className="relative z-10 flex items-center gap-2">
-                    สำรวจสถานที่แนะนำ
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <Wallet className="w-4 h-4" />
+                    จัดทริปตามงบประมาณ
                   </span>
                   <div className="absolute inset-0 bg-amber-500 transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0" />
-                </Link>
+                </button>
                 <button className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group">
                   <Play className="w-4 h-4 ml-1 group-hover:scale-110 transition-transform" />
                 </button>

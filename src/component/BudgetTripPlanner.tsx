@@ -7,7 +7,7 @@ import {
   ChevronRight, ChevronLeft, RefreshCcw,
   CheckCircle2, Luggage, X,
   AlertTriangle, Wallet, BadgeCheck,
-  LogIn, Lock
+  LogIn, Lock, Calendar, Moon
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -234,18 +234,22 @@ function TripDock({
 // ─── Over-budget Modal ────────────────────────────────────────────────────────
 
 function OverBudgetModal({
-  item,
+  entry,
   currentSpent,
   budget,
+  nights,
   onClose,
 }: {
-  item: TripItem | null;
+  entry: { item: TripItem; type: string } | null;
   currentSpent: number;
   budget: number;
+  nights: number;
   onClose: () => void;
 }) {
-  if (!item) return null;
-  const over = currentSpent + item.min_price - budget;
+  if (!entry) return null;
+  const { item, type } = entry;
+  const cost = type === "accommodation" ? item.min_price * nights : item.min_price;
+  const over = currentSpent + cost - budget;
 
   return (
     <motion.div
@@ -297,9 +301,11 @@ function OverBudgetModal({
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-neutral-500">ราคารายการนี้</span>
+            <span className="text-neutral-500">
+              ราคารายการนี้{type === "accommodation" ? ` (× ${nights} คืน)` : ""}
+            </span>
             <span className="font-bold text-red-600">
-              +฿{item.min_price.toLocaleString()}
+              +฿{cost.toLocaleString()}
             </span>
           </div>
         </div>
@@ -352,14 +358,19 @@ const CATEGORY_CONFIG = {
 function SummaryItemCard({
   item,
   type,
+  nights,
   onRemove,
   getImageUrl,
 }: {
   item: TripItem;
   type: string;
+  nights: number;
   onRemove: () => void;
   getImageUrl: (item: TripItem) => string;
 }) {
+  const isStay = type === "accommodation";
+  const cost = isStay ? item.min_price * nights : item.min_price;
+
   return (
     <motion.div
       layout
@@ -380,7 +391,8 @@ function SummaryItemCard({
         <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
         {/* price chip on image */}
         <div className="absolute bottom-2 right-2 bg-white/90 px-2.5 py-1 rounded-full text-xs font-bold text-neutral-900 shadow-sm">
-          ฿{item.min_price.toLocaleString()}
+          ฿{cost.toLocaleString()}
+          {isStay && <span className="font-normal text-neutral-500"> ({nights} คืน)</span>}
         </div>
       </div>
 
@@ -412,18 +424,23 @@ function SummaryItemCard({
 function CategorySection({
   categoryKey,
   items,
+  nights,
   onRemove,
   getImageUrl,
 }: {
   categoryKey: string;
   items: SelectedItem[];
+  nights: number;
   onRemove: (id: string | number, type: string) => void;
   getImageUrl: (item: TripItem) => string;
 }) {
   const cfg = CATEGORY_CONFIG[categoryKey as keyof typeof CATEGORY_CONFIG];
   if (!cfg || items.length === 0) return null;
   const Icon = cfg.icon;
-  const subtotal = items.reduce((s, { item }) => s + item.min_price, 0);
+  const subtotal = items.reduce(
+    (s, { item }) => s + (categoryKey === "accommodation" ? item.min_price * nights : item.min_price),
+    0
+  );
 
   return (
     <div className="mb-6 last:mb-0">
@@ -449,6 +466,7 @@ function CategorySection({
               key={`${type}-${item.id}`}
               item={item}
               type={type}
+              nights={nights}
               onRemove={() => onRemove(item.id, type)}
               getImageUrl={getImageUrl}
             />
@@ -462,6 +480,7 @@ function CategorySection({
 export function TripSummaryModal({
   items,
   totalBudget,
+  nights,
   isLoggedIn,
   onClose,
   onSave,
@@ -472,6 +491,7 @@ export function TripSummaryModal({
 }: {
   items: SelectedItem[];
   totalBudget: number;
+  nights: number;
   isLoggedIn: boolean;
   onClose: () => void;
   onSave: () => void;
@@ -480,7 +500,9 @@ export function TripSummaryModal({
   onRemove: (id: string | number, type: string) => void;
   getImageUrl: (item: TripItem) => string;
 }) {
-  const totalPrice = items.reduce((s, { item }) => s + item.min_price, 0);
+  const costOf = (item: TripItem, type: string) =>
+    type === "accommodation" ? item.min_price * nights : item.min_price;
+  const totalPrice = items.reduce((s, { item, type }) => s + costOf(item, type), 0);
   const remaining = totalBudget - totalPrice;
   const isOver = remaining < 0;
 
@@ -488,7 +510,7 @@ export function TripSummaryModal({
   const grouped = (["destination", "restaurant", "accommodation"] as const).map(
     (key) => {
       const catItems = items.filter((i) => i.type === key);
-      const spend = catItems.reduce((s, { item }) => s + item.min_price, 0);
+      const spend = catItems.reduce((s, { item, type }) => s + costOf(item, type), 0);
       return { key, items: catItems, spend };
     }
   );
@@ -544,6 +566,10 @@ export function TripSummaryModal({
               สรุปทริปของคุณ
               <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-600">
                 {items.length} รายการ
+              </span>
+              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 flex items-center gap-1">
+                <Moon className="w-3 h-3" />
+                พัก {nights} คืน
               </span>
             </h2>
           </div>
@@ -660,6 +686,7 @@ export function TripSummaryModal({
                 key={key}
                 categoryKey={key}
                 items={catItems}
+                nights={nights}
                 onRemove={onRemove}
                 getImageUrl={getImageUrl}
               />
@@ -767,6 +794,7 @@ export default function BudgetTripPlanner({
 }: BudgetTripPlannerProps) {
   const [mode, setMode] = useState<TripMode>("total");
   const [totalBudget, setTotalBudget] = useState<string>("");
+  const [days, setDays] = useState<string>("");
   const [customBudgets, setCustomBudgets] = useState({
     accommodation: "",
     food: "",
@@ -778,10 +806,30 @@ export default function BudgetTripPlanner({
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const router = useRouter();
   // Modals
+  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
-  const [overBudgetItem, setOverBudgetItem] = useState<TripItem | null>(null);
+  const [overBudgetItem, setOverBudgetItem] = useState<{ item: TripItem; type: string } | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  // ─── Open the planner modal on request (Hero CTA) or deep link (#planner) ──
+  useEffect(() => {
+    const openHandler = () => setIsPlannerOpen(true);
+    window.addEventListener("open-trip-planner", openHandler);
+    // เปิด modal ทันทีถ้ามาจากลิงก์ deep-link "#planner" (เช่นจากหน้า /trips)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (window.location.hash === "#planner") setIsPlannerOpen(true);
+    return () => window.removeEventListener("open-trip-planner", openHandler);
+  }, []);
+
+  useEffect(() => {
+    if (!isPlannerOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsPlannerOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isPlannerOpen]);
 
   // ─── Budget validation ─────────────────────────────────────────────────────
   const { valid: budgetValid, hint: budgetHint } = useBudgetValid(
@@ -789,6 +837,9 @@ export default function BudgetTripPlanner({
     totalBudget,
     customBudgets
   );
+  const daysValid = Number(days) > 0;
+  const formValid = budgetValid && daysValid;
+  const formHint = !daysValid ? "กรุณาระบุจำนวนวันเดินทาง" : budgetHint;
 
   // ─── Computed ──────────────────────────────────────────────────────────────
   const effectiveBudget = (() => {
@@ -800,14 +851,24 @@ export default function BudgetTripPlanner({
     );
   })();
 
+  // จำนวนคืนที่ต้องจ่ายค่าที่พัก (ขั้นต่ำ 1 คืน ต่อให้กรอกวันเดียว)
+  const nights = Math.max((Number(days) || 1) - 1, 1);
+
+  // ที่พักคิดราคาต่อคืน ต้องคูณจำนวนคืนที่พักจริง ส่วนร้านอาหาร/ที่เที่ยวเป็นราคาต่อรายการ
+  const getItemCost = useCallback(
+    (item: TripItem, type: string) =>
+      type === "accommodation" ? item.min_price * nights : item.min_price,
+    [nights]
+  );
+
   const totalSpent = selectedItems.reduce(
-    (s, { item }) => s + (item.min_price || 0),
+    (s, { item, type }) => s + getItemCost(item, type),
     0
   );
 
   // ─── API ───────────────────────────────────────────────────────────────────
   const handleGenerate = async () => {
-    if (!budgetValid) return;
+    if (!formValid) return;
     setIsLoading(true);
     setSelectedItems([]);
     setIsSummaryOpen(false);
@@ -815,6 +876,7 @@ export default function BudgetTripPlanner({
     try {
       const payload = {
         mode,
+        days: Number(days),
         ...(mode === "total"
           ? { totalBudget: Number(totalBudget) }
           : {
@@ -854,11 +916,15 @@ export default function BudgetTripPlanner({
         id: item.id,
         type,
       }));
+      const daysNum = Number(days);
+      const tripName = daysNum > 0
+        ? `ทริปโคราชของฉัน (${daysNum} วัน ${nights} คืน)`
+        : "ทริปโคราชของฉัน";
       await fetch("/api/trips/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: "ทริปโคราชของฉัน",
+          name: tripName,
           totalBudget: effectiveBudget || "Custom",
           items: itemsToSave,
         }),
@@ -886,14 +952,15 @@ export default function BudgetTripPlanner({
         return;
       }
 
-      if (effectiveBudget > 0 && totalSpent + item.min_price > effectiveBudget) {
-        setOverBudgetItem(item);
+      const cost = getItemCost(item, type);
+      if (effectiveBudget > 0 && totalSpent + cost > effectiveBudget) {
+        setOverBudgetItem({ item, type });
         return;
       }
 
       setSelectedItems((prev) => [...prev, { item, type }]);
     },
-    [selectedItems, effectiveBudget, totalSpent]
+    [selectedItems, effectiveBudget, totalSpent, getItemCost]
   );
 
   const removeItem = (id: string | number, type: string) => {
@@ -926,6 +993,40 @@ export default function BudgetTripPlanner({
 
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
+    <AnimatePresence>
+      {isPlannerOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-60 flex items-start sm:items-center justify-center p-0 sm:p-4"
+        >
+          {/* Backdrop */}
+          <motion.div
+            className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm"
+            onClick={() => setIsPlannerOpen(false)}
+          />
+
+          {/* Panel */}
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="จัดทริปตามงบประมาณ"
+            initial={{ y: 24, opacity: 0, scale: 0.98 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 24, opacity: 0, scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 320, damping: 32 }}
+            className="relative z-10 bg-neutral-50 w-full h-full sm:h-auto sm:max-h-[92vh] sm:max-w-5xl sm:rounded-2xl shadow-2xl overflow-y-auto"
+          >
+            {/* Close */}
+            <button
+              onClick={() => setIsPlannerOpen(false)}
+              aria-label="ปิดหน้าต่างจัดทริป"
+              className="fixed sm:absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/90 hover:bg-white shadow-md flex items-center justify-center text-neutral-500 hover:text-neutral-800 transition-colors"
+            >
+              <X className="w-4.5 h-4.5" />
+            </button>
+
     <div
       id="planner"
       className={`w-full max-w-5xl mx-auto py-12 px-4 sm:px-6 relative scroll-mt-24 ${
@@ -939,6 +1040,34 @@ export default function BudgetTripPlanner({
           <Sparkles className="w-6 h-6 text-black" />
           จัดทริปตามงบประมาณ
         </h2>
+
+        {/* Days Input — ใช้คำนวณจำนวนคืนที่ต้องจ่ายค่าที่พัก */}
+        <div className="max-w-sm mb-8">
+          <label className="text-sm font-medium text-neutral-600 mb-2 flex items-center gap-1.5">
+            <Calendar className="w-4 h-4" /> จำนวนวันเดินทาง
+            {!daysValid && <span className="w-1.5 h-1.5 bg-red-400 rounded-full ml-auto" />}
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              min={1}
+              value={days}
+              onChange={(e) => setDays(e.target.value)}
+              placeholder="เช่น 2"
+              className={`w-full px-4 py-3 bg-neutral-50 border rounded-xl focus:bg-white focus:ring-2 focus:ring-black/5 transition-all outline-none ${
+                !daysValid ? "border-neutral-200" : "border-neutral-300 focus:border-amber-500"
+              }`}
+            />
+            {daysValid && (
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-neutral-400 flex items-center gap-1">
+                <Moon className="w-3.5 h-3.5" /> พัก {nights} คืน
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-neutral-400 mt-1.5">
+            ใช้คำนวณค่าที่พักตามจำนวนคืนจริง (ที่พักคิดราคาต่อคืน)
+          </p>
+        </div>
 
         {/* Mode Toggle */}
         <div className="flex bg-neutral-100/80 p-1 rounded-2xl mb-8 w-full max-w-sm relative">
@@ -1039,10 +1168,10 @@ export default function BudgetTripPlanner({
         <div className="mt-8 flex items-center gap-3">
           <button
             onClick={handleGenerate}
-            disabled={isLoading || !budgetValid}
-            title={!budgetValid ? budgetHint : undefined}
+            disabled={isLoading || !formValid}
+            title={!formValid ? formHint : undefined}
             className={`bg-amber-600 text-white px-8 py-3.5 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${
-              budgetValid && !isLoading
+              formValid && !isLoading
                 ? "hover:bg-amber-700"
                 : "opacity-40 cursor-not-allowed"
             }`}
@@ -1058,14 +1187,14 @@ export default function BudgetTripPlanner({
 
           {/* Inline hint when budget not filled */}
           <AnimatePresence>
-            {!budgetValid && (
+            {!formValid && (
               <motion.p
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -8 }}
                 className="text-xs text-neutral-400"
               >
-                {budgetHint}
+                {formHint}
               </motion.p>
             )}
           </AnimatePresence>
@@ -1091,6 +1220,7 @@ export default function BudgetTripPlanner({
                 getImageUrl={getImageUrl}
                 budget={effectiveBudget}
                 spent={totalSpent}
+                nights={nights}
               />
               <TripRow
                 title="ร้านอาหารในงบ"
@@ -1102,6 +1232,7 @@ export default function BudgetTripPlanner({
                 getImageUrl={getImageUrl}
                 budget={effectiveBudget}
                 spent={totalSpent}
+                nights={nights}
               />
               <TripRow
                 title="ที่พักน่านอน"
@@ -1113,6 +1244,7 @@ export default function BudgetTripPlanner({
                 getImageUrl={getImageUrl}
                 budget={effectiveBudget}
                 spent={totalSpent}
+                nights={nights}
               />
             </div>
           </motion.div>
@@ -1137,6 +1269,7 @@ export default function BudgetTripPlanner({
           <TripSummaryModal
             items={selectedItems}
             totalBudget={effectiveBudget}
+            nights={nights}
             isLoggedIn={isLoggedIn}
             onClose={() => setIsSummaryOpen(false)}
             onSave={handleSaveTrip}
@@ -1154,9 +1287,10 @@ export default function BudgetTripPlanner({
       <AnimatePresence>
         {overBudgetItem && (
           <OverBudgetModal
-            item={overBudgetItem}
+            entry={overBudgetItem}
             currentSpent={totalSpent}
             budget={effectiveBudget}
+            nights={nights}
             onClose={() => setOverBudgetItem(null)}
           />
         )}
@@ -1177,7 +1311,11 @@ export default function BudgetTripPlanner({
       <AnimatePresence>
         {showSuccess && <SuccessModal onClose={() => setShowSuccess(false)} />}
       </AnimatePresence>
-    </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -1185,7 +1323,7 @@ export default function BudgetTripPlanner({
 
 function TripRow({
   title, icon, items, type, selectedItems,
-  onToggle, getImageUrl, budget, spent,
+  onToggle, getImageUrl, budget, spent, nights,
 }: {
   title: string;
   icon: React.ReactNode;
@@ -1196,7 +1334,9 @@ function TripRow({
   getImageUrl: (item: TripItem) => string;
   budget: number;
   spent: number;
+  nights: number;
 }) {
+  const isStay = type === "accommodation";
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -1276,8 +1416,9 @@ function TripRow({
               const isSelected = selectedItems.some(
                 (i) => i.item.id === item.id && i.type === type
               );
+              const cost = isStay ? item.min_price * nights : item.min_price;
               const wouldExceed =
-                !isSelected && budget > 0 && spent + item.min_price > budget;
+                !isSelected && budget > 0 && spent + cost > budget;
 
               return (
                 <motion.div
@@ -1336,13 +1477,22 @@ function TripRow({
 
                     {item.min_price != null && (
                       <div
-                        className={`absolute top-3 right-3 z-10 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
+                        className={`absolute top-3 right-3 z-10 px-3 py-1 rounded-full text-xs font-bold shadow-sm text-right ${
                           wouldExceed
                             ? "bg-red-50/90 text-red-600"
                             : "bg-white/90 text-neutral-900"
                         }`}
                       >
-                        ฿{item.min_price.toLocaleString()}
+                        {isStay ? (
+                          <>
+                            ฿{item.min_price.toLocaleString()}/คืน
+                            <div className="text-[10px] font-medium opacity-70">
+                              รวม {nights} คืน ฿{cost.toLocaleString()}
+                            </div>
+                          </>
+                        ) : (
+                          <>฿{item.min_price.toLocaleString()}</>
+                        )}
                       </div>
                     )}
                   </div>

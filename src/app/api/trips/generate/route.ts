@@ -51,11 +51,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const { mode, totalBudget, customBudgets } = body;
+  const { mode, totalBudget, customBudgets, days } = body;
 
   if (!mode || (mode !== "total" && mode !== "custom")) {
     return NextResponse.json({ error: "Invalid mode. Use 'total' or 'custom'." }, { status: 400 });
   }
+
+  // จำนวนคืนที่ต้องจ่ายค่าที่พัก (ขั้นต่ำ 1 คืน)
+  const nights = Math.max((Number(days) || 1) - 1, 1);
 
   let accBudget = 0, foodBudget = 0, destBudget = 0;
 
@@ -77,9 +80,12 @@ export async function POST(req: Request) {
   }
 
   try {
+    // ค่าที่พักคิดราคาต่อคืน จึงต้องหารด้วยจำนวนคืนก่อนกรองรายการที่พัก
+    const accBudgetPerNight = accBudget / nights;
+
     // ยิง Query ดึงข้อมูลทั้ง 3 หมวดพร้อมกัน (พร้อมระบบ Fallback ในตัว)
     const [accommodations, restaurants, destinations] = await Promise.all([
-      getItemsWithFallback("accommodations", accBudget),
+      getItemsWithFallback("accommodations", accBudgetPerNight),
       getItemsWithFallback("restaurants", foodBudget),
       getItemsWithFallback("destinations", destBudget),
     ]);
@@ -88,8 +94,10 @@ export async function POST(req: Request) {
     return NextResponse.json({
       summary: {
         mode,
+        nights,
         allocatedBudgets: {
           accommodation: accBudget,
+          accommodationPerNight: accBudgetPerNight,
           food: foodBudget,
           destination: destBudget,
         },
