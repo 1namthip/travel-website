@@ -11,26 +11,30 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-// Helper สำหรับเช็คและดึงข้อมูล Fallback (ถ้างบน้อยไปจนดึงข้อมูลได้ไม่ถึง 5 อัน)
+// ดึงทุกรายการที่เข้าเงื่อนไข โดยแบ่งหน้าเพื่อไม่ติดเพดานจำนวนแถวของ Supabase
 async function getItemsWithFallback(tableName: string, maxBudget: number, limitCount: number = 5) {
-  // 1. ดึงตามงบปกติ
-  const { data: primaryData, error: primaryError } = await supabaseAdmin
-    .from(tableName)
-    .select("*")
-    .lte("min_price", maxBudget)
-    .limit(15);
+  const pageSize = 500;
+  let results: Record<string, unknown>[] = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await supabaseAdmin
+      .from(tableName)
+      .select("*")
+      .lte("min_price", maxBudget)
+      .order("id", { ascending: true })
+      .range(offset, offset + pageSize - 1);
 
-  if (primaryError) throw new Error(`${tableName} error: ${primaryError.message}`);
+    if (error) throw new Error(`${tableName} error: ${error.message}`);
+    results = results.concat(data || []);
+    if (!data || data.length < pageSize) break;
+  }
 
-  let results = primaryData || [];
-
-  // 2. ถ้าได้ข้อมูลมาน้อยกว่าที่ต้องการ ให้ไปดึงของถูกที่สุดมาเติม (Fallback)
+  // คงรายการราคาถูกไว้เป็นตัวเลือกเมื่อไม่มีรายการในงบเพียงพอ
   if (results.length < limitCount) {
     const { data: fallbackData } = await supabaseAdmin
       .from(tableName)
       .select("*")
       .order("min_price", { ascending: true }) // เรียงจากถูกไปแพง
-      .limit(10);
+      .limit(limitCount);
 
     if (fallbackData) {
       // รวมข้อมูลโดยไม่ให้ซ้ำกัน (ป้องกันการโชว์การ์ดเบิ้ล)
@@ -90,7 +94,7 @@ export async function POST(req: Request) {
       getItemsWithFallback("destinations", destBudget),
     ]);
 
-    // สุ่มและตัดมาโชว์แค่หมวดละ 5 รายการ
+    // ส่งทุกรายการให้ผู้ใช้ค้นหาและกรองต่อในแต่ละหมวด
     return NextResponse.json({
       summary: {
         mode,
@@ -103,16 +107,16 @@ export async function POST(req: Request) {
         },
       },
       trip: {
-        accommodations: shuffleArray(accommodations).slice(0, 5),
-        restaurants: shuffleArray(restaurants).slice(0, 5),
-        destinations: shuffleArray(destinations).slice(0, 5),
+        accommodations: shuffleArray(accommodations),
+        restaurants: shuffleArray(restaurants),
+        destinations: shuffleArray(destinations),
       },
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Generate Trip Error:", error);
     return NextResponse.json(
-      { error: "Failed to generate trip.", details: error.message },
+      { error: "Failed to generate trip.", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }

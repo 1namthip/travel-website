@@ -1,13 +1,13 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, MapPin, Utensils, BedDouble,
   ChevronRight, ChevronLeft, RefreshCcw,
   CheckCircle2, Luggage, X,
   AlertTriangle, Wallet, BadgeCheck,
-  LogIn, Lock, Calendar, Moon
+  LogIn, Lock, Calendar, Moon, Search
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -26,6 +26,12 @@ interface TripItem {
 interface SelectedItem {
   item: TripItem;
   type: string;
+}
+
+interface TripResults {
+  accommodations: TripItem[];
+  restaurants: TripItem[];
+  destinations: TripItem[];
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -678,7 +684,7 @@ export function TripSummaryModal({
                 <Luggage className="w-7 h-7" />
               </div>
               <p className="text-sm font-bold text-neutral-700">ยังไม่มีรายการในทริป</p>
-              <p className="text-xs text-neutral-400 mt-0.5 max-w-50">เลือกสถานที่ท่องเที่ยวหรือที่พักที่สนใจเพิ่มเข้ามาได้เลย</p>
+              <p className="text-xs text-neutral-400 mt-0.5 max-w-[200px]">เลือกสถานที่ท่องเที่ยวหรือที่พักที่สนใจเพิ่มเข้ามาได้เลย</p>
             </div>
           ) : (
             grouped.filter(g => g.items.length > 0).map(({ key, items: catItems }) => (
@@ -708,7 +714,7 @@ export function TripSummaryModal({
             </div>
           </div>
 
-          <div className="shrink-0 w-[55%] sm:w-55">
+          <div className="shrink-0 w-1/2 sm:w-56">
             {isLoggedIn ? (
               <button
                 onClick={onSave}
@@ -802,7 +808,7 @@ export default function BudgetTripPlanner({
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [tripData, setTripData] = useState<any>(null);
+  const [tripData, setTripData] = useState<TripResults | null>(null);
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const router = useRouter();
   // Modals
@@ -1054,8 +1060,8 @@ export default function BudgetTripPlanner({
               value={days}
               onChange={(e) => setDays(e.target.value)}
               placeholder="เช่น 2"
-              className={`w-full px-4 py-3 bg-neutral-50 border rounded-xl focus:bg-white focus:ring-2 focus:ring-black/5 transition-all outline-none ${
-                !daysValid ? "border-neutral-200" : "border-neutral-300 focus:border-amber-500"
+              className={`w-full px-4 py-3 bg-neutral-50 border rounded-xl focus:bg-white focus:ring-4 transition-all outline-none ${
+                !daysValid ? "border-neutral-200 focus:ring-neutral-200/50" : "border-neutral-300 focus:border-amber-400 focus:ring-amber-500/20"
               }`}
             />
             {daysValid && (
@@ -1073,29 +1079,38 @@ export default function BudgetTripPlanner({
         <div className="flex bg-neutral-100/80 p-1 rounded-2xl mb-8 w-full max-w-sm relative">
           <button
             onClick={() => setMode("total")}
-            className={`flex-1 py-2.5 text-sm font-medium rounded-xl z-10 transition-colors ${
+            className={`flex-1 py-2.5 text-sm font-medium rounded-xl z-10 transition-colors relative ${
               mode === "total"
                 ? "text-neutral-900"
                 : "text-neutral-500 hover:text-neutral-700"
             }`}
           >
+            {mode === "total" && (
+              <motion.div
+                layoutId="mode-indicator"
+                className="absolute inset-0 bg-white rounded-xl shadow-sm border border-neutral-200/50 -z-10"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
             ระบุงบรวม
           </button>
           <button
             onClick={() => setMode("custom")}
-            className={`flex-1 py-2.5 text-sm font-medium rounded-xl z-10 transition-colors ${
+            className={`flex-1 py-2.5 text-sm font-medium rounded-xl z-10 transition-colors relative ${
               mode === "custom"
                 ? "text-neutral-900"
                 : "text-neutral-500 hover:text-neutral-700"
             }`}
           >
+            {mode === "custom" && (
+              <motion.div
+                layoutId="mode-indicator"
+                className="absolute inset-0 bg-white rounded-xl shadow-sm border border-neutral-200/50 -z-10"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
             ระบุแยกหมวด
           </button>
-          <motion.div
-            className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-xl shadow-sm border border-neutral-200/50"
-            animate={{ left: mode === "total" ? "4px" : "calc(50% + 0px)" }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          />
         </div>
 
         {/* Inputs */}
@@ -1120,7 +1135,7 @@ export default function BudgetTripPlanner({
                   value={totalBudget}
                   onChange={(e) => setTotalBudget(e.target.value)}
                   placeholder="เช่น 3000"
-                  className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black/5 focus:border-neutral-400 transition-all outline-none"
+                  className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-amber-500/20 focus:border-amber-400 transition-all outline-none"
                 />
               </div>
             </motion.div>
@@ -1152,10 +1167,10 @@ export default function BudgetTripPlanner({
                       setCustomBudgets({ ...customBudgets, [key]: e.target.value })
                     }
                     placeholder="฿"
-                    className={`w-full px-4 py-3 bg-neutral-50 border rounded-xl focus:bg-white focus:ring-2 focus:ring-black/5 transition-all outline-none ${
+                    className={`w-full px-4 py-3 bg-neutral-50 border rounded-xl focus:bg-white focus:ring-4 transition-all outline-none ${
                       !Number(customBudgets[key as keyof typeof customBudgets])
-                        ? "border-neutral-200"
-                        : "border-neutral-300 focus:border-amber-500"
+                        ? "border-neutral-200 focus:ring-neutral-200/50"
+                        : "border-neutral-300 focus:border-amber-400 focus:ring-amber-500/20"
                     }`}
                   />
                 </div>
@@ -1340,6 +1355,28 @@ function TripRow({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [sort, setSort] = useState("default");
+
+  const categories = useMemo(
+    () => [...new Set(items.map((item) => item.category?.trim()).filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b, "th")),
+    [items]
+  );
+  const filteredItems = useMemo(() => {
+    const query = search.trim().toLocaleLowerCase();
+    const priceCeiling = maxPrice === "" ? null : Number(maxPrice);
+    const result = items.filter((item) =>
+      (!query || `${item.name} ${item.category || ""}`.toLocaleLowerCase().includes(query)) &&
+      (!category || item.category === category) &&
+      (priceCeiling === null || item.min_price * (isStay ? nights : 1) <= priceCeiling)
+    );
+    if (sort === "price-asc") result.sort((a, b) => a.min_price - b.min_price);
+    if (sort === "price-desc") result.sort((a, b) => b.min_price - a.min_price);
+    if (sort === "name") result.sort((a, b) => a.name.localeCompare(b.name, "th"));
+    return result;
+  }, [items, search, category, maxPrice, sort, isStay, nights]);
 
   const checkScroll = () => {
     if (!scrollRef.current) return;
@@ -1352,7 +1389,7 @@ function TripRow({
     checkScroll();
     window.addEventListener("resize", checkScroll);
     return () => window.removeEventListener("resize", checkScroll);
-  }, [items]);
+  }, [filteredItems]);
 
   const scroll = (dir: "left" | "right") => {
     scrollRef.current?.scrollBy({
@@ -1361,18 +1398,65 @@ function TripRow({
     });
   };
 
-  if (!items || items.length === 0) return null;
-
   return (
     <div className="relative">
-      <div className="flex items-center gap-2 mb-4 px-2">
+      <div className="flex items-center gap-2 mb-2 px-2">
         {icon}
         <h3 className="text-xl font-semibold text-neutral-900 tracking-tight">
           {title}
         </h3>
+        <span className="text-sm text-neutral-500">{filteredItems.length}/{items.length} รายการ</span>
       </div>
 
-      <div className="relative">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-2 mb-4 px-2">
+        <label className="relative flex-[2] min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="ค้นหาชื่อสถานที่หรือประเภท"
+            aria-label={`ค้นหา${title}`}
+            className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-500/20 transition-all"
+          />
+        </label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          aria-label={`กรองประเภท${title}`}
+          className="flex-1 min-w-[120px] rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-500/20 transition-all"
+        >
+          <option value="">ทุกประเภท</option>
+          {categories.map((value) => <option key={value} value={value}>{value}</option>)}
+        </select>
+        <input
+          type="number"
+          min={0}
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(e.target.value)}
+          placeholder={isStay ? `ราคาสูงสุด (${nights} คืน)` : "ราคาสูงสุด (บาท)"}
+          aria-label={`กรองราคาสูงสุด${title}`}
+          className="flex-1 min-w-[120px] rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-500/20 transition-all"
+        />
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          aria-label={`เรียงลำดับ${title}`}
+          className="flex-1 min-w-[120px] rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-500/20 transition-all"
+        >
+          <option value="default">ลำดับแนะนำ</option>
+          <option value="price-asc">ราคาต่ำไปสูง</option>
+          <option value="price-desc">ราคาสูงไปต่ำ</option>
+          <option value="name">ชื่อ ก-ฮ</option>
+        </select>
+      </div>
+
+      {filteredItems.length === 0 ? (
+        <p className="mx-2 rounded-xl border border-dashed border-neutral-200 bg-white px-4 py-8 text-center text-sm text-neutral-500">
+          ไม่พบรายการตามเงื่อนไข ลองเปลี่ยนคำค้นหรือปรับตัวกรอง
+        </p>
+      ) : (
+        <div className="relative">
         <AnimatePresence>
           {canScrollLeft && (
             <motion.button
@@ -1412,7 +1496,7 @@ function TripRow({
             initial="hidden"
             animate="show"
           >
-            {items.map((item) => {
+            {filteredItems.map((item) => {
               const isSelected = selectedItems.some(
                 (i) => i.item.id === item.id && i.type === type
               );
@@ -1433,12 +1517,12 @@ function TripRow({
                     },
                   }}
                   whileHover={{ y: wouldExceed ? 0 : -4, transition: { duration: 0.2 } }}
-                  className={`snap-start shrink-0 w-70 bg-white rounded-2xl overflow-hidden cursor-pointer group transition-all duration-300 ${
+                  className={`snap-start shrink-0 w-72 bg-white rounded-2xl overflow-hidden cursor-pointer group transition-all duration-300 ${
                     isSelected
-                      ? "ring-2 ring-amber-500"
+                      ? "ring-2 ring-amber-500 shadow-md"
                       : wouldExceed
-                      ? "border border-neutral-100 opacity-50 cursor-not-allowed"
-                      : "border border-neutral-100 shadow-sm hover:shadow-md"
+                      ? "border border-neutral-100 opacity-60 cursor-not-allowed grayscale-[30%]"
+                      : "border border-neutral-100 shadow-sm hover:shadow-md hover:-translate-y-1"
                   }`}
                 >
                   <div className="relative h-40 w-full overflow-hidden bg-neutral-100">
@@ -1449,12 +1533,12 @@ function TripRow({
                     />
                     <div
                       className={`absolute inset-0 transition-opacity duration-300 ${
-                        isSelected ? "bg-black/10 opacity-100" : "opacity-0"
+                        isSelected ? "bg-black/10 opacity-100" : "opacity-0 group-hover:bg-black/5"
                       }`}
                     />
 
                     {wouldExceed && (
-                      <div className="absolute inset-0 bg-neutral-900/30 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-white/40 flex items-center justify-center backdrop-blur-[1px]">
                         <span className="bg-white/90 text-neutral-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow">
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                           เกินงบ
@@ -1512,7 +1596,8 @@ function TripRow({
             })}
           </motion.div>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
