@@ -12,6 +12,9 @@ import {
   Navigation,
   ChevronLeft,
   Ticket,
+  Calendar,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -25,6 +28,8 @@ import PlaceDetailError from "@/component/PlaceDetailError";
 import DetailStickyBar from "@/component/DetailStickyBar";
 import { useFavorites } from "@/component/FavoritesProvider";
 import { mapsSearchUrl } from "@/lib/maps";
+import { getPlaceOpeningStatus } from "@/lib/opening-hours";
+import type { OpeningHoursMap } from "@/types/destination";
 
 interface DestinationDetailData {
   id: string | number;
@@ -38,6 +43,8 @@ interface DestinationDetailData {
   max_price?: number;
   image_url?: string;
   images?: string[];
+  open_days?: string[];
+  opening_hours?: OpeningHoursMap;
 }
 
 // 📸 ฟังก์ชันแปลงข้อมูลรูปภาพให้เป็น Array แบบครอบจักรวาล
@@ -220,9 +227,14 @@ export default function DestinationDetail() {
     </a>
   );
 
+  const openingStatus = getPlaceOpeningStatus(destination);
+
   const facts: { icon: React.ElementType; label: string; value: string }[] = [];
-  if (destination.hours)
-    facts.push({ icon: Clock, label: "เวลาทำการ", value: destination.hours });
+  facts.push({
+    icon: Clock,
+    label: "เวลาทำการวันนี้",
+    value: openingStatus.isTodayOpen ? openingStatus.todayHoursText : "วันนี้ปิดทำการ",
+  });
   if (destination.location)
     facts.push({ icon: MapPin, label: "ที่ตั้ง", value: destination.location });
   if (destination.phone)
@@ -350,6 +362,87 @@ export default function DestinationDetail() {
               ))}
             </div>
 
+            {/* 7 Days Operating Schedule Section */}
+            <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 sm:p-6 mb-10 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-neutral-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <Calendar className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-neutral-900">
+                      วันและเวลาเปิดให้บริการ
+                    </h3>
+                    <p className="text-xs text-neutral-500">
+                      {openingStatus.openDaysSummary}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Live Status Badge */}
+                <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
+                  openingStatus.isOpenNow
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    : openingStatus.isTodayOpen
+                    ? "bg-amber-50 text-amber-700 border-amber-200"
+                    : "bg-rose-50 text-rose-700 border-rose-200"
+                }`}>
+                  <span className={`w-2 h-2 rounded-full ${
+                    openingStatus.isOpenNow
+                      ? "bg-emerald-500 animate-pulse"
+                      : openingStatus.isTodayOpen
+                      ? "bg-amber-500"
+                      : "bg-rose-500"
+                  }`} />
+                  {openingStatus.badgeLabel}
+                </div>
+              </div>
+
+              {/* 7 Days Grid/Table */}
+              <div className="divide-y divide-neutral-100 rounded-xl overflow-hidden border border-neutral-100 bg-neutral-50/40">
+                {openingStatus.schedule.map((day) => (
+                  <div
+                    key={day.key}
+                    className={`flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                      day.isToday
+                        ? "bg-amber-50/80 font-semibold border-l-4 border-l-amber-500 pl-3"
+                        : "hover:bg-white"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className={day.isToday ? "text-amber-900 font-bold" : "text-neutral-700"}>
+                        {day.fullLabel}
+                      </span>
+                      {day.isToday && (
+                        <span className="text-[10px] font-bold bg-amber-500 text-white px-2 py-0.5 rounded-full">
+                          วันนี้
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {day.isOpen ? (
+                        <>
+                          <span className="text-neutral-600 text-xs sm:text-sm font-medium">
+                            {day.timeDisplay}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                            เปิด
+                          </span>
+                        </>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-neutral-500 bg-neutral-100 px-2.5 py-0.5 rounded-md border border-neutral-200">
+                          <XCircle className="w-3 h-3 text-neutral-400" />
+                          ปิดทำการ
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Description */}
             <h2 className="text-xl font-bold text-neutral-900 mb-3">
               เกี่ยวกับสถานที่นี้
@@ -382,7 +475,25 @@ export default function DestinationDetail() {
           {/* Right — sticky action card */}
           <div className="lg:col-span-1">
             <div className="hidden lg:block sticky top-20 rounded-2xl border border-neutral-200 shadow-sm p-5 sm:p-6">
-              <div className="mb-5">{priceNode}</div>
+              <div className="mb-4">{priceNode}</div>
+
+              {/* Status pill in sticky card */}
+              <div className="mb-5 p-3 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-neutral-400" />
+                  <span className="text-xs text-neutral-600 font-medium">สถานะวันนี้</span>
+                </div>
+                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                  openingStatus.isOpenNow
+                    ? "bg-emerald-100 text-emerald-800"
+                    : openingStatus.isTodayOpen
+                    ? "bg-amber-100 text-amber-800"
+                    : "bg-rose-100 text-rose-800"
+                }`}>
+                  {openingStatus.badgeLabel}
+                </span>
+              </div>
+
               <a
                 href={mapsHref}
                 target="_blank"

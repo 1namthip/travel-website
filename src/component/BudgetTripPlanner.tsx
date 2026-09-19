@@ -12,6 +12,7 @@ import {
   Layers, Check, Search, SlidersHorizontal
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { getPlaceOpeningStatus } from "@/lib/opening-hours";
 
 // ─── Day Constants ────────────────────────────────────────────────────────────
 
@@ -39,7 +40,8 @@ interface TripItem {
   min_price: number;
   category?: string;
   open_days?: string[];
-  opening_hours?: string;
+  opening_hours?: any;
+  opening_hours_raw?: any;
   district?: string;
   location?: string;
   address?: string;
@@ -57,7 +59,8 @@ interface RouteStop {
   description?: string;
   address?: string;
   location?: string;
-  opening_hours?: string;
+  opening_hours?: any;
+  opening_hours_raw?: any;
   open_days?: string[];
   price?: number;
   min_price?: number;
@@ -914,6 +917,12 @@ function PlaceDetailModal({
 
   const TypeIcon = typeConfig.icon;
 
+  const openStatus = getPlaceOpeningStatus({
+    opening_hours: place.opening_hours_raw || place.opening_hours,
+    open_days: place.open_days,
+    hours: typeof place.opening_hours === "string" ? place.opening_hours : undefined,
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -960,6 +969,12 @@ function PlaceDetailModal({
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-black/60 text-white backdrop-blur-md border border-white/20">
                   <MapPin className="w-3.5 h-3.5 text-amber-400" />
                   อ.{place.district}
+                </span>
+              )}
+              {openStatus.hasData && (
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md shadow-sm ${openStatus.badgeClasses}`}>
+                  <span className={`w-2 h-2 rounded-full ${openStatus.isOpenNow ? "bg-emerald-500 animate-pulse" : openStatus.dotColor}`} />
+                  {openStatus.badgeLabel}
                 </span>
               )}
             </div>
@@ -1053,15 +1068,73 @@ function PlaceDetailModal({
               </div>
             )}
 
-            {place.opening_hours && (
-              <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100 text-sm text-neutral-700">
-                <Clock className="w-4 h-4 text-amber-600 shrink-0" />
-                <div>
-                  <span className="font-semibold text-neutral-800 block text-xs mb-0.5">เวลาเปิดให้บริการ</span>
-                  <span className="text-xs text-neutral-600">{place.opening_hours}</span>
+            {/* ── Section: วันและเวลาเปิดให้บริการ (7 วัน) ── */}
+            <div className="space-y-3 p-4 sm:p-5 rounded-2xl bg-neutral-50/80 border border-neutral-200/70">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700 shrink-0">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-neutral-900">
+                      วันและเวลาเปิดให้บริการ
+                    </h4>
+                    <p className="text-xs text-neutral-500">
+                      {openStatus.openDaysSummary}
+                    </p>
+                  </div>
+                </div>
+
+                <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${openStatus.badgeClasses}`}>
+                  <span className={`w-2 h-2 rounded-full ${openStatus.isOpenNow ? "bg-emerald-500 animate-pulse" : openStatus.dotColor}`} />
+                  {openStatus.badgeLabel}
                 </div>
               </div>
-            )}
+
+              {/* ตารางเวลา 7 วัน */}
+              <div className="rounded-xl overflow-hidden border border-neutral-200/80 divide-y divide-neutral-100 bg-white">
+                {openStatus.schedule.map((day) => (
+                  <div
+                    key={day.key}
+                    className={`flex items-center justify-between px-3.5 py-2.5 text-xs transition-colors ${
+                      day.isToday
+                        ? "bg-amber-50/80 font-semibold border-l-4 border-l-amber-500 pl-2.5"
+                        : "hover:bg-neutral-50/60"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className={day.isToday ? "text-amber-950 font-bold" : "text-neutral-700"}>
+                        {day.fullLabel}
+                      </span>
+                      {day.isToday && (
+                        <span className="text-[10px] font-bold bg-amber-500 text-white px-2 py-0.5 rounded-full">
+                          วันนี้
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {day.isOpen ? (
+                        <>
+                          <span className="text-neutral-600 font-medium">
+                            {day.timeDisplay}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
+                            <Check className="w-3 h-3 text-emerald-500" />
+                            เปิด
+                          </span>
+                        </>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-neutral-500 bg-neutral-100 px-2.5 py-0.5 rounded-md border border-neutral-200">
+                          <X className="w-3 h-3 text-neutral-400" />
+                          ปิดทำการ
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1166,6 +1239,12 @@ function DailyRouteTimeline({
                     <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-md">
                       <MapPin className="w-2.5 h-2.5 text-neutral-400" />
                       อ.{stop.district}
+                    </span>
+                  )}
+                  {stop.opening_hours && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/70">
+                      <Clock className="w-2.5 h-2.5 text-amber-600" />
+                      {stop.opening_hours}
                     </span>
                   )}
                   {stop.min_price != null && (
@@ -1373,6 +1452,10 @@ function TripRow({
                 const cost = isStay ? item.min_price * nights : item.min_price;
                 const wouldExceed =
                   !isSelected && budget > 0 && spent + cost > budget;
+                const itemOpenStatus = getPlaceOpeningStatus({
+                  opening_hours: item.opening_hours_raw || item.opening_hours,
+                  open_days: item.open_days,
+                });
 
                 return (
                   <motion.div
@@ -1472,6 +1555,15 @@ function TripRow({
                       >
                         {item.name}
                       </h4>
+
+                      {itemOpenStatus.hasData && (
+                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                          <span className={`inline-flex items-center gap-1 font-semibold px-2 py-0.5 rounded-full text-[10px] border ${itemOpenStatus.badgeClasses}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${itemOpenStatus.isOpenNow ? "bg-emerald-500 animate-pulse" : itemOpenStatus.dotColor}`} />
+                            {itemOpenStatus.badgeLabel}
+                          </span>
+                        </div>
+                      )}
 
                       <div className="flex items-center justify-between pt-3 mt-2 border-t border-neutral-100">
                         <button

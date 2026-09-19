@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import ConfirmDialog from "@/component/ConfirmDialog";
 import DestinationDetailModal from "@/component/Admin/DestinationDetailModal";
 import OpeningHoursEditor, { DEFAULT_OPENING_HOURS } from "@/component/OpeningHoursEditor";
+import { parseOpeningHours } from "@/lib/opening-hours";
 import {
   Search,
   MoreHorizontal,
@@ -443,7 +444,10 @@ export default function AdminDestinationsPage() {
         min_price: destination.min_price ?? 0,
         max_price: destination.max_price ?? 0,
         image_file: [],
-        opening_hours: destination.opening_hours || DEFAULT_OPENING_HOURS,
+        opening_hours:
+          parseOpeningHours(destination.opening_hours) ||
+          destination.opening_hours ||
+          DEFAULT_OPENING_HOURS,
         open_days: destination.open_days || ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
       });
     } else {
@@ -1662,6 +1666,7 @@ export default function AdminDestinationsPage() {
                       </div>
 
                       <OpeningHoursEditor
+                        key={editingDestination ? `edit-${editingDestination.id}` : "add-new"}
                         value={formData.opening_hours}
                         openDays={formData.open_days}
                         onChange={(hours, days, valid) => {

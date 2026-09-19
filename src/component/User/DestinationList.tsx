@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
-import { Heart, Star, Tag, Wallet, Search, Images, SlidersHorizontal, X } from "lucide-react";
+import { Heart, Star, Tag, Wallet, Search, Images, SlidersHorizontal, X, Clock } from "lucide-react";
 import type { Destination } from "@/types/destination";
 import { useFavorites } from "@/component/FavoritesProvider";
+import { getPlaceOpeningStatus } from "@/lib/opening-hours";
 
 // ─── Framer Motion variants ───────────────────────────────────────────────────
 const containerVariants: Variants = {
@@ -321,6 +322,7 @@ export default function DestinationList() {
             
             // ดึงข้อมูล Rating จากออบเจ็กต์ d ได้โดยตรงเลย 🚀
             const rating = d.rating; 
+            const openStatus = getPlaceOpeningStatus(d); 
             
             let imageCount = 0;
             try {
@@ -396,10 +398,26 @@ export default function DestinationList() {
                         <h4 className="text-base font-bold text-neutral-900 line-clamp-1 mb-1 group-hover:text-neutral-700 transition-colors leading-snug">
                           {d.name}
                         </h4>
-                        <p className="text-xs text-neutral-400 flex items-center gap-1 font-medium">
-                          <Tag className="w-3 h-3 opacity-70 shrink-0" />
-                          <span className="truncate">{d.category ?? "ท่องเที่ยวทั่วไป"}</span>
-                        </p>
+                        <div className="flex items-center justify-between gap-1 mb-1.5">
+                          <p className="text-xs text-neutral-400 flex items-center gap-1 font-medium">
+                            <Tag className="w-3 h-3 opacity-70 shrink-0" />
+                            <span className="truncate">{d.category ?? "ท่องเที่ยวทั่วไป"}</span>
+                          </p>
+                        </div>
+
+                        {/* วันและเวลาเปิดให้บริการจาก Admin */}
+                        <div className="flex items-center gap-1.5 flex-wrap text-xs">
+                          <span className={`inline-flex items-center gap-1 font-semibold px-2 py-0.5 rounded-full text-[11px] border ${openStatus.badgeClasses}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${openStatus.isOpenNow ? "bg-emerald-500 animate-pulse" : openStatus.dotColor}`} />
+                            {openStatus.badgeLabel}
+                          </span>
+                          {openStatus.todayHoursText && (
+                            <span className="text-[11px] text-neutral-500 flex items-center gap-1 font-medium">
+                              <Clock className="w-3 h-3 text-neutral-400 shrink-0" />
+                              <span className="truncate">{openStatus.todayHoursText}</span>
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Rating row (โหลดมาพร้อมข้อมูลแล้ว ไม่ต้องเช็ค ratingsLoading) */}

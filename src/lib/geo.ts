@@ -23,6 +23,7 @@ export interface RouteStop {
   address?: string;
   location?: string;
   opening_hours?: string;
+  opening_hours_raw?: any;
   open_days?: string[];
   price?: number;
   min_price?: number;
@@ -590,6 +591,7 @@ export function toRouteStop(
     address: item.address || item.location || undefined,
     location: item.location || item.address || undefined,
     opening_hours: openingHoursText,
+    opening_hours_raw: item.opening_hours || undefined,
     open_days: item.open_days || undefined,
     price: item.min_price ?? item.price ?? undefined,
     min_price: item.min_price ?? undefined,

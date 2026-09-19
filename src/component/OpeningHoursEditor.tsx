@@ -211,18 +211,29 @@ export default function OpeningHoursEditor({
     });
   };
 
+  // Active and closed days count
+  const openCount = activeDaysList.length;
+  const closedCount = 7 - openCount;
+
   return (
     <div className="space-y-3">
       {/* Header with Title and Quick Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-1 border-b border-zinc-100">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pb-2 border-b border-zinc-200">
         <div>
-          <label className="text-[13px] font-semibold text-zinc-900 flex items-center gap-1.5">
-            <Clock size={15} className="text-blue-600" />
-            วันและเวลาเปิดให้บริการ
-            <span className="text-xs font-normal text-zinc-400">
-              (เปิด {activeDaysList.length} จาก 7 วัน)
-            </span>
+          <label className="text-sm font-bold text-zinc-900 flex items-center gap-2">
+            <Clock size={16} className="text-blue-600" />
+            วันและเวลาเปิดให้บริการ (7 วัน)
           </label>
+          <div className="flex items-center gap-2 mt-0.5 text-xs">
+            <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+              เปิด {openCount} วัน
+            </span>
+            {closedCount > 0 && (
+              <span className="font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200">
+                ปิด {closedCount} วัน
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Action buttons */}
@@ -230,69 +241,79 @@ export default function OpeningHoursEditor({
           <button
             type="button"
             onClick={() => setShowApplySameModal(!showApplySameModal)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium transition-colors border border-blue-200/60"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold transition-colors border border-blue-200"
           >
-            <Copy size={12} />
+            <Copy size={13} />
             ใช้เวลาเดียวกันทุกวัน
           </button>
           <button
             type="button"
             onClick={() => setAllDays(true)}
-            className="px-2 py-1 rounded-md text-zinc-600 hover:bg-zinc-100 font-medium transition-colors"
+            className="px-2.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-medium transition-colors"
           >
             เปิดทุกวัน
           </button>
           <button
             type="button"
             onClick={setWeekdaysOnly}
-            className="px-2 py-1 rounded-md text-zinc-600 hover:bg-zinc-100 font-medium transition-colors"
+            className="px-2.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-medium transition-colors"
           >
             จ.-ศ.
           </button>
           <button
             type="button"
             onClick={setWeekendOnly}
-            className="px-2 py-1 rounded-md text-zinc-600 hover:bg-zinc-100 font-medium transition-colors"
+            className="px-2.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-medium transition-colors"
           >
             ส.-อา.
+          </button>
+          <button
+            type="button"
+            onClick={() => setAllDays(false)}
+            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium transition-colors border border-rose-200/60"
+          >
+            ปิดทุกวัน
           </button>
         </div>
       </div>
 
       {/* "ใช้เวลาเดียวกันทุกวัน" helper drawer/box */}
       {showApplySameModal && (
-        <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-lg flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="p-3.5 bg-blue-50/80 border border-blue-200 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
           <div className="flex items-center gap-2">
-            <Sparkles size={14} className="text-blue-600 shrink-0" />
-            <span className="font-medium text-blue-900">ตั้งเวลาให้กับทุกวันที่เลือกเปิด:</span>
+            <Sparkles size={16} className="text-blue-600 shrink-0" />
+            <div>
+              <span className="font-bold text-blue-950 block">ตั้งเวลาเปิด-ปิดให้กับทุกวันที่เลือกเปิด:</span>
+              <span className="text-[11px] text-blue-700">จะนำเวลานี้ไปใส่ในวันที่เปิดให้บริการทั้งหมดทันที</span>
+            </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <input
               type="time"
               value={applyTimeOpen}
               onChange={(e) => setApplyTimeOpen(e.target.value)}
-              className="px-2 py-1 bg-white border border-blue-200 rounded text-xs text-zinc-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-2.5 py-1.5 bg-white border border-blue-300 rounded-lg text-xs font-mono font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <span className="text-zinc-400 font-medium">-</span>
+            <span className="text-zinc-400 font-bold">-</span>
             <input
               type="time"
               value={applyTimeClose}
               onChange={(e) => setApplyTimeClose(e.target.value)}
-              className="px-2 py-1 bg-white border border-blue-200 rounded text-xs text-zinc-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="px-2.5 py-1.5 bg-white border border-blue-300 rounded-lg text-xs font-mono font-bold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="button"
               onClick={handleApplySameTimeToAll}
-              className="px-3 py-1 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition-colors shadow-sm"
+              className="px-3.5 py-1.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-sm"
             >
-              นำไปใช้
+              นำไปใช้กับทุกวัน
             </button>
             <button
               type="button"
               onClick={() => setShowApplySameModal(false)}
-              className="p-1 text-zinc-400 hover:text-zinc-600 rounded"
+              className="p-1.5 text-zinc-400 hover:text-zinc-600 rounded-lg hover:bg-blue-100"
             >
-              <X size={14} />
+              <X size={16} />
             </button>
           </div>
         </div>
@@ -308,80 +329,102 @@ export default function OpeningHoursEditor({
           return (
             <div
               key={day.key}
-              className={`p-2.5 sm:px-3.5 sm:py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 transition-colors ${
-                isOpen ? "bg-white hover:bg-zinc-50/50" : "bg-zinc-50/60"
+              className={`p-3 sm:px-4 sm:py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors ${
+                isOpen ? "bg-white hover:bg-blue-50/20" : "bg-zinc-50/70 hover:bg-zinc-100/60"
               }`}
             >
-              {/* Day Checkbox & Name */}
-              <div className="flex items-center gap-2.5 select-none min-w-[120px]">
-                <label className="relative flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isOpen}
-                    onChange={() => toggleDay(day.key)}
-                    className="sr-only"
-                  />
-                  <div
-                    className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${
-                      isOpen
-                        ? "bg-blue-600 border-blue-600 text-white"
-                        : "border-zinc-300 bg-white hover:border-zinc-400"
-                    }`}
-                  >
-                    {isOpen && <Check size={12} strokeWidth={2.5} />}
-                  </div>
-                </label>
+              {/* Day Toggle & Name */}
+              <div className="flex items-center gap-3 select-none min-w-[170px]">
+                {/* Status Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => toggleDay(day.key)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all border shadow-2xs cursor-pointer ${
+                    isOpen
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100"
+                      : "bg-zinc-200/80 text-zinc-600 border-zinc-300 hover:bg-zinc-300"
+                  }`}
+                >
+                  {isOpen ? (
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      เปิด
+                    </>
+                  ) : (
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-zinc-400" />
+                      ปิดทำการ
+                    </>
+                  )}
+                </button>
 
                 <span
                   onClick={() => toggleDay(day.key)}
-                  className={`text-xs font-semibold cursor-pointer ${
+                  className={`text-sm font-bold cursor-pointer transition-colors ${
                     isOpen ? "text-zinc-900" : "text-zinc-400"
                   }`}
                 >
                   {day.fullLabel}
                 </span>
-
-                {!isOpen && (
-                  <span className="text-[11px] font-medium text-zinc-400 bg-zinc-100 px-1.5 py-0.2 rounded">
-                    ปิดทำการ
-                  </span>
-                )}
               </div>
 
               {/* Time inputs or Closed State */}
-              <div className="flex items-center gap-2 pl-6 sm:pl-0 flex-wrap">
+              <div className="flex items-center gap-2.5 pl-2 sm:pl-0 flex-wrap">
                 {isOpen ? (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] text-zinc-400 font-medium">เปิด</span>
-                    <input
-                      type="time"
-                      value={item.open_time || "08:00"}
-                      onChange={(e) => updateTime(day.key, "open_time", e.target.value)}
-                      className={`h-7 px-2 text-xs border rounded-md bg-white font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-                        errorMsg ? "border-red-400 bg-red-50/30" : "border-zinc-200"
-                      }`}
-                    />
-                    <span className="text-zinc-400 text-xs font-medium">-</span>
-                    <span className="text-[11px] text-zinc-400 font-medium">ปิด</span>
-                    <input
-                      type="time"
-                      value={item.close_time || "17:00"}
-                      onChange={(e) => updateTime(day.key, "close_time", e.target.value)}
-                      className={`h-7 px-2 text-xs border rounded-md bg-white font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-                        errorMsg ? "border-red-400 bg-red-50/30" : "border-zinc-200"
-                      }`}
-                    />
-                    <span className="text-[11px] text-zinc-400">น.</span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-1.5 bg-zinc-50 px-2.5 py-1 rounded-lg border border-zinc-200">
+                      <span className="text-xs text-zinc-500 font-semibold">เปิด</span>
+                      <input
+                        type="time"
+                        value={item.open_time || "08:00"}
+                        onChange={(e) => updateTime(day.key, "open_time", e.target.value)}
+                        className={`h-7 px-2 text-xs border rounded-md bg-white font-mono font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          errorMsg ? "border-red-400 bg-red-50/30" : "border-zinc-300 text-zinc-800"
+                        }`}
+                      />
+                      <span className="text-zinc-400 text-xs font-bold">-</span>
+                      <span className="text-xs text-zinc-500 font-semibold">ปิด</span>
+                      <input
+                        type="time"
+                        value={item.close_time || "17:00"}
+                        onChange={(e) => updateTime(day.key, "close_time", e.target.value)}
+                        className={`h-7 px-2 text-xs border rounded-md bg-white font-mono font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          errorMsg ? "border-red-400 bg-red-50/30" : "border-zinc-300 text-zinc-800"
+                        }`}
+                      />
+                      <span className="text-xs text-zinc-400 font-medium">น.</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateTime(day.key, "open_time", "00:00");
+                        updateTime(day.key, "close_time", "23:59");
+                      }}
+                      className="text-[11px] text-blue-700 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md border border-blue-200 font-semibold transition-colors"
+                      title="ตั้งเป็นเปิดตลอด 24 ชั่วโมง (00:00 - 23:59)"
+                    >
+                      24 ชม.
+                    </button>
                   </div>
                 ) : (
-                  <span className="text-[11px] text-zinc-400 italic">
-                    ไม่ได้เปิดให้บริการในวันนี้
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-zinc-400 italic">
+                      ปิดทำการ (ไม่เปิดให้บริการในวันนี้)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleDay(day.key)}
+                      className="text-xs text-blue-600 hover:text-blue-800 font-semibold underline underline-offset-2 ml-1 cursor-pointer"
+                    >
+                      + เปิดวันนี้
+                    </button>
+                  </div>
                 )}
 
                 {errorMsg && (
-                  <span className="text-[11px] font-medium text-red-600 flex items-center gap-1">
-                    <AlertCircle size={12} />
+                  <span className="text-xs font-semibold text-red-600 flex items-center gap-1 bg-red-50 px-2 py-0.5 rounded border border-red-200">
+                    <AlertCircle size={13} />
                     {errorMsg}
                   </span>
                 )}
