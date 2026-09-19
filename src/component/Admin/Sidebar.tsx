@@ -44,7 +44,7 @@ const NAVIGATION_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "จัดการเนื้อหา",
+    label: "จัดการข้อมูล",
     items: [
       { name: "สถานที่ท่องเที่ยว", href: "/admin/destinations", icon: MapPin },
       { name: "ของกิน", href: "/admin/food", icon: UtensilsCrossed },
@@ -159,7 +159,7 @@ export default function Sidebar() {
         </button>
 
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-50 ring-1 ring-pink-200">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 ring-1 ring-blue-200">
             <Image
               src="/images/logo-travel.png"
               alt="Logo"
@@ -300,15 +300,15 @@ export default function Sidebar() {
                             "focus-visible:ring-2 focus-visible:ring-blue-500/40",
                             collapsed ? "justify-center px-0" : "px-2.5",
                             active
-                              ? "bg-pink-50 text-pink-700"
-                              : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900",
+                              ? "bg-blue-50/90 text-blue-700 font-semibold"
+                              : "text-zinc-600 hover:bg-zinc-100/80 hover:text-zinc-900",
                           ].join(" ")}
                         >
                           {/* Active indicator */}
                           {active && (
                             <span
                               aria-hidden="true"
-                              className="absolute left-0 top-1/2 h-4.5 w-0.5 -translate-y-1/2 rounded-r bg-pink-500"
+                              className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-md bg-blue-600"
                             />
                           )}
 
@@ -316,7 +316,7 @@ export default function Sidebar() {
                             aria-hidden="true"
                             className={`h-4 w-4 shrink-0 transition-colors ${
                               active
-                                ? "text-pink-600"
+                                ? "text-blue-600"
                                 : "text-zinc-400 group-hover:text-zinc-600"
                             }`}
                           />

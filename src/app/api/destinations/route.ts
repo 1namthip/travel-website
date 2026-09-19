@@ -135,7 +135,7 @@ export const POST = async (req: Request) => {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
-    const { name, description, category, image_url, min_price, max_price } = body as Record<string, any>;
+    const { name, description, category, image_url, min_price, max_price, opening_hours, open_days } = body as Record<string, any>;
 
     if (!name || !description || !category) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -148,21 +148,38 @@ export const POST = async (req: Request) => {
       return NextResponse.json({ error: "Invalid price range" }, { status: 400 });
     }
 
+    const insertPayload: Record<string, any> = {
+      name,
+      description,
+      category,
+      image_url: image_url || null,
+      min_price: minPriceNum,
+      max_price: maxPriceNum,
+    };
+
+    if (opening_hours !== undefined) insertPayload.opening_hours = opening_hours;
+    if (open_days !== undefined) insertPayload.open_days = open_days;
+
     // Insert ข้อมูลด้วย Admin Client
-    const { data, error } = await supabaseAdmin
+    let { data, error } = await supabaseAdmin
       .from("destinations")
-      .insert([
-        {
-          name,
-          description,
-          category,
-          image_url: image_url || null,
-          min_price: minPriceNum,
-          max_price: maxPriceNum
-        },
-      ])
+      .insert([insertPayload])
       .select()
       .single();
+
+    // Fallback: หากยังไม่ได้รัน SQL Migration ใน Supabase (คอลัมน์ opening_hours / open_days ยังไม่มี)
+    if (error && (error.message?.includes("opening_hours") || error.message?.includes("open_days") || error.code === "42703")) {
+      console.warn("⚠️ Column opening_hours/open_days not found in destinations table. Falling back to basic insert.");
+      delete insertPayload.opening_hours;
+      delete insertPayload.open_days;
+      const retry = await supabaseAdmin
+        .from("destinations")
+        .insert([insertPayload])
+        .select()
+        .single();
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error) {
       console.error("❌ Supabase POST error:", error);

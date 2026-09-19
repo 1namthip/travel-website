@@ -122,24 +122,44 @@ export const PUT = async (request: NextRequest, { params }: RouteParams) => {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
-    const { name, description, category, image_url, min_price, max_price } = body as Record<string, any>;
+    const { name, description, category, image_url, min_price, max_price, opening_hours, open_days } = body as Record<string, any>;
+
+    const updatePayload: Record<string, any> = {
+      name,
+      description,
+      category,
+      image_url: image_url || null,
+      min_price: Number(min_price) || 0,
+      max_price: Number(max_price) || 0,
+      updated_by: user.id,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (opening_hours !== undefined) updatePayload.opening_hours = opening_hours;
+    if (open_days !== undefined) updatePayload.open_days = open_days;
 
     // ใช้ Admin Client สำหรับการแก้ไขข้อมูลโดย Admin
-    const { data, error } = await supabaseAdmin
+    let { data, error } = await supabaseAdmin
       .from("destinations")
-      .update({
-        name,
-        description,
-        category,
-        image_url: image_url || null,
-        min_price: Number(min_price) || 0,
-        max_price: Number(max_price) || 0,
-        updated_by: user.id,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq("id", destinationId)
       .select()
       .single();
+
+    // Fallback: หากยังไม่มีคอลัมน์ opening_hours/open_days ในตาราง
+    if (error && (error.message?.includes("opening_hours") || error.message?.includes("open_days") || error.code === "42703")) {
+      console.warn("⚠️ Column opening_hours/open_days not found. Falling back to basic update.");
+      delete updatePayload.opening_hours;
+      delete updatePayload.open_days;
+      const retry = await supabaseAdmin
+        .from("destinations")
+        .update(updatePayload)
+        .eq("id", destinationId)
+        .select()
+        .single();
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error) {
       console.error(`❌ PUT destination ${id} error:`, error.message);
