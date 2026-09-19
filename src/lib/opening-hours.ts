@@ -213,12 +213,16 @@ export function getPlaceOpeningStatus(place: {
     const openMinutes = openH * 60 + (openM || 0);
 
     if (currentMinutes < openMinutes) {
-      badgeLabel = `เปิดเวลา ${todayItem.openTime} น.`;
-      badgeColor = "amber";
+      badgeLabel = `เปิดวันนี้ ${todayItem.openTime} น.`;
+      badgeColor = "emerald";
     } else {
-      badgeLabel = "ปิดแล้ววันนี้";
-      badgeColor = "rose";
+      // เลยเวลาปิดของวันนี้แล้ว แต่ "วันนี้เป็นวันที่เปิดให้บริการตามตารางปกติ"
+      badgeLabel = "เปิดวันนี้";
+      badgeColor = "emerald";
     }
+  } else {
+    badgeLabel = "เปิดวันนี้";
+    badgeColor = "emerald";
   }
 
   // สรุปวันเปิดให้บริการ เช่น "เปิดทุกวัน" หรือ "เปิด: จันทร์, อังคาร, พุธ"

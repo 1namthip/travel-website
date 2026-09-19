@@ -411,7 +411,7 @@ export default function DestinationList() {
                             <span className={`w-1.5 h-1.5 rounded-full ${openStatus.isOpenNow ? "bg-emerald-500 animate-pulse" : openStatus.dotColor}`} />
                             {openStatus.badgeLabel}
                           </span>
-                          {openStatus.todayHoursText && (
+                          {openStatus.isTodayOpen && openStatus.todayHoursText && (
                             <span className="text-[11px] text-neutral-500 flex items-center gap-1 font-medium">
                               <Clock className="w-3 h-3 text-neutral-400 shrink-0" />
                               <span className="truncate">{openStatus.todayHoursText}</span>
