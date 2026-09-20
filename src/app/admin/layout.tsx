@@ -47,7 +47,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 lg:flex-row flex-col">
+    <div className="flex min-h-screen bg-[#FAF9F6] selection:bg-teal-100 selection:text-teal-900 lg:flex-row flex-col">
       <Sidebar />
       <main className="flex-1 min-w-0"><OnlineTracker />{children}</main>
     </div>

@@ -1,7 +1,7 @@
 // src/app/accommodations/[id]/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
@@ -20,12 +20,19 @@ import {
   Phone,
   Star,
   MessageSquare,
-  Share,
+  Share2,
   Heart,
   Tag,
   Wallet,
   ChevronLeft,
   Navigation,
+  Copy,
+  Check,
+  Compass,
+  Sparkles,
+  Bed,
+  Users,
+  ShieldCheck,
 } from "lucide-react";
 
 interface AccommodationDetailData {
@@ -112,7 +119,6 @@ export default function AccommodationDetail() {
   const pathname = usePathname();
   const rawId = params.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
-  // decode ก่อนใช้ กันกรณีเปิดลิงก์เก่าที่เป็นชื่อ (เว้นวรรค/ภาษาไทย) แล้วโดน encode ซ้อน
   const cleanId = id ? safeDecode(id.toString()).trim() : undefined;
 
   // ─── Supabase Auth State ───────────────────────────────────────────────────
@@ -128,6 +134,7 @@ export default function AccommodationDetail() {
   const [reviews, setReviews] = useState<PlaceReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedAddress, setCopiedAddress] = useState(false);
 
   const { isFavorite, toggleFavorite } = useFavorites();
   const saved = !!cleanId && isFavorite("accommodation", cleanId);
@@ -166,7 +173,7 @@ export default function AccommodationDetail() {
         if (!alive) return;
         setAccommodation(data);
 
-        // ดึงรีวิวด้วย id จริง (uuid) — ลิงก์เก่าที่เป็นชื่อจะไม่มาถึงตรงนี้
+        // ดึงรีวิวด้วย id จริง
         const revRes = await fetch(
           `/api/reviews?accommodation_id=${encodeURIComponent(String(data.id))}`,
         );
@@ -191,7 +198,7 @@ export default function AccommodationDetail() {
   }, [cleanId]);
 
   // ================= ส่ง / ลบ รีวิว =================
-  const reloadReviews = async () => {
+  const reloadReviews = useCallback(async () => {
     if (!accId) return;
     try {
       const res = await fetch(
@@ -201,9 +208,9 @@ export default function AccommodationDetail() {
       const list = await res.json();
       if (Array.isArray(list)) setReviews(list);
     } catch {
-      /* รีวิวโหลดไม่ได้ไม่ใช่เรื่องคอขาดบาดตาย */
+      // ignore review error
     }
-  };
+  }, [accId]);
 
   const submitReview = async (rating: number, comment: string) => {
     if (!user) throw new Error("กรุณาเข้าสู่ระบบก่อนทำการรีวิว");
@@ -215,7 +222,6 @@ export default function AccommodationDetail() {
         accommodation_id: accId,
         rating,
         comment,
-        // API route อาจจะดึงจาก Token อยู่แล้ว แต่ส่งไปด้วยเพื่อความชัวร์หากใช้โครงสร้างเก่า
         created_by: user.id,
       }),
     });
@@ -237,6 +243,43 @@ export default function AccommodationDetail() {
       toast.error(
         err instanceof Error ? err.message : "เกิดข้อผิดพลาดในการลบรีวิว",
       );
+    }
+  };
+
+  // ================= 4. แชร์ & คัดลอกที่อยู่ =================
+  const handleShare = async () => {
+    const shareData = {
+      title: accommodation?.name || "ที่พัก",
+      text: `แนะนำที่พัก: ${accommodation?.name || ""}`,
+      url: typeof window !== "undefined" ? window.location.href : "",
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch {
+        // user cancelled
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("คัดลอกลิงก์เรียบร้อยแล้ว");
+    } catch {
+      toast.error("ไม่สามารถคัดลอกลิงก์ได้");
+    }
+  };
+
+  const handleCopyAddress = async () => {
+    if (!accommodation?.address) return;
+    try {
+      await navigator.clipboard.writeText(accommodation.address);
+      setCopiedAddress(true);
+      toast.success("คัดลอกที่อยู่เรียบร้อยแล้ว");
+      setTimeout(() => setCopiedAddress(false), 2000);
+    } catch {
+      toast.error("ไม่สามารถคัดลอกที่อยู่ได้");
     }
   };
 
@@ -263,7 +306,6 @@ export default function AccommodationDetail() {
   const minP = accommodation.min_price ?? 0;
   const maxP = accommodation.max_price ?? 0;
   const noPrice = maxP === 0;
-  // ค้น Google Maps ด้วย "ชื่อที่พัก" (วิธีเดียวกับหน้าที่เที่ยวและร้านอาหาร)
   const mapsHref = mapsSearchUrl(accommodation.name);
   const lineHref = lineUrl(accommodation.contact_line);
   const facebookHref = facebookUrl(accommodation.contact_facebook);
@@ -274,15 +316,18 @@ export default function AccommodationDetail() {
       ? `฿${maxP.toLocaleString()}`
       : `฿${minP.toLocaleString()}–${maxP.toLocaleString()}`;
 
-  const priceNode = (
-    <span className="flex items-baseline gap-1">
-      <span className="text-2xl font-extrabold text-neutral-900 tracking-tight">
+  const priceNode = noPrice ? (
+    <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-sm font-bold shadow-2xs">
+      <Sparkles className="w-3.5 h-3.5 text-teal-600" />
+      <span>สอบถามราคาที่พัก</span>
+    </div>
+  ) : (
+    <div className="flex items-baseline gap-1.5">
+      <span className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
         {priceText}
       </span>
-      {!noPrice && (
-        <span className="text-sm text-neutral-500 font-medium">/ คืน</span>
-      )}
-    </span>
+      <span className="text-xs sm:text-sm text-stone-500 font-medium">/ คืน</span>
+    </div>
   );
 
   const primaryCta = lineHref ? (
@@ -290,61 +335,62 @@ export default function AccommodationDetail() {
       href={lineHref}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#00B900] px-5 text-sm font-bold text-white transition-colors hover:bg-[#009900]"
+      className="inline-flex h-11 sm:h-12 items-center justify-center gap-2 rounded-xl bg-[#00B900] hover:bg-[#009900] active:scale-[0.98] px-5 sm:px-6 text-sm font-bold text-white shadow-md shadow-emerald-900/15 transition-all cursor-pointer"
     >
-      <MessageSquare className="w-4 h-4" /> ติดต่อผ่าน LINE
+      <MessageSquare className="w-4 h-4 text-white" /> ติดต่อผ่าน LINE
     </a>
   ) : accommodation.contact_phone ? (
     <a
       href={`tel:${accommodation.contact_phone}`}
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-amber-600 px-5 text-sm font-bold text-white transition-colors hover:bg-amber-700"
+      className="inline-flex h-11 sm:h-12 items-center justify-center gap-2 rounded-xl bg-teal-700 hover:bg-teal-800 active:scale-[0.98] px-5 sm:px-6 text-sm font-bold text-white shadow-md shadow-teal-900/15 transition-all cursor-pointer"
     >
-      <Phone className="w-4 h-4" /> โทรสอบถาม
+      <Phone className="w-4 h-4 text-amber-300" /> โทรสอบถาม
     </a>
   ) : (
     <a
       href={mapsHref}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-amber-600 px-5 text-sm font-bold text-white transition-colors hover:bg-amber-700"
+      className="inline-flex h-11 sm:h-12 items-center justify-center gap-2 rounded-xl bg-teal-700 hover:bg-teal-800 active:scale-[0.98] px-5 sm:px-6 text-sm font-bold text-white shadow-md shadow-teal-900/15 transition-all cursor-pointer"
     >
-      <Navigation className="w-4 h-4" /> นำทาง
+      <Navigation className="w-4 h-4 text-amber-300" /> นำทาง
     </a>
   );
 
-  const facts: { icon: React.ElementType; label: string; value: string }[] = [];
-  facts.push({ icon: Wallet, label: "ราคา", value: noPrice ? "สอบถามราคา" : `${priceText} / คืน` });
-  if (accommodation.address)
-    facts.push({ icon: MapPin, label: "ที่อยู่", value: accommodation.address });
-  if (accommodation.category)
-    facts.push({ icon: Tag, label: "ประเภทที่พัก", value: accommodation.category });
-  if (accommodation.contact_phone)
-    facts.push({ icon: Phone, label: "โทรศัพท์", value: accommodation.contact_phone });
-
   return (
-    <div className="min-h-screen bg-white pb-24 lg:pb-16">
-      {/* Top bar */}
-      <nav className="sticky top-0 z-50 border-b border-neutral-100 bg-white/90 backdrop-blur-md">
+    <div className="min-h-screen bg-[#FAF9F6] pb-24 lg:pb-16 text-stone-800 selection:bg-teal-100 selection:text-teal-900">
+      {/* ── Top Bar (Glassmorphism + Duo-tone accents) ── */}
+      <nav className="sticky top-0 z-50 border-b border-stone-200/70 bg-white/85 backdrop-blur-md transition-all">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link
             href="/accommodations"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 hover:text-stone-950 px-3 py-1.5 rounded-full hover:bg-stone-100 transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">กลับไปหน้าที่พัก</span>
+            <ChevronLeft className="w-4 h-4 text-stone-500" />
+            <span className="hidden sm:inline">กลับไปหน้าค้นหาที่พัก</span>
             <span className="sm:hidden">กลับ</span>
           </Link>
-          <div className="flex items-center gap-1">
-            <button className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100 transition-colors">
-              <Share className="w-4 h-4" />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium text-stone-600 hover:text-stone-900 bg-white hover:bg-stone-100 border border-stone-200/80 shadow-2xs transition-all cursor-pointer active:scale-95"
+              title="แชร์ที่พักนี้"
+            >
+              <Share2 className="w-3.5 h-3.5 text-stone-500" />
               <span className="hidden sm:inline">แชร์</span>
             </button>
             <button
               onClick={() => cleanId && toggleFavorite("accommodation", cleanId)}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100 transition-colors"
+              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium border shadow-2xs transition-all cursor-pointer active:scale-95 ${
+                saved
+                  ? "bg-rose-50 border-rose-200 text-rose-700"
+                  : "bg-white border-stone-200/80 text-stone-600 hover:text-stone-900 hover:bg-stone-100"
+              }`}
             >
               <Heart
-                className={`w-4 h-4 transition-colors ${saved ? "fill-rose-500 text-rose-500" : ""}`}
+                className={`w-3.5 h-3.5 transition-colors ${
+                  saved ? "fill-rose-500 text-rose-500" : "text-stone-500"
+                }`}
               />
               <span className="hidden sm:inline">
                 {saved ? "บันทึกแล้ว" : "บันทึก"}
@@ -354,167 +400,327 @@ export default function AccommodationDetail() {
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-        {/* Breadcrumb */}
-        <nav className="text-xs sm:text-sm text-neutral-500 mb-4 flex items-center gap-1.5 flex-wrap">
-          <Link href="/" className="hover:text-neutral-900 transition-colors">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* ── Breadcrumb Navigation ── */}
+        <nav className="text-xs sm:text-sm text-stone-500 mb-3 sm:mb-4 flex items-center gap-2 flex-wrap">
+          <Link
+            href="/"
+            className="hover:text-teal-800 transition-colors inline-flex items-center gap-1"
+          >
             หน้าแรก
           </Link>
-          <span className="text-neutral-300">›</span>
+          <span className="text-stone-300">/</span>
           <Link
             href="/accommodations"
-            className="hover:text-neutral-900 transition-colors"
+            className="hover:text-teal-800 transition-colors"
           >
             ที่พัก
           </Link>
-          <span className="text-neutral-300">›</span>
-          <span className="text-neutral-900 font-medium truncate max-w-[45vw]">
+          <span className="text-stone-300">/</span>
+          <span className="text-stone-900 font-medium truncate max-w-[45vw]">
             {accommodation.name}
           </span>
         </nav>
 
-        {/* Title + meta pills */}
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 tracking-tight leading-tight mb-3">
+        {/* ── Title & Duo-Tone Meta Badges ── */}
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-stone-900 tracking-tight leading-tight mb-3 sm:mb-4">
           {accommodation.name}
         </h1>
-        <div className="flex flex-wrap items-center gap-2 mb-6">
+
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-6 sm:mb-8">
+          {/* Rating Pill (Sunset Amber) */}
           {avgRating && (
             <a
               href="#reviews"
-              className="inline-flex items-center gap-1.5 rounded-full bg-white border border-neutral-200 px-3 py-1 text-sm font-semibold text-neutral-900"
+              className="inline-flex items-center gap-1.5 rounded-full bg-amber-50/90 border border-amber-200/80 px-3.5 py-1 text-xs sm:text-sm font-semibold text-amber-900 hover:bg-amber-100 transition-all shadow-2xs"
             >
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              {avgRating}
-              <span className="font-normal text-neutral-400">
+              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+              <span>{avgRating}</span>
+              <span className="text-amber-700/80 font-normal">
                 · {reviews.length} รีวิว
               </span>
             </a>
           )}
+
+          {/* Category Pill (Deep Pine Teal) */}
           {accommodation.category && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-100 px-3 py-1 text-sm font-semibold text-amber-700">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 border border-teal-200/70 px-3.5 py-1 text-xs sm:text-sm font-semibold text-teal-800 shadow-2xs">
+              <Tag className="w-3.5 h-3.5 text-teal-600" />
               {accommodation.category}
             </span>
           )}
+
+          {/* Price pill */}
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs sm:text-sm font-semibold border border-amber-200/70 bg-amber-50 text-amber-900 shadow-2xs">
+            <Wallet className="w-3.5 h-3.5 text-amber-600" />
+            <span>{priceText} {!noPrice && "/ คืน"}</span>
+          </div>
+
+          {/* Location Chip */}
           {accommodation.address && (
             <a
               href={mapsHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 px-3 py-1 text-sm font-medium text-neutral-600 hover:border-neutral-300 hover:text-neutral-900 transition-colors max-w-full"
+              className="inline-flex items-center gap-1.5 rounded-full border border-stone-200/80 bg-white px-3.5 py-1 text-xs sm:text-sm font-medium text-stone-600 hover:border-teal-300 hover:text-teal-800 hover:bg-stone-50 transition-colors max-w-full shadow-2xs"
             >
-              <MapPin className="w-3.5 h-3.5 shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0" />
               <span className="truncate">{accommodation.address}</span>
             </a>
           )}
         </div>
 
+        {/* ── Image Gallery Section ── */}
         <ImageGallery images={images} alt={accommodation.name} />
 
-        {/* Content split */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-          {/* Left */}
+        {/* ── Content Grid: 2 Cols Left / 1 Col Right Sticky ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
+          {/* Left Column: Details & Atmosphere */}
           <div className="lg:col-span-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-              {facts.map((f) => (
-                <div
-                  key={f.label}
-                  className="flex items-start gap-3 rounded-xl border border-neutral-200 p-4"
-                >
-                  <div className="p-2 bg-neutral-50 rounded-lg text-neutral-600 shrink-0">
-                    <f.icon className="w-5 h-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-medium text-neutral-500 mb-0.5">
-                      {f.label}
-                    </p>
-                    <p className="text-sm font-semibold text-neutral-900 leading-snug">
-                      {f.value}
-                    </p>
-                  </div>
+            {/* 1. Quick Facts (Duo-Tone Cards 2x2) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 mb-8">
+              {/* Card: Price */}
+              <div className="flex items-start gap-3.5 rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-4.5 shadow-2xs hover:border-amber-200 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 ring-1 ring-amber-600/15 flex items-center justify-center shrink-0">
+                  <Wallet className="w-5 h-5" />
                 </div>
-              ))}
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-0.5">
+                    ราคาห้องพักเริ่มต้น
+                  </p>
+                  <p className="text-sm font-bold text-stone-900 leading-snug">
+                    {noPrice ? "สอบถามราคา" : `${priceText} / คืน`}
+                  </p>
+                  <p className="text-[11px] text-amber-700 font-medium mt-1">
+                    {noPrice ? "ติดต่อเพื่อรับเรทราคาวันนี้" : "ราคาอาจปรับตามเทศกาล"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Card: Category */}
+              <div className="flex items-start gap-3.5 rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-4.5 shadow-2xs hover:border-teal-200 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-600/15 flex items-center justify-center shrink-0">
+                  <Bed className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-0.5">
+                    ประเภทที่พัก
+                  </p>
+                  <p className="text-sm font-bold text-stone-900 leading-snug">
+                    {accommodation.category || "รีสอร์ตและโรงแรม"}
+                  </p>
+                  <p className="text-[11px] text-teal-700 font-medium mt-1">
+                    บรรยากาศสำหรับการพักผ่อน
+                  </p>
+                </div>
+              </div>
+
+              {/* Card: Location & Quick Copy */}
+              <div className="flex items-start gap-3.5 rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-4.5 shadow-2xs hover:border-teal-200 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-600/15 flex items-center justify-center shrink-0">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-0.5">
+                      ที่ตั้งที่พัก
+                    </p>
+                    {accommodation.address && (
+                      <button
+                        onClick={handleCopyAddress}
+                        className="text-[11px] text-teal-700 hover:text-teal-900 font-medium inline-flex items-center gap-1 cursor-pointer"
+                        title="คัดลอกที่อยู่"
+                      >
+                        {copiedAddress ? (
+                          <>
+                            <Check className="w-3 h-3 text-teal-600" /> คัดลอกแล้ว
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" /> คัดลอก
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-sm font-bold text-stone-900 leading-snug line-clamp-2">
+                    {accommodation.address || "ตามพิกัดแผนที่"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Card: Phone & Call */}
+              <div className="flex items-start gap-3.5 rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-4.5 shadow-2xs hover:border-amber-200 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 ring-1 ring-amber-600/15 flex items-center justify-center shrink-0">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-0.5">
+                    เบอร์โทรศัพท์จองห้องพัก
+                  </p>
+                  {accommodation.contact_phone ? (
+                    <a
+                      href={`tel:${accommodation.contact_phone}`}
+                      className="text-sm font-bold text-stone-900 hover:text-teal-800 leading-snug inline-block underline decoration-stone-300 underline-offset-2"
+                    >
+                      {accommodation.contact_phone}
+                    </a>
+                  ) : (
+                    <p className="text-sm font-bold text-stone-900 leading-snug">
+                      ไม่มีเบอร์โทรระบุ
+                    </p>
+                  )}
+                  <p className="text-[11px] text-stone-400 font-medium mt-1">
+                    {accommodation.contact_phone ? "กดเพื่อโทรสอบถามห้องว่าง" : "ติดต่อผ่านช่องทางออนไลน์"}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <h2 className="text-xl font-bold text-neutral-900 mb-3">
-              รายละเอียดที่พัก
-            </h2>
-            <div className="text-[15px] text-neutral-600 leading-loose whitespace-pre-line mb-10">
-              {accommodation.description || "ยังไม่มีรายละเอียดเพิ่มเติมสำหรับที่พักนี้"}
+            {/* 2. Accommodation Story (Editorial Travel Style) */}
+            <div className="bg-white rounded-3xl border border-stone-200/80 p-6 sm:p-7 mb-8 shadow-sm">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-1.5 h-5 bg-teal-700 rounded-full" />
+                <h2 className="text-lg sm:text-xl font-bold text-stone-900 tracking-tight">
+                  รายละเอียดที่พักและสิ่งอำนวยความสะดวก
+                </h2>
+              </div>
+              <div className="text-[15px] sm:text-base text-stone-700 leading-relaxed sm:leading-loose whitespace-pre-line mb-6 font-normal">
+                {accommodation.description ||
+                  "ยังไม่มีรายละเอียดเพิ่มเติมสำหรับที่พักนี้ คุณสามารถติดต่อสอบถามสิ่งอำนวยความสะดวกและประเภทห้องพักได้โดยตรงกับทางที่พัก"}
+              </div>
+
+              {/* Characteristic highlight tags */}
+              <div className="pt-4 border-t border-stone-100 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100/80 text-stone-700 text-xs font-medium">
+                  <Bed className="w-3.5 h-3.5 text-amber-600" /> สะอาด บรรยากาศสงบ
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100/80 text-stone-700 text-xs font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5 text-teal-700" /> ปลอดภัย น่าเชื่อถือ
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100/80 text-stone-700 text-xs font-medium">
+                  <Users className="w-3.5 h-3.5 text-stone-600" /> เหมาะสำหรับการพักผ่อนแบบครอบครัว
+                </span>
+              </div>
             </div>
 
+            {/* 3. Location & Direction Guide Card */}
             {accommodation.address && (
-              <div className="rounded-2xl border border-neutral-200 p-5">
-                <h3 className="text-sm font-bold text-neutral-900 mb-2 flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-neutral-400" /> ที่ตั้ง
-                </h3>
-                <p className="text-sm text-neutral-600 leading-relaxed mb-3">
+              <div className="rounded-3xl border border-stone-200/80 bg-white p-6 sm:p-7 shadow-sm">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-base font-bold text-stone-900">
+                      ที่ตั้งและการเดินทาง
+                    </h3>
+                  </div>
+                  <button
+                    onClick={handleCopyAddress}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-teal-700 hover:text-teal-900 px-2.5 py-1 rounded-md hover:bg-teal-50 transition cursor-pointer"
+                  >
+                    {copiedAddress ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" /> คัดลอกที่อยู่แล้ว
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" /> คัดลอกที่อยู่
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <p className="text-sm text-stone-600 leading-relaxed mb-4">
                   {accommodation.address}
                 </p>
-                <a
-                  href={mapsHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-semibold text-neutral-900 hover:underline"
-                >
-                  เปิดใน Google Maps →
-                </a>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={mapsHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white px-4.5 py-2.5 text-sm font-bold shadow-sm transition active:scale-95"
+                  >
+                    <Navigation className="w-4 h-4 text-amber-300" /> เปิดใน Google Maps
+                  </a>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Right — sticky action card */}
+          {/* Right Column — Sticky Action Card (Desktop) */}
           <div className="lg:col-span-1">
-            <div className="hidden lg:block sticky top-20 rounded-2xl border border-neutral-200 shadow-sm p-5 sm:p-6">
-              <div className="mb-5">{priceNode}</div>
+            <div className="hidden lg:block sticky top-20 rounded-3xl border border-stone-200/80 bg-white p-6 sm:p-7 shadow-xl shadow-stone-200/50">
+              <div className="mb-5 pb-4 border-b border-stone-100">
+                <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1.5">
+                  ราคาห้องพัก
+                </p>
+                {priceNode}
+              </div>
 
+              {/* Action Buttons */}
               <div className="space-y-3">
                 {lineHref && (
                   <a
                     href={lineHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl bg-[#00B900] text-sm font-bold text-white transition-colors hover:bg-[#009900]"
+                    className="inline-flex w-full h-12 items-center justify-center gap-2.5 rounded-xl bg-[#00B900] text-sm font-bold text-white shadow-md shadow-emerald-900/15 transition-all hover:bg-[#009900] active:scale-[0.98] cursor-pointer"
                   >
-                    <MessageSquare className="w-4 h-4" /> ติดต่อผ่าน LINE
+                    <MessageSquare className="w-4 h-4 text-white" /> ติดต่อผ่าน LINE
                   </a>
                 )}
+
                 {accommodation.contact_phone && (
                   <a
                     href={`tel:${accommodation.contact_phone}`}
-                    className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl bg-amber-600 text-sm font-bold text-white transition-colors hover:bg-amber-700"
+                    className="inline-flex w-full h-12 items-center justify-center gap-2.5 rounded-xl bg-teal-700 text-sm font-bold text-white shadow-md shadow-teal-900/15 transition-all hover:bg-teal-800 active:scale-[0.98] cursor-pointer"
                   >
-                    <Phone className="w-4 h-4" /> โทร {accommodation.contact_phone}
+                    <Phone className="w-4 h-4 text-amber-300" /> โทรจอง · {accommodation.contact_phone}
                   </a>
                 )}
+
                 {facebookHref && (
                   <a
                     href={facebookHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl border border-neutral-200 text-sm font-bold text-neutral-700 transition-colors hover:bg-neutral-50"
+                    className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl border border-stone-200/80 bg-white text-sm font-semibold text-stone-700 transition-all hover:bg-stone-50 hover:border-stone-300"
                   >
                     <FacebookIcon className="w-4 h-4 shrink-0" />
                     เข้าชมเพจ Facebook
                   </a>
                 )}
+
                 <a
                   href={mapsHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl border border-neutral-200 text-sm font-bold text-neutral-700 transition-colors hover:bg-neutral-50"
+                  className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl border border-stone-200/80 bg-white text-sm font-semibold text-stone-700 transition-all hover:bg-stone-50 hover:border-stone-300"
                 >
-                  <Navigation className="w-4 h-4" /> นำทางด้วย Google Maps
+                  <Navigation className="w-4 h-4 text-stone-500" /> นำทางด้วย Google Maps
                 </a>
               </div>
 
-              <p className="mt-4 text-center text-xs text-neutral-400">
-                แจ้งว่าติดต่อมาจากเว็บไซต์ของเรา
-              </p>
+              {/* Booking Tip Box */}
+              <div className="mt-6 p-4 rounded-2xl bg-amber-50/60 border border-amber-200/60">
+                <div className="flex items-start gap-2.5">
+                  <Compass className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-950/80 leading-relaxed">
+                    <strong className="font-semibold text-amber-950">
+                      คำแนะนำการจอง:{" "}
+                    </strong>
+                    ควรโทรสอบถามหรือติดต่อสำรองห้องพักล่วงหน้า โดยเฉพาะในช่วงวันหยุดสุดสัปดาห์หรือช่วงไฮซีซั่น
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Reviews */}
+        {/* ── Reviews Section ── */}
         <PlaceReviews
           reviews={reviews}
           currentUserId={user?.id}
@@ -523,15 +729,17 @@ export default function AccommodationDetail() {
           onSubmit={submitReview}
           onDelete={handleDeleteReview}
           copy={{
-            formHeading: "เขียนรีวิวของคุณ",
-            ratingLabel: "ให้คะแนนที่พักนี้",
-            placeholder: "ที่พักสะอาดไหม? ทำเลที่ตั้งดีหรือเปล่า? แชร์ให้ทุกคนรู้สิ...",
-            emptyText: "เป็นคนแรกที่แชร์ประสบการณ์การเข้าพักของคุณที่นี่!",
+            formHeading: "เขียนรีวิวที่พักนี้",
+            ratingLabel: "คุณให้คะแนนความประทับใจของที่พักนี้เท่าไหร่?",
+            placeholder:
+              "ห้องพักสะอาดไหม? บรรยากาศและการบริการดีไหม? แชร์ความประทับใจให้คนอื่นรู้เลย...",
+            emptyText:
+              "เป็นคนแรกที่แชร์ประสบการณ์การเข้าพักและความประทับใจของที่นี่สิ!",
           }}
         />
       </main>
 
-      {/* Mobile sticky bar */}
+      {/* ── Mobile Sticky Bar ── */}
       <DetailStickyBar
         price={<div className="text-sm">{priceNode}</div>}
         cta={primaryCta}

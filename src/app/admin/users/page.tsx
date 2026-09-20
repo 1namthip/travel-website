@@ -301,9 +301,9 @@ export default function AdminUsersPage() {
         />
       );
     return sort.direction === "asc" ? (
-      <ChevronUp size={14} className="text-zinc-900" />
+      <ChevronUp size={14} className="text-stone-900" />
     ) : (
-      <ChevronDown size={14} className="text-zinc-900" />
+      <ChevronDown size={14} className="text-stone-900" />
     );
   };
 
@@ -320,29 +320,35 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-24 font-sans text-zinc-900 selection:bg-blue-100 selection:text-blue-900">
-      <main className="max-w-6xl mx-auto pt-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#FAF9F6] pb-24 font-sans text-stone-900 selection:bg-teal-100 selection:text-teal-900">
+      <main className="max-w-6xl mx-auto pt-8 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-xl font-semibold tracking-tight text-zinc-900">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-teal-600" />
+            <span className="text-xs font-semibold tracking-wider text-teal-800 uppercase">
+              User Management
+            </span>
+          </div>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-stone-900">
             จัดการสมาชิกและผู้ดูแลระบบ
           </h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-stone-500">
             จัดการข้อมูลสมาชิก กำหนดสิทธิ์การใช้งาน และตรวจสอบสถานะบัญชีผู้ใช้
           </p>
         </div>
 
         {/* Stats strip */}
-        <div className="grid grid-cols-3 divide-x divide-zinc-200 rounded-xl border border-zinc-200 bg-white shadow-sm mb-8">
+        <div className="grid grid-cols-3 divide-x divide-stone-200/80 rounded-2xl border border-stone-200/80 bg-white shadow-xs mb-8 overflow-hidden">
           {[
             { key: "total", label: "สมาชิกทั้งหมด", value: loading ? "—" : stats.total },
             { key: "online", label: "ออนไลน์", value: loading ? "—" : stats.online, highlight: true },
-            { key: "admins", label: "แอดมิน", value: loading ? "—" : stats.admins },
+            { key: "admins", label: "แอดมิน", value: loading ? "—" : stats.admins, isAmber: true },
           ].map((stat) => (
             <div key={stat.key} className="flex flex-col px-5 py-4">
-              <span className="text-xs font-medium text-zinc-500">{stat.label}</span>
+              <span className="text-xs font-medium text-stone-500">{stat.label}</span>
               <div className="mt-1 flex items-center gap-2">
-                <span className="text-2xl font-semibold tracking-tight text-zinc-900 tabular-nums">
+                <span className="text-2xl font-bold tracking-tight text-stone-900 tabular-nums">
                   {typeof stat.value === "number"
                     ? stat.value.toLocaleString("th-TH")
                     : stat.value}
@@ -353,30 +359,36 @@ export default function AdminUsersPage() {
                   stat.value > 0 && (
                     <span className="h-2 w-2 rounded-full bg-emerald-500" />
                   )}
+                {stat.isAmber &&
+                  !loading &&
+                  typeof stat.value === "number" &&
+                  stat.value > 0 && (
+                    <span className="h-2 w-2 rounded-full bg-amber-500" />
+                  )}
               </div>
             </div>
           ))}
         </div>
 
         {/* Data Container (Unified Toolbar + Table) */}
-        <div className="bg-white rounded-xl border border-zinc-200 shadow-sm flex flex-col">
+        <div className="bg-white rounded-2xl border border-stone-200/80 shadow-xs flex flex-col overflow-hidden">
           {/* Integrated Toolbar */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between p-2.5 border-b border-zinc-200 gap-2.5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between p-3 border-b border-stone-200/80 gap-3 bg-stone-50/50">
             <div className="flex items-center gap-1.5">
               {(Object.keys(TAB_LABEL) as TabKey[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600/30 ${
                     activeTab === tab
-                      ? "bg-blue-600 text-white"
-                      : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
+                      ? "bg-teal-700 text-white shadow-xs"
+                      : "text-stone-600 hover:text-stone-900 hover:bg-stone-100"
                   }`}
                 >
                   {TAB_LABEL[tab]}
                   <span
                     className={`text-[11px] tabular-nums ${
-                      activeTab === tab ? "text-blue-100" : "text-zinc-400"
+                      activeTab === tab ? "text-teal-100" : "text-stone-400"
                     }`}
                   >
                     {loading ? "—" : TAB_COUNT[tab]}
@@ -387,7 +399,7 @@ export default function AdminUsersPage() {
 
             <div className="relative w-full md:w-64">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
                 size={16}
               />
               <input
@@ -395,12 +407,12 @@ export default function AdminUsersPage() {
                 placeholder="ค้นหาด้วยอีเมล..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full h-9 bg-white border border-zinc-200 text-zinc-900 rounded-lg pl-9 pr-9 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-zinc-400"
+                className="w-full h-9 bg-white border border-stone-200 text-stone-900 rounded-xl pl-9 pr-9 text-sm outline-none transition-all focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 placeholder:text-stone-400"
               />
               {searchInput && (
                 <button
                   onClick={() => setSearchInput("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 p-1 rounded-md transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-1 rounded-md transition-colors"
                 >
                   <X size={14} />
                 </button>
@@ -411,7 +423,7 @@ export default function AdminUsersPage() {
           {/* Desktop Table */}
           <div className="hidden md:block overflow-x-auto min-h-100">
             <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-transparent border-b border-zinc-200 text-zinc-500 text-xs font-medium">
+              <thead className="bg-stone-50/70 border-b border-stone-200/80 text-stone-500 text-xs font-semibold">
                 <tr>
                   <th className="pl-4 py-3 w-10">
                     <input
@@ -419,14 +431,14 @@ export default function AdminUsersPage() {
                       checked={allOnPageSelected}
                       onChange={toggleSelectAllOnPage}
                       aria-label="เลือกผู้ใช้ทั้งหมดในหน้านี้"
-                      className="w-3.5 h-3.5 rounded-sm border-zinc-300 accent-blue-600 text-blue-600 focus:ring-blue-500/30 cursor-pointer"
+                      className="w-4 h-4 rounded-md border-stone-300 accent-teal-700 text-teal-700 focus:ring-teal-600/30 cursor-pointer"
                     />
                   </th>
 
                   <th className="px-4 py-3">
                     <button
                       onClick={() => toggleSort("email")}
-                      className="flex items-center gap-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1 -ml-1"
+                      className="flex items-center gap-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 rounded px-1 -ml-1"
                     >
                       ผู้ใช้งาน <SortIcon column="email" />
                     </button>
@@ -437,7 +449,7 @@ export default function AdminUsersPage() {
                   <th className="px-4 py-3">
                     <button
                       onClick={() => toggleSort("isOnline")}
-                      className="flex items-center gap-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1 -ml-1"
+                      className="flex items-center gap-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 rounded px-1 -ml-1"
                     >
                       สถานะ <SortIcon column="isOnline" />
                     </button>
@@ -446,7 +458,7 @@ export default function AdminUsersPage() {
                   <th className="px-4 py-3">
                     <button
                       onClick={() => toggleSort("role")}
-                      className="flex items-center gap-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1 -ml-1"
+                      className="flex items-center gap-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 rounded px-1 -ml-1"
                     >
                       สิทธิ์ <SortIcon column="role" />
                     </button>
@@ -455,7 +467,7 @@ export default function AdminUsersPage() {
                   <th className="px-4 py-3">
                     <button
                       onClick={() => toggleSort("created_at")}
-                      className="flex items-center gap-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded px-1 -ml-1"
+                      className="flex items-center gap-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 rounded px-1 -ml-1"
                     >
                       วันที่สมัคร <SortIcon column="created_at" />
                     </button>
@@ -464,33 +476,33 @@ export default function AdminUsersPage() {
                   <th className="pr-4 py-3 text-right w-12"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100 bg-white">
+              <tbody className="divide-y divide-stone-100 bg-white">
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <tr key={i} className="animate-pulse">
                       <td className="pl-4 py-3">
-                        <div className="h-3.5 w-3.5 bg-zinc-100 rounded-sm" />
+                        <div className="h-4 w-4 bg-stone-100 rounded-md" />
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-6 h-6 rounded bg-zinc-100" />
-                          <div className="h-4 w-32 bg-zinc-100 rounded" />
+                          <div className="w-7 h-7 rounded-xl bg-stone-100" />
+                          <div className="h-4 w-32 bg-stone-100 rounded" />
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="h-4 w-16 bg-zinc-100 rounded" />
+                        <div className="h-4 w-16 bg-stone-100 rounded" />
                       </td>
                       <td className="px-4 py-3">
-                        <div className="h-4 w-20 bg-zinc-100 rounded" />
+                        <div className="h-4 w-20 bg-stone-100 rounded" />
                       </td>
                       <td className="px-4 py-3">
-                        <div className="h-5 w-14 bg-zinc-100 rounded-md" />
+                        <div className="h-5 w-14 bg-stone-100 rounded-md" />
                       </td>
                       <td className="px-4 py-3">
-                        <div className="h-4 w-24 bg-zinc-100 rounded" />
+                        <div className="h-4 w-24 bg-stone-100 rounded" />
                       </td>
                       <td className="pr-4 py-3">
-                        <div className="h-6 w-6 ml-auto bg-zinc-100 rounded" />
+                        <div className="h-6 w-6 ml-auto bg-stone-100 rounded" />
                       </td>
                     </tr>
                   ))
@@ -513,7 +525,7 @@ export default function AdminUsersPage() {
                     return (
                       <tr
                         key={u.id}
-                        className={`group transition-colors ${isSelected ? "bg-blue-50/50" : "hover:bg-zinc-50"}`}
+                        className={`group transition-colors ${isSelected ? "bg-teal-50/40" : "hover:bg-stone-50/70"}`}
                         onClick={() => toggleSelectOne(u.id)}
                       >
                         <td className="pl-4 py-3">
@@ -523,7 +535,7 @@ export default function AdminUsersPage() {
                             onChange={() => toggleSelectOne(u.id)}
                             onClick={(e) => e.stopPropagation()}
                             aria-label={`Select ${u.email}`}
-                            className="w-3.5 h-3.5 rounded-sm border-zinc-300 accent-blue-600 text-blue-600 focus:ring-blue-500/30 cursor-pointer"
+                            className="w-4 h-4 rounded-md border-stone-300 accent-teal-700 text-teal-700 focus:ring-teal-600/30 cursor-pointer"
                           />
                         </td>
 
@@ -531,7 +543,7 @@ export default function AdminUsersPage() {
                           <div className="flex items-center gap-2.5">
                             <div className="relative">
                               <div
-                                className="w-6 h-6 rounded bg-zinc-100 text-zinc-600 flex items-center justify-center text-[10px] font-medium uppercase shrink-0"
+                                className="w-7 h-7 rounded-xl bg-teal-50 border border-teal-200/80 text-teal-800 flex items-center justify-center text-[10px] font-bold uppercase shrink-0 shadow-2xs"
                               >
                                 {u.email?.charAt(0)}
                               </div>
@@ -539,16 +551,16 @@ export default function AdminUsersPage() {
                                 <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-500 border border-white rounded-full" />
                               )}
                             </div>
-                            <span className="font-medium text-zinc-900 truncate max-w-50">
+                            <span className="font-semibold text-stone-900 truncate max-w-50">
                               {u.email}
                             </span>
                             <button
                               onClick={(e) => copyEmail(e, u)}
-                              className="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-600 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded p-0.5"
+                              className="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-stone-600 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 rounded p-0.5 transition-opacity"
                               title="Copy email"
                             >
                               {copiedId === u.id ? (
-                                <Check size={13} className="text-emerald-500" />
+                                <Check size={13} className="text-emerald-600" />
                               ) : (
                                 <Copy size={13} />
                               )}
@@ -581,18 +593,18 @@ export default function AdminUsersPage() {
                               />
                             </svg>
                           ) : (
-                            <Mail size={16} className="text-zinc-500" />
+                            <Mail size={16} className="text-stone-400" />
                           )}
                         </td>
 
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1.5">
                             <div
-                              className={`w-1.5 h-1.5 rounded-full ${u.isOnline ? "bg-emerald-500" : "bg-zinc-300"}`}
+                              className={`w-2 h-2 rounded-full ${u.isOnline ? "bg-emerald-500" : "bg-stone-300"}`}
                             />
                             <span
                               className={
-                                u.isOnline ? "text-zinc-900" : "text-zinc-500"
+                                u.isOnline ? "text-stone-900 font-medium" : "text-stone-500"
                               }
                             >
                               {u.isOnline
@@ -604,23 +616,23 @@ export default function AdminUsersPage() {
 
                         <td className="px-4 py-3">
                           <span
-                            className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium ${
+                            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-semibold ${
                               isAdmin
-                                ? "bg-blue-50 text-blue-700 border border-blue-200"
-                                : "bg-zinc-50 text-zinc-700 border border-zinc-200"
+                                ? "bg-teal-50 text-teal-800 border border-teal-200/80 shadow-2xs"
+                                : "bg-stone-100 text-stone-700 border border-stone-200/80"
                             }`}
                           >
                             {isAdmin ? (
-                              <ShieldCheck size={12} strokeWidth={2.3} />
+                              <ShieldCheck size={13} strokeWidth={2.3} className="text-teal-700" />
                             ) : (
-                              <User size={12} strokeWidth={2.3} />
+                              <User size={13} strokeWidth={2.3} className="text-stone-500" />
                             )}
 
                             {isAdmin ? "แอดมิน" : "ผู้ใช้งาน"}
                           </span>
                         </td>
 
-                        <td className="px-4 py-2 text-zinc-500">
+                        <td className="px-4 py-2 text-stone-500 text-xs">
                           {new Date(u.created_at).toLocaleString("th-TH", {
                             year: "numeric",
                             month: "short",
@@ -633,7 +645,7 @@ export default function AdminUsersPage() {
                         <td className="pr-4 py-3 text-right relative">
                           <button
                             onClick={(e) => toggleMenu(e, u.id)}
-                            className="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            className="p-1.5 text-stone-400 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
                             aria-expanded={openMenuId === u.id}
                             aria-haspopup="true"
                           >
@@ -648,7 +660,7 @@ export default function AdminUsersPage() {
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.98, y: 4 }}
                                 transition={{ duration: 0.12 }}
-                                className="absolute right-4 top-10 w-44 bg-white rounded-lg shadow-lg border border-zinc-200 py-1 z-50 overflow-hidden"
+                                className="absolute right-4 top-10 w-44 bg-white rounded-xl shadow-xl border border-stone-200/80 py-1 z-50 overflow-hidden"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {isAdmin ? (
@@ -662,9 +674,9 @@ export default function AdminUsersPage() {
                                       });
                                       setOpenMenuId(null);
                                     }}
-                                    className="w-full text-left px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-2"
+                                    className="w-full text-left px-3 py-2 text-xs font-medium text-stone-700 hover:bg-stone-50 flex items-center gap-2 transition-colors"
                                   >
-                                    <User size={14} className="text-zinc-400" />{" "}
+                                    <User size={14} className="text-stone-400" />{" "}
                                     ลดสิทธิ์เป็นผู้ใช้
                                   </button>
                                 ) : (
@@ -678,16 +690,16 @@ export default function AdminUsersPage() {
                                       });
                                       setOpenMenuId(null);
                                     }}
-                                    className="w-full text-left px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-2"
+                                    className="w-full text-left px-3 py-2 text-xs font-medium text-teal-800 hover:bg-teal-50 flex items-center gap-2 transition-colors"
                                   >
                                     <Shield
                                       size={14}
-                                      className="text-zinc-400"
+                                      className="text-teal-600"
                                     />{" "}
                                     เลื่อนเป็นแอดมิน
                                   </button>
                                 )}
-                                <div className="h-px bg-zinc-100 my-1" />
+                                <div className="h-px bg-stone-100 my-1" />
                                 <button
                                   onClick={() => {
                                     setDialog({
@@ -697,11 +709,11 @@ export default function AdminUsersPage() {
                                     });
                                     setOpenMenuId(null);
                                   }}
-                                  className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                  className="w-full text-left px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors"
                                 >
                                   <Trash2
                                     size={14}
-                                    className="text-red-500/70"
+                                    className="text-rose-500/70"
                                   />{" "}
                                   ลบบัญชี
                                 </button>
@@ -717,16 +729,15 @@ export default function AdminUsersPage() {
             </table>
           </div>
 
-          {/* Mobile view logic (simplified for enterprise brevity, maintaining same aesthetics) */}
-          <div className="md:hidden divide-y divide-zinc-100 bg-white">
-            {/* Same conditional rendering structure as desktop, adapted for mobile list */}
+          {/* Mobile view */}
+          <div className="md:hidden divide-y divide-stone-100 bg-white">
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="p-4 animate-pulse flex gap-3">
-                  <div className="w-8 h-8 rounded bg-zinc-100 shrink-0" />
+                  <div className="w-8 h-8 rounded-xl bg-stone-100 shrink-0" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 w-32 bg-zinc-100 rounded" />
-                    <div className="h-3 w-20 bg-zinc-100 rounded" />
+                    <div className="h-4 w-32 bg-stone-100 rounded" />
+                    <div className="h-3 w-20 bg-stone-100 rounded" />
                   </div>
                 </div>
               ))
@@ -752,18 +763,18 @@ export default function AdminUsersPage() {
                         checked={selectedIds.has(u.id)}
                         onChange={() => toggleSelectOne(u.id)}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-4 h-4 rounded-sm border-zinc-300 accent-blue-600 text-blue-600"
+                        className="w-4 h-4 rounded-md border-stone-300 accent-teal-700 text-teal-700"
                       />
                       <div
-                        className="w-8 h-8 rounded bg-zinc-100 text-zinc-600 flex items-center justify-center text-[11px] font-medium uppercase shrink-0"
+                        className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200/80 text-teal-800 flex items-center justify-center text-[11px] font-bold uppercase shrink-0"
                       >
                         {u.email?.charAt(0)}
                       </div>
                       <div>
-                        <p className="font-medium text-sm text-zinc-900 truncate max-w-45">
+                        <p className="font-semibold text-sm text-stone-900 truncate max-w-45">
                           {u.email}
                         </p>
-                        <p className="text-xs text-zinc-500">
+                        <p className="text-xs text-stone-500">
                           {u.role === "admin" ? "Admin" : "User"} ·{" "}
                           {u.isOnline ? "Online" : timeAgo(u.last_sign_in_at)}
                         </p>
@@ -771,7 +782,7 @@ export default function AdminUsersPage() {
                     </div>
                     <button
                       onClick={(e) => toggleMenu(e, u.id)}
-                      className="p-1.5 text-zinc-400 hover:text-zinc-900 rounded"
+                      className="p-1.5 text-stone-400 hover:text-stone-900 rounded-lg"
                     >
                       <MoreHorizontal size={16} />
                     </button>
@@ -780,7 +791,7 @@ export default function AdminUsersPage() {
                   {/* Mobile Action Menu Overlay */}
                   {openMenuId === u.id && (
                     <div
-                      className="mt-2 p-2 bg-zinc-50 rounded-lg border border-zinc-200 flex flex-col gap-1"
+                      className="mt-2 p-2 bg-stone-50 rounded-xl border border-stone-200 flex flex-col gap-1"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
@@ -793,7 +804,7 @@ export default function AdminUsersPage() {
                           });
                           setOpenMenuId(null);
                         }}
-                        className="text-left px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-100 rounded"
+                        className="text-left px-3 py-2 text-xs font-medium text-stone-700 hover:bg-stone-100 rounded-lg"
                       >
                         {u.role === "admin"
                           ? "ลดสิทธิ์เป็นผู้ใช้"
@@ -808,7 +819,7 @@ export default function AdminUsersPage() {
                           });
                           setOpenMenuId(null);
                         }}
-                        className="text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded"
+                        className="text-left px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-lg"
                       >
                         ลบบัญชี
                       </button>
@@ -821,18 +832,18 @@ export default function AdminUsersPage() {
 
           {/* Pagination */}
           {!loading && sortedUsers.length > 0 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-200 bg-zinc-50/50">
-              <p className="text-xs text-zinc-500">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-stone-200/80 bg-stone-50/50">
+              <p className="text-xs text-stone-500">
                 แสดง{" "}
-                <span className="font-medium text-zinc-900">
+                <span className="font-semibold text-stone-900">
                   {(page - 1) * ROWS_PER_PAGE + 1}
                 </span>
                 –
-                <span className="font-medium text-zinc-900">
+                <span className="font-semibold text-stone-900">
                   {Math.min(page * ROWS_PER_PAGE, sortedUsers.length)}
                 </span>{" "}
                 จาก{" "}
-                <span className="font-medium text-zinc-900">
+                <span className="font-semibold text-stone-900">
                   {sortedUsers.length}
                 </span>{" "}
                 รายการ
@@ -841,14 +852,14 @@ export default function AdminUsersPage() {
                 <button
                   disabled={page === 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-zinc-500 border border-zinc-200 bg-white hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                  className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-stone-500 border border-stone-200 bg-white hover:bg-stone-50 hover:text-stone-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                 >
                   <ChevronLeft size={16} />
                 </button>
                 <button
                   disabled={page === totalPages}
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-zinc-500 border border-zinc-200 bg-white hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                  className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-stone-500 border border-stone-200 bg-white hover:bg-stone-50 hover:text-stone-900 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -867,33 +878,33 @@ export default function AdminUsersPage() {
               transition={{ duration: 0.15 }}
               className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
             >
-              <div className="flex items-center gap-3 px-4 py-2.5 bg-zinc-900 text-white rounded-xl shadow-lg border border-zinc-800">
-                <span className="text-xs font-medium px-1">
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-stone-900 text-white rounded-2xl shadow-xl border border-stone-800">
+                <span className="text-xs font-semibold px-1">
                   เลือกแล้ว {selectedIds.size} รายการ
                 </span>
-                <div className="w-px h-4 bg-zinc-700" />
+                <div className="w-px h-4 bg-stone-700" />
                 <button
                   onClick={() => openBulkRoleDialog("admin")}
-                  className="text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 px-2 py-1 rounded-md transition-colors"
+                  className="text-xs font-semibold text-teal-300 hover:text-teal-200 hover:bg-stone-800 px-2.5 py-1 rounded-lg transition-colors"
                 >
                   ตั้งเป็นแอดมิน
                 </button>
                 <button
                   onClick={() => openBulkRoleDialog("user")}
-                  className="text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 px-2 py-1 rounded-md transition-colors"
+                  className="text-xs font-semibold text-stone-300 hover:text-white hover:bg-stone-800 px-2.5 py-1 rounded-lg transition-colors"
                 >
                   ตั้งเป็นผู้ใช้
                 </button>
                 <button
                   onClick={openBulkDeleteDialog}
-                  className="text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-400/10 px-2 py-1 rounded-md transition-colors"
+                  className="text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 px-2.5 py-1 rounded-lg transition-colors"
                 >
                   ลบ
                 </button>
-                <div className="w-px h-4 bg-zinc-700 ml-1" />
+                <div className="w-px h-4 bg-stone-700 ml-1" />
                 <button
                   onClick={() => setSelectedIds(new Set())}
-                  className="p-1.5 text-zinc-400 hover:text-white transition-colors rounded-md"
+                  className="p-1.5 text-stone-400 hover:text-white transition-colors rounded-lg"
                   aria-label="ล้างการเลือก"
                 >
                   <X size={14} />
@@ -903,7 +914,7 @@ export default function AdminUsersPage() {
           )}
         </AnimatePresence>
 
-        {/* Dialog (Props structure kept exactly the same for compatibility) */}
+        {/* Dialog */}
         <ConfirmDialog
           open={!!dialog}
           danger={dialog?.type === "delete"}
@@ -924,7 +935,7 @@ export default function AdminUsersPage() {
                   dialog.ids.length > 1 ? (
                     <>
                       กำลังจะลบผู้ใช้{" "}
-                      <span className="font-semibold text-zinc-900">
+                      <span className="font-semibold text-stone-900">
                         {dialog.ids.length} คน
                       </span>{" "}
                       อย่างถาวร รวมถึงข้อมูลที่เกี่ยวข้องทั้งหมด และกู้คืนไม่ได้
@@ -932,7 +943,7 @@ export default function AdminUsersPage() {
                   ) : (
                     <>
                       กำลังจะลบผู้ใช้{" "}
-                      <span className="font-semibold text-zinc-900">
+                      <span className="font-semibold text-stone-900">
                         {dialog.emails[0]}
                       </span>{" "}
                       อย่างถาวร และกู้คืนไม่ได้
@@ -941,11 +952,11 @@ export default function AdminUsersPage() {
                 ) : dialog.ids.length > 1 ? (
                   <>
                     ยืนยันการเปลี่ยนสิทธิ์ของผู้ใช้{" "}
-                    <span className="font-semibold text-zinc-900">
+                    <span className="font-semibold text-stone-900">
                       {dialog.ids.length} คน
                     </span>{" "}
                     เป็น{" "}
-                    <span className="font-semibold text-zinc-900">
+                    <span className="font-semibold text-teal-800">
                       {dialog.newRole === "admin" ? "แอดมิน" : "ผู้ใช้"}
                     </span>
                     ?
@@ -953,11 +964,11 @@ export default function AdminUsersPage() {
                 ) : (
                   <>
                     ยืนยันการเปลี่ยนสิทธิ์ของ{" "}
-                    <span className="font-semibold text-zinc-900">
+                    <span className="font-semibold text-stone-900">
                       {dialog.emails[0]}
                     </span>{" "}
                     เป็น{" "}
-                    <span className="font-semibold text-zinc-900">
+                    <span className="font-semibold text-teal-800">
                       {dialog.newRole === "admin" ? "แอดมิน" : "ผู้ใช้"}
                     </span>
                     ?
@@ -1002,15 +1013,15 @@ function EmptyState({
 
   return (
     <div className="flex flex-col items-center justify-center py-8">
-      <div className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-lg flex items-center justify-center mb-4">
-        <Search size={18} className="text-zinc-400" />
+      <div className="w-10 h-10 bg-stone-50 border border-stone-200 rounded-xl flex items-center justify-center mb-4 text-stone-400">
+        <Search size={18} />
       </div>
-      <h3 className="text-sm font-semibold text-zinc-900">{title}</h3>
-      <p className="text-sm text-zinc-500 mt-1 max-w-sm mx-auto">{subtitle}</p>
+      <h3 className="text-sm font-semibold text-stone-900">{title}</h3>
+      <p className="text-sm text-stone-500 mt-1 max-w-sm mx-auto">{subtitle}</p>
       {searchQuery && (
         <button
           onClick={onClear}
-          className="mt-4 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+          className="mt-4 text-sm font-semibold text-teal-700 hover:text-teal-800 transition-colors"
         >
           ล้างการค้นหา
         </button>

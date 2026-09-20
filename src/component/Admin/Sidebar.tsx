@@ -145,21 +145,21 @@ export default function Sidebar() {
   return (
     <>
       {/* ── Mobile Header ───────────────────────────────────────────── */}
-      <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 lg:hidden">
+      <header className="flex items-center justify-between border-b border-stone-200/80 bg-white px-4 py-3 lg:hidden">
         <button
           onClick={() => setMobileOpen(true)}
           aria-label="เปิดเมนู"
           className="
             flex h-9 w-9 items-center justify-center rounded-lg
-            border border-zinc-200 text-zinc-500
-            transition-colors hover:bg-zinc-100 hover:text-zinc-900
+            border border-stone-200 text-stone-500
+            transition-colors hover:bg-stone-100 hover:text-stone-900
           "
         >
           <Menu className="h-4 w-4" />
         </button>
 
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 ring-1 ring-blue-200">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 ring-1 ring-teal-200">
             <Image
               src="/images/logo-travel.png"
               alt="Logo"
@@ -169,7 +169,7 @@ export default function Sidebar() {
               priority
             />
           </div>
-          <span className="text-sm font-semibold tracking-tight text-zinc-900">
+          <span className="text-sm font-semibold tracking-tight text-stone-900">
             เที่ยวโคราช
           </span>
         </div>
@@ -178,7 +178,7 @@ export default function Sidebar() {
           onClick={handleSignOut}
           disabled={signingOut}
           aria-label="ออกจากระบบ"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-40"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent text-stone-500 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
         >
           {signingOut ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -193,7 +193,7 @@ export default function Sidebar() {
         <div
           onClick={() => setMobileOpen(false)}
           aria-hidden="true"
-          className="fixed inset-0 z-40 bg-zinc-950/20 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-stone-950/20 backdrop-blur-xs lg:hidden"
         />
       )}
 
@@ -201,7 +201,7 @@ export default function Sidebar() {
       <aside
         className={[
           "fixed left-0 top-0 z-50 flex h-screen flex-col",
-          "border-r border-zinc-200 bg-white",
+          "border-r border-stone-200/80 bg-white",
           "transition-[width,transform] duration-300 ease-in-out",
           "lg:sticky lg:translate-x-0",
           collapsed ? "w-18" : "w-60",
@@ -214,9 +214,9 @@ export default function Sidebar() {
           aria-label={collapsed ? "ขยาย Sidebar" : "ย่อ Sidebar"}
           className="
             absolute -right-3.5 top-4.25 z-50 hidden h-7 w-7 items-center justify-center
-            rounded-full border border-zinc-200 bg-white
-            text-zinc-500 shadow-sm
-            transition-colors hover:text-zinc-900
+            rounded-full border border-stone-200 bg-white
+            text-stone-500 shadow-2xs
+            transition-colors hover:text-stone-900 cursor-pointer
             lg:flex
           "
         >
@@ -226,13 +226,13 @@ export default function Sidebar() {
         </button>
 
         {/* ── Logo / Header ──────────────────────────────────────── */}
-        <div className="flex h-15 shrink-0 items-center border-b border-zinc-200 px-3.5">
+        <div className="flex h-15 shrink-0 items-center border-b border-stone-200/80 px-3.5">
           <Link
             href="/dashboard"
             className="group flex items-center gap-3 px-2 w-full min-w-0"
           >
             {/* Logo */}
-            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg">
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl shadow-2xs">
               <Image
                 src="/images/logo-travel.png"
                 alt="เที่ยวตามงบโคราช"
@@ -248,11 +248,11 @@ export default function Sidebar() {
                 collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
               }`}
             >
-              <p className="truncate text-sm font-semibold tracking-tight text-zinc-900">
-                เที่ยวตามงบ<span className="text-blue-600">โคราช</span>
+              <p className="truncate text-sm font-bold tracking-tight text-stone-900">
+                เที่ยวตามงบ<span className="text-teal-700">โคราช</span>
               </p>
-              <p className="mt-0.5 truncate text-xs text-zinc-500">
-                หน้าจัดการระบบของเว็บไซต์
+              <p className="mt-0.5 truncate text-[11px] text-stone-500 font-medium">
+                ระบบจัดการเว็บไซต์
               </p>
             </div>
           </Link>
@@ -261,7 +261,7 @@ export default function Sidebar() {
           <button
             onClick={() => setMobileOpen(false)}
             aria-label="ปิดเมนู"
-            className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 lg:hidden"
+            className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-stone-500 hover:text-stone-900 lg:hidden"
           >
             <X className="h-4 w-4" />
           </button>
@@ -269,7 +269,7 @@ export default function Sidebar() {
 
         {/* ── Navigation ─────────────────────────────────────────── */}
         <nav
-          className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
           aria-label="Navigation"
         >
           <div className="space-y-4">
@@ -277,11 +277,11 @@ export default function Sidebar() {
               <div key={group.label}>
                 {/* Group header */}
                 {!collapsed ? (
-                  <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                  <p className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-wider text-stone-400">
                     {group.label}
                   </p>
                 ) : (
-                  <div className="mx-auto mb-2 h-px w-5 rounded-full bg-zinc-200" />
+                  <div className="mx-auto mb-2 h-px w-5 rounded-full bg-stone-200" />
                 )}
 
                 <ul className="space-y-0.5" role="list">
@@ -295,20 +295,20 @@ export default function Sidebar() {
                           href={item.href}
                           aria-current={active ? "page" : undefined}
                           className={[
-                            "group relative flex h-9 items-center rounded-lg min-w-0",
-                            "outline-none transition-colors duration-150",
-                            "focus-visible:ring-2 focus-visible:ring-blue-500/40",
+                            "group relative flex h-9 items-center rounded-xl min-w-0",
+                            "outline-none transition-all duration-150",
+                            "focus-visible:ring-2 focus-visible:ring-teal-500/40",
                             collapsed ? "justify-center px-0" : "px-2.5",
                             active
-                              ? "bg-blue-50/90 text-blue-700 font-semibold"
-                              : "text-zinc-600 hover:bg-zinc-100/80 hover:text-zinc-900",
+                              ? "bg-teal-50 text-teal-800 font-semibold shadow-2xs"
+                              : "text-stone-600 hover:bg-stone-100/80 hover:text-stone-900",
                           ].join(" ")}
                         >
                           {/* Active indicator */}
                           {active && (
                             <span
                               aria-hidden="true"
-                              className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-md bg-blue-600"
+                              className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-md bg-teal-700"
                             />
                           )}
 
@@ -316,15 +316,15 @@ export default function Sidebar() {
                             aria-hidden="true"
                             className={`h-4 w-4 shrink-0 transition-colors ${
                               active
-                                ? "text-blue-600"
-                                : "text-zinc-400 group-hover:text-zinc-600"
+                                ? "text-teal-700"
+                                : "text-stone-400 group-hover:text-stone-600"
                             }`}
                           />
 
                           {/* Text */}
                           <div
                             className={`flex items-center overflow-hidden transition-all duration-300 ${
-                              collapsed ? "w-0 opacity-0" : "flex-1 w-auto opacity-100 ml-2"
+                              collapsed ? "w-0 opacity-0" : "flex-1 w-auto opacity-100 ml-2.5"
                             }`}
                           >
                             <span className="truncate text-[13px] font-medium block w-full">
@@ -344,42 +344,42 @@ export default function Sidebar() {
         </nav>
 
         {/* ── User Panel ─────────────────────────────────────────── */}
-        <div className="shrink-0 border-t border-zinc-200 p-3">
+        <div className="shrink-0 border-t border-stone-200/80 p-3">
           {loading ? (
             <div className="flex h-12 items-center justify-center">
-              <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
+              <Loader2 className="h-4 w-4 animate-spin text-stone-400" />
             </div>
           ) : (
             <div
               className={[
-                "relative flex items-center rounded-lg min-w-0",
-                "border border-zinc-200 bg-zinc-50",
-                "transition-colors hover:border-zinc-300",
+                "relative flex items-center rounded-xl min-w-0",
+                "border border-stone-200/80 bg-stone-50/60",
+                "transition-colors hover:border-stone-300",
                 collapsed ? "justify-center p-2" : "p-2",
               ].join(" ")}
             >
               {/* Avatar */}
               <div className="relative shrink-0">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-[13px] font-semibold text-zinc-600">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-[13px] font-bold text-teal-800 ring-1 ring-teal-200/60">
                   {avatarInitial}
                 </div>
                 <span
                   aria-label="Online"
-                  className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-400"
+                  className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500"
                 />
               </div>
 
               {/* Info */}
               <div
                 className={`flex items-center overflow-hidden transition-all duration-300 ${
-                  collapsed ? "w-0 opacity-0" : "flex-1 w-auto opacity-100 ml-2"
+                  collapsed ? "w-0 opacity-0" : "flex-1 w-auto opacity-100 ml-2.5"
                 }`}
               >
                 <div className="min-w-0 flex-1 overflow-hidden pr-1">
-                  <p className="truncate text-[13px] font-semibold capitalize leading-none text-zinc-900">
+                  <p className="truncate text-[13px] font-semibold capitalize leading-none text-stone-900">
                     {displayName}
                   </p>
-                  <p className="mt-1 truncate text-[10px] uppercase leading-none tracking-[0.04em] text-zinc-400">
+                  <p className="mt-1 truncate text-[10px] uppercase leading-none tracking-[0.04em] text-teal-700 font-semibold">
                     Administrator
                   </p>
                 </div>
@@ -389,7 +389,7 @@ export default function Sidebar() {
                   disabled={signingOut}
                   aria-label="ออกจากระบบ"
                   title="ออกจากระบบ"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-40"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-stone-400 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40 cursor-pointer"
                 >
                   {signingOut ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -405,7 +405,7 @@ export default function Sidebar() {
                   onClick={handleSignOut}
                   disabled={signingOut}
                   aria-label="ออกจากระบบ"
-                  className="group absolute inset-0 z-10 h-full w-full cursor-pointer rounded-lg"
+                  className="group absolute inset-0 z-10 h-full w-full cursor-pointer rounded-xl"
                 >
                   <Tooltip label="ออกจากระบบ" />
                 </button>

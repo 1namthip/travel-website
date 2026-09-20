@@ -415,16 +415,16 @@ export const AddAccommodationModal = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 15 }}
             transition={{ duration: 0.23, ease: "easeOut" }}
-            className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl border border-zinc-200 flex flex-col max-h-[85vh] overflow-hidden"
+            className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-stone-200/80 flex flex-col max-h-[85vh] overflow-hidden"
           >
             {/* Modal Sub-Header Node */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white z-10 shrink-0">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200/80 bg-stone-50/50 z-10 shrink-0">
               <div>
-                <h2 className="text-[15px] font-semibold text-zinc-900 tracking-tight flex items-center gap-2">
-                  <Building2 size={15} className="text-zinc-400" />
+                <h2 className="text-[15px] font-bold text-stone-900 tracking-tight flex items-center gap-2">
+                  <Building2 size={16} className="text-teal-700" />
                   {editAccommodation ? "แก้ไขข้อมูลที่พัก" : "เพิ่มที่พักใหม่"}
                 </h2>
-                <p className="text-xs text-zinc-400 mt-0.5">
+                <p className="text-xs text-stone-500 mt-0.5">
                   {editAccommodation ? "ปรับปรุงรายละเอียดของที่พักในระบบ" : "เพิ่มข้อมูลที่พักใหม่เข้าสู่ระบบ"}
                 </p>
               </div>
@@ -432,7 +432,7 @@ export const AddAccommodationModal = ({
                 type="button"
                 onClick={() => { resetForm(); onClose(); }}
                 disabled={submitting || uploading}
-                className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+                className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
               >
                 <X size={16} strokeWidth={2.2} />
               </button>
@@ -449,9 +449,9 @@ export const AddAccommodationModal = ({
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-xs font-medium border border-red-200/60 flex items-center gap-2"
+                      className="bg-rose-50 text-rose-700 px-4 py-3 rounded-xl text-xs font-medium border border-rose-200 flex items-center gap-2"
                     >
-                      <AlertCircle size={14} className="shrink-0 text-red-500" />
+                      <AlertCircle size={14} className="shrink-0 text-rose-500" />
                       <span>{error}</span>
                     </motion.div>
                   )}
@@ -459,9 +459,9 @@ export const AddAccommodationModal = ({
 
                 {/* MODULE LAYER: MEDIA MANAGEMENT DECK */}
                 <div className="space-y-2">
-                  <label className="block text-[13px] font-medium text-zinc-700">
+                  <label className="block text-[13px] font-semibold text-stone-800">
                     รูปภาพ / วิดีโอที่พักประกอบการตัดสินใจ{" "}
-                    <span className="text-zinc-400 font-normal">
+                    <span className="text-stone-400 font-normal">
                       ({totalImages}/{MAX_IMAGES} รูป · {totalVideos}/{MAX_VIDEOS} วิดีโอ)
                     </span>
                   </label>
@@ -473,55 +473,55 @@ export const AddAccommodationModal = ({
                     videoPreviews.length > 0) && (
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-2">
                       {existingImages.map((image, index) => (
-                        <div key={`existing-img-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-50">
+                        <div key={`existing-img-${index}`} className="relative group aspect-square rounded-xl overflow-hidden border border-stone-200 shadow-2xs bg-stone-50">
                           <img src={image} alt="" className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button type="button" onClick={() => removeExistingImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                          <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button type="button" onClick={() => removeExistingImage(index)} className="p-1.5 bg-white text-stone-900 shadow rounded-lg hover:bg-stone-50 hover:text-rose-600 transition-all scale-95 group-hover:scale-100">
                               <Trash2 size={13} />
                             </button>
                           </div>
                         </div>
                       ))}
                       {imagePreviews.map((preview, index) => (
-                        <div key={`new-img-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-50">
+                        <div key={`new-img-${index}`} className="relative group aspect-square rounded-xl overflow-hidden border border-stone-900/10 shadow-2xs bg-stone-50">
                           <img src={preview} alt="" className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button type="button" onClick={() => removeNewImage(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                          <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button type="button" onClick={() => removeNewImage(index)} className="p-1.5 bg-white text-stone-900 shadow rounded-lg hover:bg-stone-50 hover:text-rose-600 transition-all scale-95 group-hover:scale-100">
                               <Trash2 size={13} />
                             </button>
                           </div>
-                          <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-zinc-900 text-white px-1 py-0.5 rounded">NEW</span>
+                          <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-teal-800 text-teal-100 px-1.5 py-0.5 rounded-md shadow-2xs">NEW</span>
                         </div>
                       ))}
                       {existingVideos.map((video, index) => (
-                        <div key={`existing-vid-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-200 shadow-sm bg-zinc-900">
+                        <div key={`existing-vid-${index}`} className="relative group aspect-square rounded-xl overflow-hidden border border-stone-200 shadow-2xs bg-stone-900">
                           <video src={video} muted playsInline preload="metadata" className="w-full h-full object-cover" />
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="w-8 h-8 rounded-full bg-zinc-950/55 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-stone-950/60 flex items-center justify-center">
                               <Play size={13} className="text-white fill-white ml-0.5" />
                             </div>
                           </div>
-                          <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button type="button" onClick={() => removeExistingVideo(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                          <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button type="button" onClick={() => removeExistingVideo(index)} className="p-1.5 bg-white text-stone-900 shadow rounded-lg hover:bg-stone-50 hover:text-rose-600 transition-all scale-95 group-hover:scale-100">
                               <Trash2 size={13} />
                             </button>
                           </div>
                         </div>
                       ))}
                       {videoPreviews.map((preview, index) => (
-                        <div key={`new-vid-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-zinc-900/10 shadow-sm bg-zinc-900">
+                        <div key={`new-vid-${index}`} className="relative group aspect-square rounded-xl overflow-hidden border border-stone-900/10 shadow-2xs bg-stone-900">
                           <video src={preview} muted playsInline preload="metadata" className="w-full h-full object-cover" />
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="w-8 h-8 rounded-full bg-zinc-950/55 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-stone-950/60 flex items-center justify-center">
                               <Play size={13} className="text-white fill-white ml-0.5" />
                             </div>
                           </div>
-                          <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button type="button" onClick={() => removeNewVideo(index)} className="p-1.5 bg-white text-zinc-900 shadow rounded-md hover:bg-zinc-50 hover:text-red-600 transition-all scale-95 group-hover:scale-100">
+                          <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button type="button" onClick={() => removeNewVideo(index)} className="p-1.5 bg-white text-stone-900 shadow rounded-lg hover:bg-stone-50 hover:text-rose-600 transition-all scale-95 group-hover:scale-100">
                               <Trash2 size={13} />
                             </button>
                           </div>
-                          <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-zinc-900 text-white px-1 py-0.5 rounded">NEW</span>
+                          <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-teal-800 text-teal-100 px-1.5 py-0.5 rounded-md shadow-2xs">NEW</span>
                         </div>
                       ))}
                     </div>
@@ -534,54 +534,54 @@ export const AddAccommodationModal = ({
                       onDragLeave={onDragLeave}
                       onDrop={onDrop}
                       onClick={() => fileInputRef.current?.click()}
-                      className={`relative flex flex-col items-center justify-center w-full min-h-35 p-4 transition-all border border-dashed rounded-lg cursor-pointer
-                        ${isDragging ? "border-zinc-500 bg-zinc-100/70" : "border-zinc-300 hover:border-zinc-400 bg-zinc-50/50 hover:bg-zinc-50"}`}
+                      className={`relative flex flex-col items-center justify-center w-full min-h-35 p-4 transition-all border border-dashed rounded-2xl cursor-pointer
+                        ${isDragging ? "border-teal-600 bg-teal-50/40" : "border-stone-300 hover:border-teal-500 bg-stone-50/50 hover:bg-stone-50"}`}
                     >
                       <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={handleImageChange} className="hidden" />
-                      <div className="p-2 bg-white shadow-sm border border-zinc-200/80 rounded-md text-zinc-400 mb-2">
-                        <ImageIcon size={18} strokeWidth={1.8} />
+                      <div className="p-2.5 bg-white shadow-2xs border border-stone-200/80 rounded-xl text-teal-700 mb-2">
+                        <ImageIcon size={20} strokeWidth={1.8} />
                       </div>
-                      <p className="text-xs font-medium text-zinc-900">
-                        คลิกเพื่อเลือกไฟล์ <span className="font-normal text-zinc-400">หรือลากไฟล์มาวางที่นี่</span>
+                      <p className="text-xs font-semibold text-stone-900">
+                        คลิกเพื่อเลือกไฟล์ <span className="font-normal text-stone-400">หรือลากไฟล์มาวางที่นี่</span>
                       </p>
-                      <p className="text-[10px] text-zinc-400 mt-0.5">
+                      <p className="text-[10px] text-stone-400 mt-0.5">
                         รูป JPG/PNG/WEBP ≤ 5MB · วิดีโอ MP4/WEBM ≤ 50MB (สูงสุด {MAX_VIDEOS} คลิป) · ต้องมีรูปอย่างน้อย 1 รูปก่อนแนบวิดีโอ
                       </p>
                     </div>
                   )}
                 </div>
 
-                <div className="h-px bg-zinc-100" />
+                <div className="h-px bg-stone-200/70" />
 
                 {/* MODULE LAYER: GENERAL META INPUT FIELDS */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-1 space-y-1.5">
-                    <label className="text-[13px] font-medium text-zinc-700 flex items-center gap-1">
-                      <FileText size={13} className="text-zinc-400" /> ชื่อที่พัก <span className="text-red-500">*</span>
+                    <label className="text-[13px] font-semibold text-stone-800 flex items-center gap-1">
+                      <FileText size={13} className="text-teal-700" /> ชื่อที่พัก <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-stone-200 rounded-xl bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400"
                       placeholder="ระบุชื่อหอพัก หรือชื่อโครงการที่พัก"
                     />
                   </div>
 
                   {/* CUSTOM PREMIUM DROPDOWN ENGINE */}
                   <div className="md:col-span-1 space-y-1.5" ref={dropdownRef}>
-                    <label className="text-[13px] font-medium text-zinc-700">ประเภทที่พัก</label>
+                    <label className="text-[13px] font-semibold text-stone-800">ประเภทที่พัก</label>
                     <div className="relative">
                       <button
                         type="button"
                         onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                        className={`w-full pl-3 pr-3 py-2 text-sm border rounded-lg bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
-                          isCategoryOpen ? "border-zinc-400 ring-4 ring-zinc-900/5" : "border-zinc-200 hover:border-zinc-300"
-                        } text-zinc-900`}
+                        className={`w-full pl-3.5 pr-3 py-2 text-sm border rounded-xl bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 ${
+                          isCategoryOpen ? "border-teal-600 ring-2 ring-teal-600/20" : "border-stone-200 hover:border-stone-300"
+                        } text-stone-900`}
                       >
-                        <span>{formData.category}</span>
-                        <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${isCategoryOpen ? "rotate-180" : ""}`} />
+                        <span className="font-medium">{formData.category}</span>
+                        <ChevronDown size={14} className={`text-stone-400 transition-transform duration-200 ${isCategoryOpen ? "rotate-180" : ""}`} />
                       </button>
 
                       <AnimatePresence>
@@ -591,7 +591,7 @@ export const AddAccommodationModal = ({
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 4, scale: 0.98 }}
                             transition={{ duration: 0.13 }}
-                            className="absolute synchronized-dropdown z-50 w-full mt-1 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 overflow-hidden"
+                            className="absolute synchronized-dropdown z-50 w-full mt-1 bg-white border border-stone-200/80 rounded-xl shadow-xl py-1 overflow-hidden"
                           >
                             <div className="max-h-48 overflow-y-auto custom-scrollbar">
                               {categories.map((cat) => (
@@ -602,10 +602,10 @@ export const AddAccommodationModal = ({
                                     setFormData({ ...formData, category: cat });
                                     setIsCategoryOpen(false);
                                   }}
-                                  className="w-full text-left px-3 py-2 text-xs font-medium hover:bg-zinc-50 flex items-center justify-between transition-colors group text-zinc-700 hover:text-zinc-900"
+                                  className="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-stone-50 flex items-center justify-between transition-colors group text-stone-700 hover:text-stone-900"
                                 >
                                   <span>{cat}</span>
-                                  {formData.category === cat && <Check size={12} className="text-zinc-900 shrink-0" />}
+                                  {formData.category === cat && <Check size={13} className="text-teal-700 shrink-0" />}
                                 </button>
                               ))}
                             </div>
@@ -616,92 +616,92 @@ export const AddAccommodationModal = ({
                   </div>
 
                   <div className="md:col-span-2 space-y-1.5">
-                    <label className="text-[13px] font-medium text-zinc-700">รายละเอียดเพิ่มเติม</label>
+                    <label className="text-[13px] font-semibold text-stone-800">รายละเอียดเพิ่มเติม</label>
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400 resize-none leading-relaxed"
+                      className="w-full px-3 py-2 text-sm border border-stone-200 rounded-xl bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400 resize-none leading-relaxed"
                       placeholder="ระบุสิ่งอำนวยความสะดวก รายละเอียดค่าน้ำ/ค่าไฟ หรือจุดเด่นของโครงการ..."
                     />
                   </div>
 
                   <div className="md:col-span-2 space-y-1.5">
-                    <label className="text-[13px] font-medium text-zinc-700 flex items-center gap-1">
-                      <MapPin size={13} className="text-zinc-400" /> ที่อยู่ตำแหน่งพิกัด
+                    <label className="text-[13px] font-semibold text-stone-800 flex items-center gap-1">
+                      <MapPin size={13} className="text-teal-700" /> ที่อยู่ตำแหน่งพิกัด
                     </label>
                     <input
                       type="text"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-stone-200 rounded-xl bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400"
                       placeholder="บ้านเลขที่, ซอย, ถนน, ตำบล, อำเภอ..."
                     />
                   </div>
                 </div>
 
-                <div className="h-px bg-zinc-100" />
+                <div className="h-px bg-stone-200/70" />
 
                 {/* MODULE LAYER: PRICING LOG deck */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[13px] font-medium text-zinc-700 flex items-center gap-0.5">
-                      <DollarSign size={13} className="text-zinc-400" /> ราคาเริ่มต้น <span className="text-zinc-400 font-normal">(บาท)</span> <span className="text-red-500">*</span>
+                    <label className="text-[13px] font-semibold text-stone-800 flex items-center gap-0.5">
+                      <DollarSign size={13} className="text-amber-600" /> ราคาเริ่มต้น <span className="text-stone-400 font-normal">(บาท)</span> <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="number"
                       required
                       value={formData.min_price}
                       onChange={(e) => setFormData({ ...formData, min_price: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-stone-200 rounded-xl bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400 font-medium"
                       placeholder="0"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[13px] font-medium text-zinc-700">ราคาสูงสุด <span className="text-zinc-400 font-normal">(บาท / ไม่บังคับ)</span></label>
+                    <label className="text-[13px] font-semibold text-stone-800">ราคาสูงสุด <span className="text-stone-400 font-normal">(บาท / ไม่บังคับ)</span></label>
                     <input
                       type="number"
                       value={formData.max_price}
                       onChange={(e) => setFormData({ ...formData, max_price: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-stone-200 rounded-xl bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400 font-medium"
                       placeholder="0"
                     />
                   </div>
                 </div>
 
-                <div className="h-px bg-zinc-100" />
+                <div className="h-px bg-stone-200/70" />
 
                 {/* MODULE LAYER: CONTACT MATRIX DECK */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[13px] font-medium text-zinc-700 flex items-center gap-1">
-                      <Phone size={13} className="text-zinc-400" /> เบอร์โทรติดต่อ
+                    <label className="text-[13px] font-semibold text-stone-800 flex items-center gap-1">
+                      <Phone size={13} className="text-teal-700" /> เบอร์โทรติดต่อ
                     </label>
                     <input
                       type="tel"
                       value={formData.contact_phone}
                       onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-stone-200 rounded-xl bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400"
                       placeholder="08X-XXX-XXXX"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[13px] font-medium text-zinc-700">LINE ID</label>
+                    <label className="text-[13px] font-semibold text-stone-800">LINE ID</label>
                     <input
                       type="text"
                       value={formData.contact_line}
                       onChange={(e) => setFormData({ ...formData, contact_line: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-stone-200 rounded-xl bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400"
                       placeholder="@lineid"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[13px] font-medium text-zinc-700">Facebook</label>
+                    <label className="text-[13px] font-semibold text-stone-800">Facebook</label>
                     <input
                       type="text"
                       value={formData.contact_facebook}
                       onChange={(e) => setFormData({ ...formData, contact_facebook: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                      className="w-full px-3 py-2 text-sm border border-stone-200 rounded-xl bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400"
                       placeholder="ชื่อเพจ หรือลิงก์โฮมเพจ"
                     />
                   </div>
@@ -710,12 +710,12 @@ export const AddAccommodationModal = ({
             </div>
 
             {/* Footer / Actions Menu Console */}
-            <div className="px-6 py-4 border-t border-zinc-100 bg-zinc-50/50 flex justify-end gap-2.5 shrink-0">
+            <div className="px-6 py-4 border-t border-stone-200/80 bg-stone-50/50 flex justify-end gap-2.5 shrink-0">
               <button
                 type="button"
                 onClick={() => { resetForm(); onClose(); }}
                 disabled={submitting || uploading}
-                className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-50"
+                className="inline-flex h-9 items-center justify-center rounded-xl border border-stone-200 bg-white px-4 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-100 hover:text-stone-900 disabled:opacity-50"
               >
                 ยกเลิก
               </button>
@@ -723,11 +723,11 @@ export const AddAccommodationModal = ({
                 form="accommodation-form"
                 type="submit"
                 disabled={submitting || uploading}
-                className="inline-flex h-9 min-w-30 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:opacity-70"
+                className="inline-flex h-9 min-w-30 items-center justify-center gap-2 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-teal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600/40 disabled:opacity-70"
               >
                 {uploading || submitting ? (
                   <span className="flex items-center gap-2">
-                    <Loader2 size={14} className="animate-spin text-zinc-400" />
+                    <Loader2 size={14} className="animate-spin text-teal-200" />
                     {uploading ? "กำลังอัปโหลดรูป..." : "กำลังบันทึก..."}
                   </span>
                 ) : editAccommodation ? (

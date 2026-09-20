@@ -84,21 +84,20 @@ export default function ImageGallery({ images, alt }: ImageGalleryProps) {
 
   if (!images || images.length === 0) {
     return (
-      <div className="w-full h-[40vh] md:h-[50vh] lg:h-[60vh] rounded-3xl mb-12 bg-neutral-100 flex flex-col items-center justify-center text-neutral-300">
-        <ImageOff className="w-10 h-10 mb-2" />
-        <span className="text-sm font-medium">ไม่มีรูปภาพ</span>
+      <div className="w-full h-[200px] sm:h-[250px] md:h-[290px] lg:h-[330px] rounded-2xl mb-6 sm:mb-8 bg-stone-100 flex flex-col items-center justify-center text-stone-300">
+        <ImageOff className="w-8 h-8 mb-2" />
+        <span className="text-xs sm:text-sm font-medium">ไม่มีรูปภาพ</span>
       </div>
     );
   }
 
   const rightImages = images.slice(1, 5);
-  const extraCount = images.length - 5;
 
   const rightGridClass =
-    rightImages.length === 4
+    rightImages.length >= 4
       ? "grid-cols-2 grid-rows-2"
       : rightImages.length === 3
-        ? "grid-cols-1 grid-rows-3"
+        ? "grid-cols-2 grid-rows-2"
         : rightImages.length === 2
           ? "grid-cols-1 grid-rows-2"
           : "grid-cols-1 grid-rows-1";
@@ -107,42 +106,43 @@ export default function ImageGallery({ images, alt }: ImageGalleryProps) {
 
   return (
     <>
-      <div className="w-full h-[40vh] md:h-[50vh] lg:h-[60vh] relative rounded-3xl overflow-hidden mb-12 flex gap-2">
+      <div className="w-full h-[200px] sm:h-[250px] md:h-[290px] lg:h-[330px] relative rounded-2xl overflow-hidden mb-6 sm:mb-8 flex gap-1.5 sm:gap-2 shadow-2xs ring-1 ring-stone-900/5 select-none">
         {/* Main Large Image */}
         <div
           onClick={() => openLightbox(0)}
-          className={`relative h-full cursor-pointer group ${rightImages.length > 0 ? "w-full md:w-1/2" : "w-full"}`}
+          className={`relative h-full cursor-pointer group overflow-hidden bg-stone-100 ${
+            rightImages.length > 0 ? "w-full md:w-1/2" : "w-full"
+          }`}
         >
           <MediaTile
             src={images[0]}
             alt={alt}
-            className="object-cover w-full h-full group-hover:brightness-95 transition-all duration-300"
+            className="object-cover object-center w-full h-full group-hover:scale-[1.03] transition-all duration-500"
           />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none" />
         </div>
 
         {/* Grid Small Images (Desktop Only) */}
         {rightImages.length > 0 && (
-          <div className={`hidden md:grid w-1/2 h-full gap-2 ${rightGridClass}`}>
+          <div className={`hidden md:grid w-1/2 h-full gap-1.5 sm:gap-2 ${rightGridClass}`}>
             {rightImages.map((img, i) => {
               const realIndex = i + 1;
-              const isLastVisible = i === rightImages.length - 1;
+              const isFirstOfThree = rightImages.length === 3 && i === 0;
+
               return (
                 <div
                   key={realIndex}
                   onClick={() => openLightbox(realIndex)}
-                  className="relative w-full h-full cursor-pointer group overflow-hidden bg-neutral-100"
+                  className={`relative w-full h-full cursor-pointer group overflow-hidden bg-stone-100 ${
+                    isFirstOfThree ? "col-span-2 row-span-1" : ""
+                  }`}
                 >
                   <MediaTile
                     src={img}
                     alt={`${alt} ${realIndex + 1}`}
-                    className="object-cover w-full h-full group-hover:scale-105 group-hover:brightness-95 transition-all duration-500"
+                    className="object-cover object-center w-full h-full group-hover:scale-105 transition-all duration-500"
                   />
-                  {isLastVisible && extraCount > 0 && (
-                    <div className="absolute inset-0 bg-neutral-950/55 flex flex-col items-center justify-center text-white pointer-events-none">
-                      <LayoutGrid className="w-5 h-5 mb-1" />
-                      <span className="text-sm font-bold">+{extraCount} รูป</span>
-                    </div>
-                  )}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none" />
                 </div>
               );
             })}
@@ -154,9 +154,10 @@ export default function ImageGallery({ images, alt }: ImageGalleryProps) {
           <button
             type="button"
             onClick={() => openLightbox(0)}
-            className="absolute bottom-4 right-4 flex items-center gap-1.5 px-3.5 py-2 bg-white text-neutral-900 text-xs font-bold rounded-lg shadow-lg hover:bg-neutral-50 transition active:scale-95"
+            className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 bg-stone-950/80 hover:bg-stone-950 text-white text-xs font-semibold rounded-lg sm:rounded-xl shadow-md backdrop-blur-md transition-all duration-200 active:scale-95 border border-white/20 group cursor-pointer"
           >
-            <LayoutGrid className="w-3.5 h-3.5" /> ดูรูปทั้งหมด ({images.length})
+            <LayoutGrid className="w-3.5 h-3.5 text-amber-300 transition-transform group-hover:rotate-12" />
+            <span>ดูรูปทั้งหมด ({images.length})</span>
           </button>
         )}
       </div>

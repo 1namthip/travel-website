@@ -668,26 +668,30 @@ export default function AdminDestinationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50/60 pb-24 font-sans text-zinc-900 selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen bg-[#FAF9F6] pb-24 font-sans text-stone-900 selection:bg-teal-100 selection:text-teal-900">
       <main className="max-w-7xl mx-auto pt-8 px-4 sm:px-6 lg:px-8">
         {/* ─── 1. HEADER (Item 3) ─── */}
         <motion.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-200/80 pb-6"
+          className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between border-b border-stone-200/80 pb-6"
         >
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
+            <div className="inline-flex items-center gap-2 rounded-full border border-teal-200/80 bg-teal-50/80 px-3 py-0.5 text-xs font-semibold text-teal-800 mb-2">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-teal-600" />
+              จัดการข้อมูลท่องเที่ยว • Attractions Management
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-stone-900">
               สถานที่ท่องเที่ยว
             </h1>
-            <p className="mt-1 text-sm text-zinc-500">
+            <p className="mt-1 text-sm text-stone-500">
               จัดการข้อมูลสถานที่ เวลาเปิด-ปิด และรายละเอียดสำหรับระบบแนะนำทริป
             </p>
           </div>
 
           <button
             onClick={() => handleOpenModal()}
-            className="inline-flex h-10 w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 text-sm font-semibold text-white transition-all hover:bg-blue-700 shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 shrink-0 cursor-pointer"
+            className="inline-flex h-10 w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-all hover:bg-teal-800 shadow-md shadow-teal-900/15 hover:shadow-lg hover:shadow-teal-900/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600/30 shrink-0 cursor-pointer"
           >
             <Plus size={18} strokeWidth={2.2} />
             เพิ่มสถานที่
@@ -701,9 +705,9 @@ export default function AdminDestinationsPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="bg-red-50 border border-red-200 p-3.5 rounded-xl mb-6 text-red-700 text-xs font-medium flex items-center gap-2.5"
+              className="bg-rose-50 border border-rose-200 p-3.5 rounded-xl mb-6 text-rose-700 text-xs font-medium flex items-center gap-2.5"
             >
-              <AlertCircle size={14} className="shrink-0 text-red-500" />
+              <AlertCircle size={14} className="shrink-0 text-rose-500" />
               <span>{error}</span>
             </motion.div>
           )}
@@ -712,27 +716,27 @@ export default function AdminDestinationsPage() {
         {/* ─── 2. STATISTICS: 3 SUMMARY CARDS (Item 4) ─── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {/* Card 1: ทั้งหมด */}
-          <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-xs flex items-center justify-between hover:border-zinc-300 transition-colors">
+          <div className="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-xs flex items-center justify-between hover:border-teal-200 transition-colors">
             <div className="space-y-1">
-              <span className="text-xs font-medium text-zinc-500">📍 สถานที่ทั้งหมด</span>
-              <div className="text-3xl font-extrabold tracking-tight text-zinc-900 tabular-nums">
+              <span className="text-xs font-medium text-stone-500">📍 สถานที่ทั้งหมด</span>
+              <div className="text-3xl font-extrabold tracking-tight text-stone-900 tabular-nums">
                 {loading ? "—" : stats.total.toLocaleString()}
               </div>
-              <p className="text-[11px] text-zinc-400">จุดเช็คอินในจังหวัดนครราชสีมา</p>
+              <p className="text-[11px] text-stone-400">จุดเช็คอินในจังหวัดนครราชสีมา</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center text-xl shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-700 border border-teal-100 flex items-center justify-center text-xl shrink-0">
               📍
             </div>
           </div>
 
           {/* Card 2: เข้าฟรี */}
-          <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-xs flex items-center justify-between hover:border-zinc-300 transition-colors">
+          <div className="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-xs flex items-center justify-between hover:border-emerald-200 transition-colors">
             <div className="space-y-1">
-              <span className="text-xs font-medium text-zinc-500">🎟️ เข้าฟรี</span>
+              <span className="text-xs font-medium text-stone-500">🎟️ เข้าฟรี</span>
               <div className="text-3xl font-extrabold tracking-tight text-emerald-600 tabular-nums">
                 {loading ? "—" : stats.free.toLocaleString()}
               </div>
-              <p className="text-[11px] text-zinc-400">ไม่มีค่าธรรมเนียมเข้าชม</p>
+              <p className="text-[11px] text-stone-400">ไม่มีค่าธรรมเนียมเข้าชม</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center text-xl shrink-0">
               🎟️
@@ -740,13 +744,13 @@ export default function AdminDestinationsPage() {
           </div>
 
           {/* Card 3: มีค่าเข้าชม */}
-          <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-xs flex items-center justify-between hover:border-zinc-300 transition-colors">
+          <div className="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-xs flex items-center justify-between hover:border-amber-200 transition-colors">
             <div className="space-y-1">
-              <span className="text-xs font-medium text-zinc-500">💰 มีค่าเข้าชม</span>
+              <span className="text-xs font-medium text-stone-500">💰 มีค่าเข้าชม</span>
               <div className="text-3xl font-extrabold tracking-tight text-amber-600 tabular-nums">
                 {loading ? "—" : stats.paid.toLocaleString()}
               </div>
-              <p className="text-[11px] text-zinc-400">มีค่าบัตรผ่านประตูหรือกิจกรรม</p>
+              <p className="text-[11px] text-stone-400">มีค่าบัตรผ่านประตูหรือกิจกรรม</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-xl shrink-0">
               💰
@@ -755,12 +759,12 @@ export default function AdminDestinationsPage() {
         </div>
 
         {/* ─── 3. SEARCH & FILTER SECTION (Item 5 & 6) ─── */}
-        <div className="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-xs mb-6 space-y-3.5">
+        <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-xs mb-6 space-y-3.5">
           {/* Main Search row */}
           <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
             <div className="relative flex-1 w-full">
               <Search
-                className="absolute left-3.5 text-zinc-400 pointer-events-none"
+                className="absolute left-3.5 text-stone-400 pointer-events-none"
                 size={17}
               />
               <input
@@ -771,12 +775,12 @@ export default function AdminDestinationsPage() {
                   setSearchQuery(e.target.value);
                   setPage(1);
                 }}
-                className="w-full h-10 pl-10 pr-9 bg-zinc-50/70 border border-zinc-200 rounded-xl text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-all focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="w-full h-10 pl-10 pr-9 bg-stone-50/70 border border-stone-200 rounded-xl text-sm text-stone-900 placeholder:text-stone-400 outline-none transition-all focus:bg-white focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 p-1 rounded-md transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-1 rounded-md transition-colors"
                 >
                   <X size={15} />
                 </button>
@@ -792,7 +796,7 @@ export default function AdminDestinationsPage() {
                   setFeeFilter(e.target.value as any);
                   setPage(1);
                 }}
-                className="h-10 px-3 text-xs bg-zinc-50/70 border border-zinc-200 rounded-xl text-zinc-700 font-medium outline-none focus:border-blue-500 focus:bg-white cursor-pointer"
+                className="h-10 px-3 text-xs bg-stone-50/70 border border-stone-200 rounded-xl text-stone-700 font-medium outline-none focus:border-teal-600 focus:bg-white cursor-pointer"
               >
                 <option value="all">ค่าเข้าชม: ทั้งหมด</option>
                 <option value="free">🎟️ เข้าฟรี</option>
@@ -806,7 +810,7 @@ export default function AdminDestinationsPage() {
                   setStatusFilter(e.target.value as any);
                   setPage(1);
                 }}
-                className="h-10 px-3 text-xs bg-zinc-50/70 border border-zinc-200 rounded-xl text-zinc-700 font-medium outline-none focus:border-blue-500 focus:bg-white cursor-pointer"
+                className="h-10 px-3 text-xs bg-stone-50/70 border border-stone-200 rounded-xl text-stone-700 font-medium outline-none focus:border-teal-600 focus:bg-white cursor-pointer"
               >
                 <option value="all">สถานะ: ทั้งหมด</option>
                 <option value="open">🟢 เปิดวันนี้</option>
@@ -814,15 +818,15 @@ export default function AdminDestinationsPage() {
               </select>
 
               {/* View Switcher */}
-              <div className="flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200/60 shrink-0">
+              <div className="flex items-center bg-stone-100 p-1 rounded-xl border border-stone-200/60 shrink-0">
                 <button
                   type="button"
                   onClick={() => setViewMode("grid")}
                   title="แสดงแบบการ์ด"
-                  className={`p-1.5 rounded-lg transition-colors ${
+                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                     viewMode === "grid"
-                      ? "bg-white text-blue-600 shadow-xs font-medium"
-                      : "text-zinc-500 hover:text-zinc-800"
+                      ? "bg-white text-teal-700 shadow-xs font-semibold"
+                      : "text-stone-500 hover:text-stone-800"
                   }`}
                 >
                   <LayoutGrid size={16} />
@@ -831,10 +835,10 @@ export default function AdminDestinationsPage() {
                   type="button"
                   onClick={() => setViewMode("list")}
                   title="แสดงแบบตาราง / แถว"
-                  className={`p-1.5 rounded-lg transition-colors ${
+                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                     viewMode === "list"
-                      ? "bg-white text-blue-600 shadow-xs font-medium"
-                      : "text-zinc-500 hover:text-zinc-800"
+                      ? "bg-white text-teal-700 shadow-xs font-semibold"
+                      : "text-stone-500 hover:text-stone-800"
                   }`}
                 >
                   <List size={16} />
@@ -844,9 +848,9 @@ export default function AdminDestinationsPage() {
           </div>
 
           {/* Quick Filter Categories Tabs (Item 6) */}
-          <div className="flex items-center justify-between overflow-x-auto pt-1 pb-0.5 scrollbar-none border-t border-zinc-100">
+          <div className="flex items-center justify-between overflow-x-auto pt-1 pb-0.5 scrollbar-none border-t border-stone-100">
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-xs font-semibold text-zinc-400 pr-1 flex items-center gap-1 shrink-0 select-none">
+              <span className="text-xs font-semibold text-stone-400 pr-1 flex items-center gap-1 shrink-0 select-none">
                 <Filter size={12} /> หมวดหมู่:
               </span>
               {CATEGORIES.map((cat) => {
@@ -860,8 +864,8 @@ export default function AdminDestinationsPage() {
                     }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all select-none cursor-pointer ${
                       isActive
-                        ? "bg-blue-600 text-white shadow-xs"
-                        : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 bg-zinc-50"
+                        ? "bg-teal-700 text-white shadow-xs"
+                        : "text-stone-600 hover:bg-stone-100 hover:text-stone-900 bg-stone-50"
                     }`}
                   >
                     {cat}
@@ -882,8 +886,8 @@ export default function AdminDestinationsPage() {
 
             {/* Select all & Count on page */}
             {!loading && filteredDestinations.length > 0 && (
-              <div className="flex items-center gap-3 pl-4 text-xs text-zinc-500 shrink-0">
-                <span className="text-zinc-400">
+              <div className="flex items-center gap-3 pl-4 text-xs text-stone-500 shrink-0">
+                <span className="text-stone-400">
                   พบ {filteredDestinations.length} รายการ
                 </span>
                 <div className="flex items-center gap-1.5">
@@ -891,12 +895,12 @@ export default function AdminDestinationsPage() {
                     type="checkbox"
                     checked={allOnPageSelected}
                     onChange={toggleSelectAllOnPage}
-                    className="w-3.5 h-3.5 rounded border-zinc-300 text-blue-600 accent-blue-600 cursor-pointer"
+                    className="w-3.5 h-3.5 rounded border-stone-300 text-teal-700 accent-teal-700 cursor-pointer"
                     id="select-all"
                   />
                   <label
                     htmlFor="select-all"
-                    className="cursor-pointer hover:text-zinc-700 select-none font-medium"
+                    className="cursor-pointer hover:text-stone-700 select-none font-medium"
                   >
                     เลือกทั้งหมดในหน้านี้
                   </label>
@@ -918,17 +922,17 @@ export default function AdminDestinationsPage() {
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow-xs animate-pulse"
+                    className="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-xs animate-pulse"
                   >
-                    <div className="aspect-16/10 bg-zinc-100 w-full" />
+                    <div className="aspect-16/10 bg-stone-100 w-full" />
                     <div className="p-4 space-y-3">
-                      <div className="h-4 bg-zinc-100 rounded w-1/3" />
-                      <div className="h-5 bg-zinc-200 rounded w-3/4" />
-                      <div className="h-3.5 bg-zinc-100 rounded w-full" />
-                      <div className="h-3.5 bg-zinc-100 rounded w-2/3" />
-                      <div className="pt-3 border-t border-zinc-100 flex justify-between">
-                        <div className="h-4 bg-zinc-100 rounded w-20" />
-                        <div className="h-4 bg-zinc-200 rounded w-16" />
+                      <div className="h-4 bg-stone-100 rounded w-1/3" />
+                      <div className="h-5 bg-stone-200 rounded w-3/4" />
+                      <div className="h-3.5 bg-stone-100 rounded w-full" />
+                      <div className="h-3.5 bg-stone-100 rounded w-2/3" />
+                      <div className="pt-3 border-t border-stone-100 flex justify-between">
+                        <div className="h-4 bg-stone-100 rounded w-20" />
+                        <div className="h-4 bg-stone-200 rounded w-16" />
                       </div>
                     </div>
                   </div>
@@ -939,21 +943,21 @@ export default function AdminDestinationsPage() {
                 key="empty"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white border border-dashed border-zinc-200 rounded-2xl p-16 text-center flex flex-col items-center justify-center shadow-xs"
+                className="bg-white border border-dashed border-stone-200 rounded-2xl p-16 text-center flex flex-col items-center justify-center shadow-xs"
               >
-                <div className="w-12 h-12 bg-zinc-50 border border-zinc-200 rounded-2xl flex items-center justify-center mb-3 text-zinc-400">
+                <div className="w-12 h-12 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-center mb-3 text-stone-400">
                   <Inbox size={22} />
                 </div>
-                <h3 className="text-base font-semibold text-zinc-900">
+                <h3 className="text-base font-semibold text-stone-900">
                   ไม่พบสถานที่ท่องเที่ยว
                 </h3>
-                <p className="text-zinc-500 text-xs mt-1 max-w-sm">
+                <p className="text-stone-500 text-xs mt-1 max-w-sm">
                   ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือตัวกรองที่เลือกในขณะนี้
                 </p>
                 {isAnyFilterActive && (
                   <button
                     onClick={resetFilters}
-                    className="mt-4 px-3.5 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-semibold transition-colors"
+                    className="mt-4 px-3.5 py-1.5 bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200/60 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
                   >
                     ล้างการค้นหาและตัวกรองทั้งหมด
                   </button>
@@ -986,13 +990,13 @@ export default function AdminDestinationsPage() {
                       key={d.id}
                       className={`group bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all border flex flex-col justify-between ${
                         isSelected
-                          ? "border-blue-600 ring-2 ring-blue-600/10"
-                          : "border-zinc-200/80 hover:border-zinc-300"
+                          ? "border-teal-700 ring-2 ring-teal-700/20"
+                          : "border-stone-200/80 hover:border-stone-300"
                       }`}
                     >
                       <div>
                         {/* Thumbnail Image Area */}
-                        <div className="relative aspect-16/10 w-full overflow-hidden bg-zinc-100 border-b border-zinc-100">
+                        <div className="relative aspect-16/10 w-full overflow-hidden bg-stone-100 border-b border-stone-100">
                           {displayImgUrl ? (
                             <>
                               <Image
@@ -1003,20 +1007,20 @@ export default function AdminDestinationsPage() {
                                 className="object-cover group-hover:scale-104 transition-transform duration-300"
                               />
                               {parsedImages.length > 1 && (
-                                <div className="absolute bottom-2.5 right-2.5 bg-zinc-950/75 backdrop-blur-xs text-white text-[10px] font-semibold px-2 py-0.5 rounded-md shadow-xs">
+                                <div className="absolute bottom-2.5 right-2.5 bg-stone-950/75 backdrop-blur-xs text-white text-[10px] font-semibold px-2 py-0.5 rounded-md shadow-xs">
                                   +{parsedImages.length - 1} รูป
                                 </div>
                               )}
                             </>
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-zinc-300">
+                            <div className="w-full h-full flex items-center justify-center text-stone-300">
                               <ImageIcon size={32} strokeWidth={1.5} />
                             </div>
                           )}
 
                           {/* Top-left: Category tag */}
                           <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10">
-                            <span className="bg-white/95 backdrop-blur-xs text-zinc-800 border border-zinc-200/70 text-[11px] font-semibold px-2 py-0.5 rounded-lg shadow-xs">
+                            <span className="bg-white/95 backdrop-blur-xs text-stone-800 border border-stone-200/80 text-[11px] font-semibold px-2.5 py-0.5 rounded-lg shadow-2xs">
                               {d.category || "สถานที่ท่องเที่ยว"}
                             </span>
                           </div>
@@ -1029,8 +1033,8 @@ export default function AdminDestinationsPage() {
                             <div
                               className={`w-6 h-6 rounded-lg flex items-center justify-center backdrop-blur-md cursor-pointer transition-all ${
                                 isSelected
-                                  ? "bg-blue-600 text-white shadow-sm"
-                                  : "bg-white/85 text-transparent border border-zinc-300 hover:bg-white"
+                                  ? "bg-teal-700 text-white shadow-sm"
+                                  : "bg-white/85 text-transparent border border-stone-300 hover:bg-white"
                               }`}
                             >
                               <Check size={14} strokeWidth={3} className={isSelected ? "block" : "hidden"} />
@@ -1042,41 +1046,41 @@ export default function AdminDestinationsPage() {
                         <div className="p-4.5 space-y-3">
                           <div>
                             {/* Category subtitle */}
-                            <div className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400 mb-1">
+                            <div className="flex items-center gap-1.5 text-[11px] font-medium text-stone-400 mb-1">
                               <span>{d.category || "ทั่วไป"}</span>
                               <span>•</span>
                               <span>จุดท่องเที่ยวแนะนำ</span>
                             </div>
 
                             {/* Destination Name */}
-                            <h3 className="text-base font-bold text-zinc-900 tracking-tight line-clamp-1 group-hover:text-blue-600 transition-colors">
+                            <h3 className="text-base font-bold text-stone-900 tracking-tight line-clamp-1 group-hover:text-teal-700 transition-colors">
                               {d.name}
                             </h3>
 
                             {/* Short Description */}
-                            <p className="text-xs text-zinc-500 mt-1.5 line-clamp-2 leading-relaxed">
+                            <p className="text-xs text-stone-500 mt-1.5 line-clamp-2 leading-relaxed">
                               {d.description || "ยังไม่มีข้อมูลคำอธิบายเพิ่มเติม"}
                             </p>
                           </div>
 
                           {/* Operating Hours & Admission Badges (Item 8) */}
-                          <div className="space-y-2 pt-1 border-t border-zinc-100">
+                          <div className="space-y-2 pt-1 border-t border-stone-100">
                             {/* Today's Status Badge */}
                             <div className="flex items-center justify-between text-xs">
                               <div className="flex items-center gap-1.5">
                                 {todayStat.status === "open" ? (
-                                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                                     {todayStat.label}
                                   </span>
                                 ) : todayStat.status === "closed" ? (
-                                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-800 border border-rose-200/80">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
                                     {todayStat.label}
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium bg-zinc-100 text-zinc-600">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-stone-100 text-stone-600">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
                                     {todayStat.label}
                                   </span>
                                 )}
@@ -1085,11 +1089,11 @@ export default function AdminDestinationsPage() {
                               {/* Price */}
                               <div className="font-bold text-xs">
                                 {isFree ? (
-                                  <span className="text-emerald-600 bg-emerald-50/70 px-2 py-0.5 rounded-md border border-emerald-200/40">
+                                  <span className="text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
                                     เข้าฟรี
                                   </span>
                                 ) : (
-                                  <span className="text-zinc-800 bg-zinc-100 px-2 py-0.5 rounded-md">
+                                  <span className="text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/80">
                                     ฿{minP.toLocaleString()}{maxP > minP ? ` - ฿${maxP.toLocaleString()}` : ""}
                                   </span>
                                 )}
@@ -1100,11 +1104,11 @@ export default function AdminDestinationsPage() {
                       </div>
 
                       {/* Footer Actions (Item 7) */}
-                      <div className="px-4.5 py-3 bg-zinc-50/70 border-t border-zinc-100 flex items-center justify-between gap-2">
+                      <div className="px-4.5 py-3 bg-stone-50/70 border-t border-stone-100 flex items-center justify-between gap-2">
                         <button
                           type="button"
                           onClick={() => handleOpenDetail(d)}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-blue-600 transition-colors cursor-pointer"
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-stone-700 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 hover:text-teal-700 transition-colors cursor-pointer"
                         >
                           <Eye size={13} />
                           ดูรายละเอียด
@@ -1113,68 +1117,20 @@ export default function AdminDestinationsPage() {
                         <button
                           type="button"
                           onClick={() => handleOpenModal(d)}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50/80 border border-blue-200/60 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer"
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-teal-800 bg-teal-50/90 border border-teal-200/80 rounded-xl hover:bg-teal-100 transition-colors cursor-pointer"
                         >
                           <Edit3 size={13} />
                           แก้ไข
                         </button>
 
-                        {/* More Menu (3-Dot) */}
-                        <div className="relative">
-                          <button
-                            type="button"
-                            onClick={(e) => handleMenuToggle(e, d.id)}
-                            className="p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/60 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <MoreHorizontal size={17} />
-                          </button>
-
-                          <AnimatePresence>
-                            {openCardMenuId === d.id && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.95, y: 4 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95, y: 4 }}
-                                className="absolute right-0 bottom-full mb-1 w-36 bg-white rounded-xl shadow-xl border border-zinc-200 py-1 z-50 text-left overflow-hidden"
-                              >
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    handleOpenDetail(d);
-                                    setOpenCardMenuId(null);
-                                  }}
-                                  className="w-full text-left px-3 py-1.5 text-xs text-zinc-700 hover:bg-zinc-50 flex items-center gap-2 font-medium"
-                                >
-                                  <Eye size={13} className="text-zinc-400" />
-                                  ดูรายละเอียด
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    handleOpenModal(d);
-                                    setOpenCardMenuId(null);
-                                  }}
-                                  className="w-full text-left px-3 py-1.5 text-xs text-zinc-700 hover:bg-zinc-50 flex items-center gap-2 font-medium"
-                                >
-                                  <Edit3 size={13} className="text-zinc-400" />
-                                  แก้ไขข้อมูล
-                                </button>
-                                <div className="h-px bg-zinc-100 my-1" />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setDeleteConfirm({ id: d.id, name: d.name });
-                                    setOpenCardMenuId(null);
-                                  }}
-                                  className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2 font-medium"
-                                >
-                                  <Trash2 size={13} className="text-red-500" />
-                                  ลบสถานที่
-                                </button>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteConfirm({ id: d.id, name: d.name })}
+                          className="inline-flex items-center justify-center p-2 rounded-xl border border-stone-200 bg-white text-rose-600 hover:border-rose-300 hover:bg-rose-50 transition-all cursor-pointer shadow-2xs"
+                          title="ลบสถานที่"
+                        >
+                          <Trash2 size={13} />
+                        </button>
                       </div>
                     </motion.div>
                   );
@@ -1185,7 +1141,7 @@ export default function AdminDestinationsPage() {
               <motion.div
                 key="list-view"
                 layout
-                className="bg-white rounded-2xl border border-zinc-200/80 shadow-xs divide-y divide-zinc-100 overflow-hidden"
+                className="bg-white rounded-2xl border border-stone-200/80 shadow-xs divide-y divide-stone-100 overflow-hidden"
               >
                 {displayedDestinations.map((d) => {
                   const isSelected = selectedIds.includes(d.id);
@@ -1200,7 +1156,7 @@ export default function AdminDestinationsPage() {
                     <div
                       key={d.id}
                       className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors ${
-                        isSelected ? "bg-blue-50/40" : "hover:bg-zinc-50/50"
+                        isSelected ? "bg-teal-50/40" : "hover:bg-stone-50/50"
                       }`}
                     >
                       <div className="flex items-center gap-3.5 min-w-0">
@@ -1208,14 +1164,14 @@ export default function AdminDestinationsPage() {
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => toggleSelectOne(e as any, d.id)}
-                          className="w-4 h-4 rounded border-zinc-300 text-blue-600 accent-blue-600 cursor-pointer shrink-0"
+                          className="w-4 h-4 rounded border-stone-300 text-teal-700 accent-teal-700 cursor-pointer shrink-0"
                         />
 
-                        <div className="relative w-16 h-12 rounded-lg overflow-hidden bg-zinc-100 shrink-0 border border-zinc-200/60">
+                        <div className="relative w-16 h-12 rounded-lg overflow-hidden bg-stone-100 shrink-0 border border-stone-200/60">
                           {displayImgUrl ? (
                             <Image src={displayImgUrl} alt="" fill sizes="64px" className="object-cover" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-zinc-300">
+                            <div className="w-full h-full flex items-center justify-center text-stone-300">
                               <ImageIcon size={18} />
                             </div>
                           )}
@@ -1223,14 +1179,14 @@ export default function AdminDestinationsPage() {
 
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.2 rounded-md">
+                            <span className="text-xs font-semibold text-teal-800 bg-teal-50 border border-teal-200/60 px-2 py-0.5 rounded-md">
                               {d.category}
                             </span>
-                            <h4 className="text-sm font-bold text-zinc-900 truncate">
+                            <h4 className="text-sm font-bold text-stone-900 truncate">
                               {d.name}
                             </h4>
                           </div>
-                          <div className="flex items-center gap-3 text-xs text-zinc-400 mt-1">
+                          <div className="flex items-center gap-3 text-xs text-stone-400 mt-1">
                             <span>{todayStat.label}</span>
                             <span>•</span>
                             <span>{isFree ? "เข้าฟรี" : `฿${minP}`}</span>
@@ -1242,21 +1198,21 @@ export default function AdminDestinationsPage() {
                         <button
                           type="button"
                           onClick={() => handleOpenDetail(d)}
-                          className="px-3 py-1.5 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
+                          className="px-3 py-1.5 text-xs font-semibold text-stone-700 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 hover:text-teal-700 transition-colors cursor-pointer"
                         >
                           ดูรายละเอียด
                         </button>
                         <button
                           type="button"
                           onClick={() => handleOpenModal(d)}
-                          className="px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 rounded-lg hover:bg-blue-100 transition-colors"
+                          className="px-3 py-1.5 text-xs font-semibold text-teal-800 bg-teal-50 border border-teal-200/80 rounded-lg hover:bg-teal-100 transition-colors cursor-pointer"
                         >
                           แก้ไข
                         </button>
                         <button
                           type="button"
                           onClick={() => setDeleteConfirm({ id: d.id, name: d.name })}
-                          className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -1272,17 +1228,17 @@ export default function AdminDestinationsPage() {
         {/* ─── 5. PAGINATION ─── */}
         {!loading && totalPages > 1 && (
           <div className="flex items-center justify-between mt-8 px-1">
-            <p className="hidden sm:block text-xs text-zinc-500">
+            <p className="hidden sm:block text-xs text-stone-500">
               แสดง{" "}
-              <span className="font-semibold text-zinc-900">
+              <span className="font-semibold text-stone-900">
                 {(page - 1) * itemsPerPage + 1}
               </span>
               –
-              <span className="font-semibold text-zinc-900">
+              <span className="font-semibold text-stone-900">
                 {Math.min(page * itemsPerPage, filteredDestinations.length)}
               </span>{" "}
               จากทั้งหมด{" "}
-              <span className="font-semibold text-zinc-900">
+              <span className="font-semibold text-stone-900">
                 {filteredDestinations.length}
               </span>{" "}
               รายการ
@@ -1291,7 +1247,7 @@ export default function AdminDestinationsPage() {
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="inline-flex items-center gap-1 h-9 px-3 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                className="inline-flex items-center gap-1 h-9 px-3 text-xs font-semibold text-stone-700 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
               >
                 <ChevronLeft size={15} />
                 <span>ก่อนหน้า</span>
@@ -1301,10 +1257,10 @@ export default function AdminDestinationsPage() {
                   <button
                     key={pNum}
                     onClick={() => setPage(pNum)}
-                    className={`w-9 h-9 rounded-xl text-xs font-bold transition-all flex items-center justify-center ${
+                    className={`w-9 h-9 rounded-xl text-xs font-bold transition-all flex items-center justify-center cursor-pointer ${
                       page === pNum
-                        ? "bg-blue-600 text-white shadow-xs"
-                        : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                        ? "bg-teal-700 text-white shadow-xs"
+                        : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
                     }`}
                   >
                     {pNum}
@@ -1314,7 +1270,7 @@ export default function AdminDestinationsPage() {
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="inline-flex items-center gap-1 h-9 px-3 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                className="inline-flex items-center gap-1 h-9 px-3 text-xs font-semibold text-stone-700 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
               >
                 <span>ถัดไป</span>
                 <ChevronRight size={15} />
@@ -1330,12 +1286,12 @@ export default function AdminDestinationsPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 16 }}
-              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-zinc-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-4 border border-zinc-800"
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-stone-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-4 border border-stone-800"
             >
               <span className="text-xs font-medium">
-                เลือกแล้ว <strong className="text-blue-400">{selectedIds.length}</strong> รายการ
+                เลือกแล้ว <strong className="text-teal-300">{selectedIds.length}</strong> รายการ
               </span>
-              <div className="h-4 w-px bg-zinc-700" />
+              <div className="h-4 w-px bg-stone-700" />
               <button
                 type="button"
                 onClick={() =>
@@ -1346,7 +1302,7 @@ export default function AdminDestinationsPage() {
                     message: `ยืนยันการลบสถานที่จำนวน ${selectedIds.length} รายการอย่างถาวรหรือไม่?`,
                   })
                 }
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer"
               >
                 <Trash2 size={13} />
                 ลบรายการที่เลือก
@@ -1354,7 +1310,7 @@ export default function AdminDestinationsPage() {
               <button
                 type="button"
                 onClick={() => setSelectedIds([])}
-                className="p-1 text-zinc-400 hover:text-white transition-colors"
+                className="p-1 text-stone-400 hover:text-white transition-colors cursor-pointer"
                 title="ล้างการเลือก"
               >
                 <X size={15} />
@@ -1426,20 +1382,20 @@ export default function AdminDestinationsPage() {
                   >
                     {/* ════ SECTION 1: ข้อมูลพื้นฐาน ════ */}
                     <div className="space-y-4">
-                      <div className="flex items-center gap-2 pb-2 border-b border-zinc-100">
-                        <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center">
+                      <div className="flex items-center gap-2 pb-2 border-b border-stone-100">
+                        <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-800 text-xs font-bold flex items-center justify-center">
                           1
                         </span>
-                        <h3 className="text-sm font-bold text-zinc-900">
+                        <h3 className="text-sm font-bold text-stone-900">
                           ข้อมูลพื้นฐานของสถานที่
                         </h3>
                       </div>
 
                       {/* Media Upload Area */}
                       <div>
-                        <label className="block text-xs font-semibold text-zinc-700 mb-2">
+                        <label className="block text-xs font-semibold text-stone-700 mb-2">
                           รูปภาพ / วิดีโอแลนด์มาร์ค{" "}
-                          <span className="text-zinc-400 font-normal">
+                          <span className="text-stone-400 font-normal">
                             ({totalImages}/{MAX_IMAGES} รูป · {totalVideos}/{MAX_VIDEOS} วิดีโอ)
                           </span>
                         </label>
@@ -1449,15 +1405,15 @@ export default function AdminDestinationsPage() {
                             {formData.image_url.map((media, index) => (
                               <div
                                 key={`existing-${index}`}
-                                className={`relative group aspect-square rounded-xl overflow-hidden border border-zinc-200 shadow-xs ${
-                                  isVideoUrl(media) ? "bg-zinc-900" : "bg-zinc-50"
+                                className={`relative group aspect-square rounded-xl overflow-hidden border border-stone-200 shadow-xs ${
+                                  isVideoUrl(media) ? "bg-stone-900" : "bg-stone-50"
                                 }`}
                               >
                                 {isVideoUrl(media) ? (
                                   <>
                                     <video src={media} muted playsInline preload="metadata" className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                      <div className="w-8 h-8 rounded-full bg-zinc-950/60 flex items-center justify-center">
+                                      <div className="w-8 h-8 rounded-full bg-stone-950/60 flex items-center justify-center">
                                         <Play size={13} className="text-white fill-white ml-0.5" />
                                       </div>
                                     </div>
@@ -1466,11 +1422,11 @@ export default function AdminDestinationsPage() {
                                   /* eslint-disable-next-line @next/next/no-img-element */
                                   <img src={media} alt="" className="w-full h-full object-cover" />
                                 )}
-                                <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                   <button
                                     type="button"
                                     onClick={() => removeExistingImage(index)}
-                                    className="p-1.5 bg-white text-zinc-900 shadow-sm rounded-lg hover:bg-zinc-50 hover:text-red-600 transition-all"
+                                    className="p-1.5 bg-white text-stone-900 shadow-sm rounded-lg hover:bg-stone-50 hover:text-rose-600 transition-all cursor-pointer"
                                   >
                                     <Trash2 size={13} />
                                   </button>
@@ -1483,15 +1439,15 @@ export default function AdminDestinationsPage() {
                               return (
                                 <div
                                   key={`new-${index}`}
-                                  className={`relative group aspect-square rounded-xl overflow-hidden border border-blue-500/30 shadow-xs ${
-                                    isVid ? "bg-zinc-900" : "bg-zinc-50"
+                                  className={`relative group aspect-square rounded-xl overflow-hidden border border-teal-500/40 shadow-xs ${
+                                    isVid ? "bg-stone-900" : "bg-stone-50"
                                   }`}
                                 >
                                   {isVid ? (
                                     <>
                                       <video src={preview} muted playsInline preload="metadata" className="w-full h-full object-cover" />
                                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                        <div className="w-8 h-8 rounded-full bg-zinc-950/60 flex items-center justify-center">
+                                        <div className="w-8 h-8 rounded-full bg-stone-950/60 flex items-center justify-center">
                                           <Play size={13} className="text-white fill-white ml-0.5" />
                                         </div>
                                       </div>
@@ -1500,16 +1456,16 @@ export default function AdminDestinationsPage() {
                                     /* eslint-disable-next-line @next/next/no-img-element */
                                     <img src={preview} alt="" className="w-full h-full object-cover" />
                                   )}
-                                  <div className="absolute inset-0 bg-zinc-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <button
                                       type="button"
                                       onClick={() => removeNewImage(index)}
-                                      className="p-1.5 bg-white text-zinc-900 shadow-sm rounded-lg hover:bg-zinc-50 hover:text-red-600 transition-all"
+                                      className="p-1.5 bg-white text-stone-900 shadow-sm rounded-lg hover:bg-stone-50 hover:text-rose-600 transition-all cursor-pointer"
                                     >
                                       <Trash2 size={13} />
                                     </button>
                                   </div>
-                                  <span className="absolute bottom-1.5 left-1.5 text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.2 rounded-md shadow-xs">
+                                  <span className="absolute bottom-1.5 left-1.5 text-[9px] font-bold bg-teal-700 text-white px-1.5 py-0.2 rounded-md shadow-xs">
                                     ใหม่
                                   </span>
                                 </div>
@@ -1532,8 +1488,8 @@ export default function AdminDestinationsPage() {
                             onClick={() => fileInputRef.current?.click()}
                             className={`relative flex flex-col items-center justify-center w-full min-h-[120px] p-4 transition-all border border-dashed rounded-xl cursor-pointer ${
                               isDragging
-                                ? "border-blue-500 bg-blue-50/50"
-                                : "border-zinc-300 hover:border-zinc-400 bg-zinc-50/60 hover:bg-zinc-50"
+                                ? "border-teal-600 bg-teal-50/50"
+                                : "border-stone-300 hover:border-stone-400 bg-stone-50/60 hover:bg-stone-50"
                             }`}
                           >
                             <input
@@ -1548,16 +1504,16 @@ export default function AdminDestinationsPage() {
                               accept="image/*,video/*"
                               className="hidden"
                             />
-                            <div className="p-2.5 bg-white shadow-xs border border-zinc-200 rounded-xl text-zinc-400 mb-1">
+                            <div className="p-2.5 bg-white shadow-xs border border-stone-200 rounded-xl text-stone-400 mb-1">
                               <ImageIcon size={20} strokeWidth={1.6} />
                             </div>
-                            <p className="text-xs font-semibold text-zinc-800">
+                            <p className="text-xs font-semibold text-stone-800">
                               คลิกเพื่อเลือกไฟล์{" "}
-                              <span className="font-normal text-zinc-500">
+                              <span className="font-normal text-stone-500">
                                 หรือลากไฟล์มาวางที่นี่
                               </span>
                             </p>
-                            <p className="text-[11px] text-zinc-400 mt-1">
+                            <p className="text-[11px] text-stone-400 mt-1">
                               รูป JPG/PNG/WEBP ≤ 5MB · วิดีโอ MP4/WEBM ≤ 50MB (สูงสุด {MAX_VIDEOS} คลิป)
                             </p>
                           </div>
@@ -1567,36 +1523,36 @@ export default function AdminDestinationsPage() {
                       {/* Name & Category Inputs */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-zinc-700">
-                            ชื่อสถานที่ <span className="text-red-500">*</span>
+                          <label className="text-xs font-semibold text-stone-700">
+                            ชื่อสถานที่ <span className="text-rose-500">*</span>
                           </label>
                           <input
                             type="text"
                             required
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full px-3.5 py-2 text-sm border border-zinc-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                            className="w-full px-3.5 py-2 text-sm border border-stone-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-colors"
                             placeholder="เช่น ไร่มณีศร, วัดศาลาลอย"
                           />
                         </div>
 
                         {/* Category Dropdown */}
                         <div className="space-y-1.5" ref={dropdownRef}>
-                          <label className="text-xs font-semibold text-zinc-700">
+                          <label className="text-xs font-semibold text-stone-700">
                             หมวดหมู่สถานที่
                           </label>
                           <div className="relative">
                             <button
                               type="button"
                               onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                              className={`w-full px-3.5 py-2 text-sm border rounded-xl bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
-                                isCategoryOpen ? "border-blue-500 ring-2 ring-blue-500/20" : "border-zinc-200"
-                              } text-zinc-900`}
+                              className={`w-full px-3.5 py-2 text-sm border rounded-xl bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 cursor-pointer ${
+                                isCategoryOpen ? "border-teal-600 ring-2 ring-teal-600/20" : "border-stone-200"
+                              } text-stone-900`}
                             >
                               <span>{formData.category}</span>
                               <ChevronDown
                                 size={15}
-                                className={`text-zinc-400 transition-transform duration-200 ${
+                                className={`text-stone-400 transition-transform duration-200 ${
                                   isCategoryOpen ? "rotate-180" : ""
                                 }`}
                               />
@@ -1609,7 +1565,7 @@ export default function AdminDestinationsPage() {
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 4, scale: 0.98 }}
                                   transition={{ duration: 0.13 }}
-                                  className="absolute z-50 w-full mt-1 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 overflow-hidden"
+                                  className="absolute z-50 w-full mt-1 bg-white border border-stone-200 rounded-xl shadow-xl py-1 overflow-hidden"
                                 >
                                   <div className="max-h-48 overflow-y-auto custom-scrollbar">
                                     {CATEGORIES.filter((c) => c !== "ทั้งหมด").map((cat) => (
@@ -1623,11 +1579,11 @@ export default function AdminDestinationsPage() {
                                           });
                                           setIsCategoryOpen(false);
                                         }}
-                                        className="w-full text-left px-3.5 py-2 text-xs font-medium hover:bg-zinc-50 flex items-center justify-between transition-colors text-zinc-700 hover:text-zinc-900"
+                                        className="w-full text-left px-3.5 py-2 text-xs font-medium hover:bg-teal-50/50 flex items-center justify-between transition-colors text-stone-700 hover:text-teal-900 cursor-pointer"
                                       >
                                         <span>{cat}</span>
                                         {formData.category === cat && (
-                                          <Check size={14} className="text-blue-600 shrink-0" />
+                                          <Check size={14} className="text-teal-700 shrink-0" />
                                         )}
                                       </button>
                                     ))}
@@ -1640,14 +1596,14 @@ export default function AdminDestinationsPage() {
 
                         {/* Description */}
                         <div className="sm:col-span-2 space-y-1.5">
-                          <label className="text-xs font-semibold text-zinc-700">
+                          <label className="text-xs font-semibold text-stone-700">
                             รายละเอียดสถานที่
                           </label>
                           <textarea
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             rows={3}
-                            className="w-full px-3.5 py-2 text-sm border border-zinc-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors placeholder:text-zinc-400 resize-none leading-relaxed"
+                            className="w-full px-3.5 py-2 text-sm border border-stone-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-colors placeholder:text-stone-400 resize-none leading-relaxed"
                             placeholder="ประวัติ, จุดเด่น หรือข้อมูลแนะนำสำหรับนักท่องเที่ยว..."
                           />
                         </div>
@@ -1656,11 +1612,11 @@ export default function AdminDestinationsPage() {
 
                     {/* ════ SECTION 2: วันและเวลาเปิดให้บริการ (Item 10) ════ */}
                     <div className="space-y-4">
-                      <div className="flex items-center gap-2 pb-2 border-b border-zinc-100">
-                        <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center">
+                      <div className="flex items-center gap-2 pb-2 border-b border-stone-100">
+                        <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-800 text-xs font-bold flex items-center justify-center">
                           2
                         </span>
-                        <h3 className="text-sm font-bold text-zinc-900">
+                        <h3 className="text-sm font-bold text-stone-900">
                           วันและเวลาเปิดให้บริการ
                         </h3>
                       </div>
@@ -1682,20 +1638,20 @@ export default function AdminDestinationsPage() {
 
                     {/* ════ SECTION 3: ค่าเข้าชม (Item 10) ════ */}
                     <div className="space-y-4">
-                      <div className="flex items-center gap-2 pb-2 border-b border-zinc-100">
-                        <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center">
+                      <div className="flex items-center gap-2 pb-2 border-b border-stone-100">
+                        <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-800 text-xs font-bold flex items-center justify-center">
                           3
                         </span>
-                        <h3 className="text-sm font-bold text-zinc-900">
+                        <h3 className="text-sm font-bold text-stone-900">
                           ค่าธรรมเนียมเข้าชม (บาท)
                         </h3>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-zinc-700">
+                          <label className="text-xs font-semibold text-stone-700">
                             ราคาเริ่มต้น (บาท){" "}
-                            <span className="text-zinc-400 font-normal">
+                            <span className="text-stone-400 font-normal">
                               (ใส่ 0 หากเข้าชมฟรี)
                             </span>
                           </label>
@@ -1704,13 +1660,13 @@ export default function AdminDestinationsPage() {
                             min="0"
                             value={formData.min_price}
                             onChange={(e) => setFormData({ ...formData, min_price: e.target.value })}
-                            className="w-full px-3.5 py-2 text-sm border border-zinc-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                            className="w-full px-3.5 py-2 text-sm border border-stone-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-colors"
                             placeholder="0"
                           />
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-zinc-700">
+                          <label className="text-xs font-semibold text-stone-700">
                             ราคาสูงสุด (บาท)
                           </label>
                           <input
@@ -1718,7 +1674,7 @@ export default function AdminDestinationsPage() {
                             min="0"
                             value={formData.max_price}
                             onChange={(e) => setFormData({ ...formData, max_price: e.target.value })}
-                            className="w-full px-3.5 py-2 text-sm border border-zinc-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                            className="w-full px-3.5 py-2 text-sm border border-stone-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-colors"
                             placeholder="0"
                           />
                         </div>
@@ -1728,12 +1684,12 @@ export default function AdminDestinationsPage() {
                 </div>
 
                 {/* Modal Footer Buttons */}
-                <div className="px-6 py-4 border-t border-zinc-100 bg-zinc-50/70 flex justify-end gap-2.5 shrink-0">
+                <div className="px-6 py-4 border-t border-stone-100 bg-stone-50/70 flex justify-end gap-2.5 shrink-0">
                   <button
                     type="button"
                     onClick={handleCloseModal}
                     disabled={isSubmitting}
-                    className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 disabled:opacity-50"
+                    className="inline-flex h-10 items-center justify-center rounded-xl border border-stone-200 bg-white px-5 text-xs font-semibold text-stone-700 transition-colors hover:bg-stone-100 disabled:opacity-50 cursor-pointer"
                   >
                     ยกเลิก
                   </button>
@@ -1741,7 +1697,7 @@ export default function AdminDestinationsPage() {
                     form="destination-modal-form"
                     type="submit"
                     disabled={isSubmitting || !isScheduleValid}
-                    className="inline-flex h-10 min-w-32 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 text-xs font-semibold text-white transition-all hover:bg-blue-700 shadow-md shadow-blue-600/20 disabled:opacity-50 cursor-pointer"
+                    className="inline-flex h-10 min-w-32 items-center justify-center gap-2 rounded-xl bg-teal-700 px-5 text-xs font-semibold text-white transition-all hover:bg-teal-800 shadow-md shadow-teal-900/15 disabled:opacity-50 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">

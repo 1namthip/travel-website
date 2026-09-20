@@ -81,17 +81,17 @@ export default function DestinationDetailModal({
           className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-zinc-200 flex flex-col max-h-[90vh] overflow-hidden z-10"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white shrink-0">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 bg-white shrink-0">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60">
-                <Sparkles size={12} />
+              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200/80">
+                <Sparkles size={12} className="text-teal-600" />
                 {destination.category || "สถานที่ท่องเที่ยว"}
               </span>
-              <span className="text-xs text-zinc-400">• รายละเอียดสถานที่</span>
+              <span className="text-xs text-stone-400">• รายละเอียดสถานที่</span>
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded-lg transition-colors"
+              className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -101,7 +101,7 @@ export default function DestinationDetailModal({
           <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-white">
             {/* Image Gallery */}
             <div>
-              <div className="relative w-full aspect-16/9 rounded-xl overflow-hidden bg-zinc-100 border border-zinc-200 shadow-xs">
+              <div className="relative w-full aspect-16/9 rounded-2xl overflow-hidden bg-stone-100 border border-stone-200 shadow-xs">
                 {currentImage ? (
                   <Image
                     src={currentImage}
@@ -112,15 +112,15 @@ export default function DestinationDetailModal({
                     priority
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-zinc-300">
+                  <div className="w-full h-full flex flex-col items-center justify-center text-stone-300">
                     <ImageIcon size={40} strokeWidth={1.5} />
-                    <span className="text-xs text-zinc-400 mt-2">ไม่มีรูปภาพ</span>
+                    <span className="text-xs text-stone-400 mt-2">ไม่มีรูปภาพ</span>
                   </div>
                 )}
 
                 {/* Admission badge on image */}
-                <div className="absolute bottom-3 left-3 bg-zinc-950/75 backdrop-blur-md text-white text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-md">
-                  <Ticket size={13} className="text-emerald-400" />
+                <div className="absolute bottom-3 left-3 bg-stone-950/80 backdrop-blur-md text-white text-xs font-medium px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-md">
+                  <Ticket size={13} className="text-amber-400" />
                   <span>{priceDisplay}</span>
                 </div>
               </div>
@@ -132,9 +132,9 @@ export default function DestinationDetailModal({
                     <button
                       key={idx}
                       onClick={() => setActiveImageIndex(idx)}
-                      className={`relative w-16 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
+                      className={`relative w-16 h-12 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
                         activeImageIndex === idx
-                          ? "border-blue-600 ring-2 ring-blue-500/20"
+                          ? "border-teal-700 ring-2 ring-teal-600/20"
                           : "border-transparent opacity-70 hover:opacity-100"
                       }`}
                     >
@@ -147,10 +147,10 @@ export default function DestinationDetailModal({
 
             {/* Title & Description Section */}
             <div className="space-y-2">
-              <h2 className="text-xl font-bold tracking-tight text-zinc-900">
+              <h2 className="text-xl font-bold tracking-tight text-stone-900">
                 {destination.name}
               </h2>
-              <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-line bg-zinc-50/70 p-4 rounded-xl border border-zinc-100">
+              <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-line bg-stone-50/80 p-4 rounded-xl border border-stone-100">
                 {destination.description || "ยังไม่มีข้อมูลคำอธิบายสำหรับสถานที่นี้"}
               </p>
             </div>
@@ -158,13 +158,13 @@ export default function DestinationDetailModal({
             {/* 7 Days Operating Schedule Section */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-zinc-900 flex items-center gap-2">
-                  <Calendar size={16} className="text-blue-600" />
+                <h3 className="text-sm font-semibold text-stone-900 flex items-center gap-2">
+                  <Calendar size={16} className="text-teal-700" />
                   วันและเวลาเปิดให้บริการ (7 วัน)
                 </h3>
               </div>
 
-              <div className="border border-zinc-200 rounded-xl overflow-hidden divide-y divide-zinc-100 bg-white">
+              <div className="border border-stone-200 rounded-xl overflow-hidden divide-y divide-stone-100 bg-white">
                 {DAYS_CONFIG.map((day) => {
                   const isToday = todayDayCode === day.key;
                   const sched = destination.opening_hours?.[day.key];
@@ -190,16 +190,16 @@ export default function DestinationDetailModal({
                   return (
                     <div
                       key={day.key}
-                      className={`flex items-center justify-between px-4 py-2.5 text-xs ${
-                        isToday ? "bg-blue-50/50 font-semibold" : "hover:bg-zinc-50/50"
+                      className={`flex items-center justify-between px-4 py-2.5 text-xs transition-colors ${
+                        isToday ? "bg-amber-50/70 font-semibold border-l-3 border-amber-500" : "hover:bg-stone-50/50"
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <span className={`w-16 font-medium ${isToday ? "text-blue-700" : "text-zinc-700"}`}>
+                        <span className={`w-16 font-medium ${isToday ? "text-amber-900 font-bold" : "text-stone-700"}`}>
                           {day.fullLabel}
                         </span>
                         {isToday && (
-                          <span className="text-[10px] font-medium bg-blue-600 text-white px-1.5 py-0.2 rounded-full">
+                          <span className="text-[10px] font-bold bg-amber-500 text-white px-2 py-0.2 rounded-full">
                             วันนี้
                           </span>
                         )}
@@ -208,15 +208,15 @@ export default function DestinationDetailModal({
                       <div className="flex items-center gap-2">
                         {isOpen ? (
                           <>
-                            <span className="text-zinc-600 font-mono text-[11px]">{timeStr}</span>
-                            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/50">
-                              <CheckCircle2 size={11} className="text-emerald-500" />
+                            <span className="text-stone-600 font-mono text-[11px]">{timeStr}</span>
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/60">
+                              <CheckCircle2 size={11} className="text-emerald-600" />
                               เปิด
                             </span>
                           </>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-md">
-                            <XCircle size={11} className="text-zinc-400" />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-stone-500 bg-stone-100 px-2.5 py-0.5 rounded-full">
+                            <XCircle size={11} className="text-stone-400" />
                             ปิดทำการ
                           </span>
                         )}
@@ -228,17 +228,17 @@ export default function DestinationDetailModal({
             </div>
 
             {/* Admission Info */}
-            <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200/70 flex items-center justify-between">
+            <div className="p-4 rounded-xl bg-stone-50/80 border border-stone-200/70 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
                   <Ticket size={18} />
                 </div>
                 <div>
-                  <div className="text-xs text-zinc-500">ค่าธรรมเนียมเข้าชม</div>
-                  <div className="text-sm font-bold text-zinc-900">{priceDisplay}</div>
+                  <div className="text-xs text-stone-500">ค่าธรรมเนียมเข้าชม</div>
+                  <div className="text-sm font-bold text-stone-900">{priceDisplay}</div>
                 </div>
               </div>
-              <div className="text-xs text-zinc-400">
+              <div className="text-xs text-stone-500">
                 {destination.min_price === 0 && destination.max_price === 0
                   ? "เปิดให้เข้าชมฟรีไม่มีค่าใช้จ่าย"
                   : `ขั้นต่ำ ฿${(destination.min_price || 0).toLocaleString()} ต่อคน`}
@@ -247,11 +247,11 @@ export default function DestinationDetailModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="px-6 py-3.5 border-t border-zinc-100 bg-zinc-50/60 flex items-center justify-between shrink-0">
+          <div className="px-6 py-3.5 border-t border-stone-100 bg-stone-50/60 flex items-center justify-between shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
+              className="px-4 py-2 text-xs font-semibold text-stone-700 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 transition-colors cursor-pointer"
             >
               ปิดหน้าต่าง
             </button>
@@ -262,7 +262,7 @@ export default function DestinationDetailModal({
                 onClose();
                 onEdit(destination);
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 rounded-xl transition-colors shadow-sm shadow-teal-900/15 cursor-pointer"
             >
               <Edit3 size={13} />
               แก้ไขข้อมูลนี้

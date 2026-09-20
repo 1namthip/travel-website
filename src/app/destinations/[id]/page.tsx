@@ -7,7 +7,7 @@ import {
   Phone,
   Clock,
   Star,
-  Share,
+  Share2,
   Heart,
   Navigation,
   ChevronLeft,
@@ -15,6 +15,13 @@ import {
   Calendar,
   CheckCircle2,
   XCircle,
+  Copy,
+  Check,
+  Compass,
+  Sparkles,
+  Camera,
+  Users,
+  Car,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -93,6 +100,7 @@ export default function DestinationDetail() {
   const [reviews, setReviews] = useState<PlaceReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedAddress, setCopiedAddress] = useState(false);
 
   const { isFavorite, toggleFavorite } = useFavorites();
   const saved = !!cleanId && isFavorite("destination", cleanId);
@@ -175,6 +183,43 @@ export default function DestinationDetail() {
     }
   };
 
+  // ================= 4. แชร์ & คัดลอกที่อยู่ =================
+  const handleShare = async () => {
+    const shareData = {
+      title: destination?.name || "สถานที่ท่องเที่ยว",
+      text: `แนะนำสถานที่ท่องเที่ยว: ${destination?.name || ""}`,
+      url: typeof window !== "undefined" ? window.location.href : "",
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch {
+        // user dismissed
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("คัดลอกลิงก์เรียบร้อยแล้ว");
+    } catch {
+      toast.error("ไม่สามารถคัดลอกลิงก์ได้");
+    }
+  };
+
+  const handleCopyAddress = async () => {
+    if (!destination?.location) return;
+    try {
+      await navigator.clipboard.writeText(destination.location);
+      setCopiedAddress(true);
+      toast.success("คัดลอกที่อยู่เรียบร้อยแล้ว");
+      setTimeout(() => setCopiedAddress(false), 2000);
+    } catch {
+      toast.error("ไม่สามารถคัดลอกที่อยู่ได้");
+    }
+  };
+
   if (loading) return <PlaceDetailSkeleton />;
 
   if (error || !destination) {
@@ -198,81 +243,75 @@ export default function DestinationDetail() {
   const minPrice = destination.min_price || 0;
   const maxPrice = destination.max_price || 0;
   const isFree = maxPrice === 0;
-  // ค้น Google Maps ด้วย "ชื่อสถานที่" (วิธีเดียวกับหน้าร้านอาหารและที่พัก)
+
+  // ค้น Google Maps ด้วย "ชื่อสถานที่"
   const mapsHref = mapsSearchUrl(destination.name);
 
+  // การแสดงราคาแบบ Duo-Tone พรีเมียม
   const priceNode = isFree ? (
-    <span className="text-2xl font-extrabold text-emerald-600 tracking-tight">
-      เข้าชมฟรี
-    </span>
+    <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-sm font-bold shadow-2xs">
+      <Sparkles className="w-3.5 h-3.5 text-teal-600" />
+      <span>เข้าชมฟรี</span>
+    </div>
   ) : (
-    <span className="flex items-baseline gap-1">
-      <span className="text-2xl font-extrabold text-neutral-900 tracking-tight">
+    <div className="flex items-baseline gap-1.5">
+      <span className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
         {minPrice === maxPrice
           ? `฿${minPrice.toLocaleString()}`
           : `฿${minPrice.toLocaleString()}–${maxPrice.toLocaleString()}`}
       </span>
-      <span className="text-sm text-neutral-500 font-medium">/ ท่าน</span>
-    </span>
+      <span className="text-xs sm:text-sm text-stone-500 font-medium">/ ท่าน</span>
+    </div>
   );
 
+  // ปุ่ม CTA หลัก
   const primaryCta = (
     <a
       href={mapsHref}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-amber-600 px-5 text-sm font-bold text-white transition-colors hover:bg-amber-700"
+      className="inline-flex h-11 sm:h-12 items-center justify-center gap-2 rounded-xl bg-teal-700 hover:bg-teal-800 active:scale-[0.98] px-5 sm:px-6 text-sm font-bold text-white shadow-md shadow-teal-900/15 transition-all cursor-pointer"
     >
-      <Navigation className="w-4 h-4" /> นำทาง
+      <Navigation className="w-4 h-4 text-amber-300" /> นำทาง
     </a>
   );
 
   const openingStatus = getPlaceOpeningStatus(destination);
 
-  const facts: { icon: React.ElementType; label: string; value: string }[] = [];
-  facts.push({
-    icon: Clock,
-    label: "เวลาทำการวันนี้",
-    value: openingStatus.isTodayOpen ? openingStatus.todayHoursText : "วันนี้ปิดทำการ",
-  });
-  if (destination.location)
-    facts.push({ icon: MapPin, label: "ที่ตั้ง", value: destination.location });
-  if (destination.phone)
-    facts.push({ icon: Phone, label: "ติดต่อสอบถาม", value: destination.phone });
-  facts.push({
-    icon: Ticket,
-    label: "ราคาเข้าชม",
-    value: isFree
-      ? "เข้าชมฟรี"
-      : minPrice === maxPrice
-        ? `฿${minPrice.toLocaleString()} / ท่าน`
-        : `฿${minPrice.toLocaleString()}–${maxPrice.toLocaleString()} / ท่าน`,
-  });
-
   return (
-    <div className="min-h-screen bg-white pb-24 lg:pb-16">
-      {/* Top bar */}
-      <nav className="sticky top-0 z-50 border-b border-neutral-100 bg-white/90 backdrop-blur-md">
+    <div className="min-h-screen bg-[#FAF9F6] pb-24 lg:pb-16 text-stone-800 selection:bg-teal-100 selection:text-teal-900">
+      {/* ── Top Bar (Glassmorphism + Duo-tone accents) ── */}
+      <nav className="sticky top-0 z-50 border-b border-stone-200/70 bg-white/85 backdrop-blur-md transition-all">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link
             href="/destinations"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 hover:text-stone-950 px-3 py-1.5 rounded-full hover:bg-stone-100 transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-4 h-4 text-stone-500" />
             <span className="hidden sm:inline">กลับไปหน้ารวมสถานที่</span>
             <span className="sm:hidden">กลับ</span>
           </Link>
-          <div className="flex items-center gap-1">
-            <button className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100 transition-colors">
-              <Share className="w-4 h-4" />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium text-stone-600 hover:text-stone-900 bg-white hover:bg-stone-100 border border-stone-200/80 shadow-2xs transition-all cursor-pointer active:scale-95"
+              title="แชร์สถานที่ท่องเที่ยวนี้"
+            >
+              <Share2 className="w-3.5 h-3.5 text-stone-500" />
               <span className="hidden sm:inline">แชร์</span>
             </button>
             <button
               onClick={() => cleanId && toggleFavorite("destination", cleanId)}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100 transition-colors"
+              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium border shadow-2xs transition-all cursor-pointer active:scale-95 ${
+                saved
+                  ? "bg-rose-50 border-rose-200 text-rose-700"
+                  : "bg-white border-stone-200/80 text-stone-600 hover:text-stone-900 hover:bg-stone-100"
+              }`}
             >
               <Heart
-                className={`w-4 h-4 transition-colors ${saved ? "fill-rose-500 text-rose-500" : ""}`}
+                className={`w-3.5 h-3.5 transition-colors ${
+                  saved ? "fill-rose-500 text-rose-500" : "text-stone-500"
+                }`}
               />
               <span className="hidden sm:inline">
                 {saved ? "บันทึกแล้ว" : "บันทึก"}
@@ -282,139 +321,266 @@ export default function DestinationDetail() {
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-        {/* Breadcrumb */}
-        <nav className="text-xs sm:text-sm text-neutral-500 mb-4 flex items-center gap-1.5 flex-wrap">
-          <Link href="/" className="hover:text-neutral-900 transition-colors">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* ── Breadcrumb Navigation ── */}
+        <nav className="text-xs sm:text-sm text-stone-500 mb-3 sm:mb-4 flex items-center gap-2 flex-wrap">
+          <Link
+            href="/"
+            className="hover:text-teal-800 transition-colors inline-flex items-center gap-1"
+          >
             หน้าแรก
           </Link>
-          <span className="text-neutral-300">›</span>
+          <span className="text-stone-300">/</span>
           <Link
             href="/destinations"
-            className="hover:text-neutral-900 transition-colors"
+            className="hover:text-teal-800 transition-colors"
           >
             สถานที่ท่องเที่ยว
           </Link>
-          <span className="text-neutral-300">›</span>
-          <span className="text-neutral-900 font-medium truncate max-w-[45vw]">
+          <span className="text-stone-300">/</span>
+          <span className="text-stone-900 font-medium truncate max-w-[45vw]">
             {destination.name}
           </span>
         </nav>
 
-        {/* Title + meta pills */}
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 tracking-tight leading-tight mb-3">
+        {/* ── Title & Duo-Tone Meta Badges ── */}
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-stone-900 tracking-tight leading-tight mb-3 sm:mb-4">
           {destination.name}
         </h1>
-        <div className="flex flex-wrap items-center gap-2 mb-6">
+
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-6 sm:mb-8">
+          {/* Rating Pill (Sunset Amber) */}
           {avgRating && (
             <a
               href="#reviews"
-              className="inline-flex items-center gap-1.5 rounded-full bg-white border border-neutral-200 px-3 py-1 text-sm font-semibold text-neutral-900"
+              className="inline-flex items-center gap-1.5 rounded-full bg-amber-50/90 border border-amber-200/80 px-3.5 py-1 text-xs sm:text-sm font-semibold text-amber-900 hover:bg-amber-100 transition-all shadow-2xs"
             >
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              {avgRating}
-              <span className="font-normal text-neutral-400">
+              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+              <span>{avgRating}</span>
+              <span className="text-amber-700/80 font-normal">
                 · {reviews.length} รีวิว
               </span>
             </a>
           )}
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-100 px-3 py-1 text-sm font-semibold text-amber-700">
+
+          {/* Category Pill (Deep Pine Teal) */}
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 border border-teal-200/70 px-3.5 py-1 text-xs sm:text-sm font-semibold text-teal-800 shadow-2xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-600" />
             {destination.category || "จุดหมายปลายทาง"}
           </span>
+
+          {/* Live Status Badge */}
+          <div
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs sm:text-sm font-semibold border shadow-2xs ${
+              openingStatus.isOpenNow
+                ? "bg-emerald-50 text-emerald-800 border-emerald-200/70"
+                : openingStatus.isTodayOpen
+                ? "bg-amber-50 text-amber-800 border-amber-200/70"
+                : "bg-stone-100 text-stone-600 border-stone-200"
+            }`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                openingStatus.isOpenNow
+                  ? "bg-emerald-500 animate-pulse"
+                  : openingStatus.isTodayOpen
+                  ? "bg-amber-500"
+                  : "bg-stone-400"
+              }`}
+            />
+            <span>{openingStatus.badgeLabel}</span>
+          </div>
+
+          {/* Location Chip */}
           {destination.location && (
             <a
               href={mapsHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 px-3 py-1 text-sm font-medium text-neutral-600 hover:border-neutral-300 hover:text-neutral-900 transition-colors max-w-full"
+              className="inline-flex items-center gap-1.5 rounded-full border border-stone-200/80 bg-white px-3.5 py-1 text-xs sm:text-sm font-medium text-stone-600 hover:border-teal-300 hover:text-teal-800 hover:bg-stone-50 transition-colors max-w-full shadow-2xs"
             >
-              <MapPin className="w-3.5 h-3.5 shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0" />
               <span className="truncate">{destination.location}</span>
             </a>
           )}
         </div>
 
+        {/* ── Image Gallery Section ── */}
         <ImageGallery images={images} alt={destination.name} />
 
-        {/* Content split */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-          {/* Left */}
+        {/* ── Content Grid: 2 Cols Left / 1 Col Right Sticky ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
+          {/* Left Column: Details & Insights */}
           <div className="lg:col-span-2">
-            {/* Key facts */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-              {facts.map((f) => (
-                <div
-                  key={f.label}
-                  className="flex items-start gap-3 rounded-xl border border-neutral-200 p-4"
-                >
-                  <div className="p-2 bg-neutral-50 rounded-lg text-neutral-600 shrink-0">
-                    <f.icon className="w-5 h-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-medium text-neutral-500 mb-0.5">
-                      {f.label}
-                    </p>
-                    <p className="text-sm font-semibold text-neutral-900 leading-snug">
-                      {f.value}
-                    </p>
-                  </div>
+            {/* 1. Quick Facts (Duo-Tone Cards 2x2) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 mb-8">
+              {/* Card: Opening hours */}
+              <div className="flex items-start gap-3.5 rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-4.5 shadow-2xs hover:border-teal-200 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-600/15 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5" />
                 </div>
-              ))}
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-0.5">
+                    เวลาทำการวันนี้
+                  </p>
+                  <p className="text-sm font-bold text-stone-900 leading-snug">
+                    {openingStatus.isTodayOpen
+                      ? openingStatus.todayHoursText
+                      : "วันนี้ปิดทำการ"}
+                  </p>
+                  <p className="text-[11px] text-teal-700 font-medium mt-1">
+                    {openingStatus.badgeLabel}
+                  </p>
+                </div>
+              </div>
+
+              {/* Card: Admission Ticket */}
+              <div className="flex items-start gap-3.5 rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-4.5 shadow-2xs hover:border-amber-200 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 ring-1 ring-amber-600/15 flex items-center justify-center shrink-0">
+                  <Ticket className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-0.5">
+                    ค่าเข้าชม
+                  </p>
+                  <p className="text-sm font-bold text-stone-900 leading-snug">
+                    {isFree
+                      ? "เข้าชมฟรี"
+                      : minPrice === maxPrice
+                      ? `฿${minPrice.toLocaleString()} / ท่าน`
+                      : `฿${minPrice.toLocaleString()}–${maxPrice.toLocaleString()} / ท่าน`}
+                  </p>
+                  <p className="text-[11px] text-amber-700 font-medium mt-1">
+                    {isFree ? "ไม่มีค่าบริการเข้าชม" : "ราคาสำหรับบุคคลทั่วไป"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Card: Location & Quick Copy */}
+              <div className="flex items-start gap-3.5 rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-4.5 shadow-2xs hover:border-teal-200 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-600/15 flex items-center justify-center shrink-0">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-0.5">
+                      ที่ตั้ง
+                    </p>
+                    {destination.location && (
+                      <button
+                        onClick={handleCopyAddress}
+                        className="text-[11px] text-teal-700 hover:text-teal-900 font-medium inline-flex items-center gap-1 cursor-pointer"
+                        title="คัดลอกที่อยู่"
+                      >
+                        {copiedAddress ? (
+                          <>
+                            <Check className="w-3 h-3 text-teal-600" /> คัดลอกแล้ว
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" /> คัดลอก
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-sm font-bold text-stone-900 leading-snug line-clamp-2">
+                    {destination.location || "ไม่มีข้อมูลที่ตั้งระบุ"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Card: Contact / Phone */}
+              <div className="flex items-start gap-3.5 rounded-2xl border border-stone-200/80 bg-white p-4 sm:p-4.5 shadow-2xs hover:border-amber-200 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 ring-1 ring-amber-600/15 flex items-center justify-center shrink-0">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-0.5">
+                    ติดต่อสอบถาม
+                  </p>
+                  {destination.phone ? (
+                    <a
+                      href={`tel:${destination.phone}`}
+                      className="text-sm font-bold text-stone-900 hover:text-teal-800 leading-snug inline-block underline decoration-stone-300 underline-offset-2"
+                    >
+                      {destination.phone}
+                    </a>
+                  ) : (
+                    <p className="text-sm font-bold text-stone-900 leading-snug">
+                      ไม่มีเบอร์ติดต่อระบุ
+                    </p>
+                  )}
+                  <p className="text-[11px] text-stone-400 font-medium mt-1">
+                    {destination.phone ? "กดเพื่อโทรออกได้ทันที" : "สอบถามข้อมูลเพิ่มเติมที่จุดบริการ"}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            {/* 7 Days Operating Schedule Section */}
-            <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 sm:p-6 mb-10 shadow-xs">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-neutral-100">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            {/* 2. 7 Days Operating Schedule Section */}
+            <div className="bg-white rounded-3xl border border-stone-200/80 p-5 sm:p-6 mb-8 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-stone-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-600/10 flex items-center justify-center">
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-neutral-900">
+                    <h3 className="text-base font-bold text-stone-900">
                       วันและเวลาเปิดให้บริการ
                     </h3>
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-stone-500">
                       {openingStatus.openDaysSummary}
                     </p>
                   </div>
                 </div>
 
                 {/* Live Status Badge */}
-                <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
-                  openingStatus.isOpenNow
-                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                    : openingStatus.isTodayOpen
-                    ? "bg-amber-50 text-amber-700 border-amber-200"
-                    : "bg-rose-50 text-rose-700 border-rose-200"
-                }`}>
-                  <span className={`w-2 h-2 rounded-full ${
+                <div
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
                     openingStatus.isOpenNow
-                      ? "bg-emerald-500 animate-pulse"
+                      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
                       : openingStatus.isTodayOpen
-                      ? "bg-amber-500"
-                      : "bg-rose-500"
-                  }`} />
+                      ? "bg-amber-50 text-amber-800 border-amber-200"
+                      : "bg-rose-50 text-rose-700 border-rose-200"
+                  }`}
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      openingStatus.isOpenNow
+                        ? "bg-emerald-500 animate-pulse"
+                        : openingStatus.isTodayOpen
+                        ? "bg-amber-500"
+                        : "bg-rose-500"
+                    }`}
+                  />
                   {openingStatus.badgeLabel}
                 </div>
               </div>
 
-              {/* 7 Days Grid/Table */}
-              <div className="divide-y divide-neutral-100 rounded-xl overflow-hidden border border-neutral-100 bg-neutral-50/40">
+              {/* 7 Days Schedule Table */}
+              <div className="divide-y divide-stone-100 rounded-2xl overflow-hidden border border-stone-100 bg-stone-50/30">
                 {openingStatus.schedule.map((day) => (
                   <div
                     key={day.key}
-                    className={`flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                    className={`flex items-center justify-between px-4 py-3 text-sm transition-colors ${
                       day.isToday
-                        ? "bg-amber-50/80 font-semibold border-l-4 border-l-amber-500 pl-3"
+                        ? "bg-amber-50/70 font-semibold border-l-4 border-l-amber-500 pl-3.5"
                         : "hover:bg-white"
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className={day.isToday ? "text-amber-900 font-bold" : "text-neutral-700"}>
+                    <div className="flex items-center gap-2.5">
+                      <span
+                        className={
+                          day.isToday
+                            ? "text-amber-950 font-bold"
+                            : "text-stone-700"
+                        }
+                      >
                         {day.fullLabel}
                       </span>
                       {day.isToday && (
-                        <span className="text-[10px] font-bold bg-amber-500 text-white px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-bold bg-amber-500 text-white px-2 py-0.5 rounded-full shadow-2xs">
                           วันนี้
                         </span>
                       )}
@@ -423,7 +589,7 @@ export default function DestinationDetail() {
                     <div className="flex items-center gap-2">
                       {day.isOpen ? (
                         <>
-                          <span className="text-neutral-600 text-xs sm:text-sm font-medium">
+                          <span className="text-stone-600 text-xs sm:text-sm font-medium">
                             {day.timeDisplay}
                           </span>
                           <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
@@ -432,8 +598,8 @@ export default function DestinationDetail() {
                           </span>
                         </>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-neutral-500 bg-neutral-100 px-2.5 py-0.5 rounded-md border border-neutral-200">
-                          <XCircle className="w-3 h-3 text-neutral-400" />
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-stone-500 bg-stone-100 px-2.5 py-0.5 rounded-md border border-stone-200">
+                          <XCircle className="w-3 h-3 text-stone-400" />
                           ปิดทำการ
                         </span>
                       )}
@@ -443,81 +609,162 @@ export default function DestinationDetail() {
               </div>
             </div>
 
-            {/* Description */}
-            <h2 className="text-xl font-bold text-neutral-900 mb-3">
-              เกี่ยวกับสถานที่นี้
-            </h2>
-            <div className="text-[15px] text-neutral-600 leading-loose whitespace-pre-line mb-10">
-              {destination.description || "ยังไม่มีรายละเอียดเพิ่มเติมสำหรับสถานที่นี้"}
+            {/* 3. Description (Editorial Travel Style) */}
+            <div className="bg-white rounded-3xl border border-stone-200/80 p-6 sm:p-7 mb-8 shadow-sm">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-1.5 h-5 bg-teal-700 rounded-full" />
+                <h2 className="text-lg sm:text-xl font-bold text-stone-900 tracking-tight">
+                  เกี่ยวกับสถานที่นี้
+                </h2>
+              </div>
+              <div className="text-[15px] sm:text-base text-stone-700 leading-relaxed sm:leading-loose whitespace-pre-line mb-6 font-normal">
+                {destination.description ||
+                  "ยังไม่มีรายละเอียดเพิ่มเติมสำหรับสถานที่นี้ สามารถตรวจสอบข้อมูลเพิ่มเติม ณ จุดบริการหรือสอบถามผ่านช่องทางติดต่อ"}
+              </div>
+
+              {/* Characteristic highlight tags */}
+              <div className="pt-4 border-t border-stone-100 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100/80 text-stone-700 text-xs font-medium">
+                  <Camera className="w-3.5 h-3.5 text-amber-600" /> จุดถ่ายรูปยอดนิยม
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100/80 text-stone-700 text-xs font-medium">
+                  <Users className="w-3.5 h-3.5 text-teal-700" /> เหมาะสำหรับครอบครัวและกลุ่มเพื่อน
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100/80 text-stone-700 text-xs font-medium">
+                  <Car className="w-3.5 h-3.5 text-stone-600" /> มีจุดจอดรถรองรับ
+                </span>
+              </div>
             </div>
 
-            {/* Location card */}
+            {/* 4. Location & Direction Guide Card */}
             {destination.location && (
-              <div className="rounded-2xl border border-neutral-200 p-5">
-                <h3 className="text-sm font-bold text-neutral-900 mb-2 flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-neutral-400" /> ที่ตั้ง
-                </h3>
-                <p className="text-sm text-neutral-600 leading-relaxed mb-3">
+              <div className="rounded-3xl border border-stone-200/80 bg-white p-6 sm:p-7 shadow-sm">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-base font-bold text-stone-900">
+                      ที่ตั้งและการเดินทาง
+                    </h3>
+                  </div>
+                  <button
+                    onClick={handleCopyAddress}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-teal-700 hover:text-teal-900 px-2.5 py-1 rounded-md hover:bg-teal-50 transition cursor-pointer"
+                  >
+                    {copiedAddress ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" /> คัดลอกที่อยู่แล้ว
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" /> คัดลอกที่อยู่
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <p className="text-sm text-stone-600 leading-relaxed mb-4">
                   {destination.location}
                 </p>
-                <a
-                  href={mapsHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-semibold text-neutral-900 hover:underline"
-                >
-                  เปิดใน Google Maps →
-                </a>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={mapsHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white px-4.5 py-2.5 text-sm font-bold shadow-sm transition active:scale-95"
+                  >
+                    <Navigation className="w-4 h-4 text-amber-300" /> เปิดใน Google Maps
+                  </a>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Right — sticky action card */}
+          {/* Right Column — Sticky Action Card (Desktop) */}
           <div className="lg:col-span-1">
-            <div className="hidden lg:block sticky top-20 rounded-2xl border border-neutral-200 shadow-sm p-5 sm:p-6">
-              <div className="mb-4">{priceNode}</div>
-
-              {/* Status pill in sticky card */}
-              <div className="mb-5 p-3 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-neutral-400" />
-                  <span className="text-xs text-neutral-600 font-medium">สถานะวันนี้</span>
+            <div className="hidden lg:block sticky top-20 rounded-3xl border border-stone-200/80 bg-white p-6 sm:p-7 shadow-xl shadow-stone-200/50">
+              {/* Price Row */}
+              <div className="mb-5 pb-4 border-b border-stone-100 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1">
+                    ค่าธรรมเนียมเข้าชม
+                  </p>
+                  {priceNode}
                 </div>
-                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
-                  openingStatus.isOpenNow
-                    ? "bg-emerald-100 text-emerald-800"
-                    : openingStatus.isTodayOpen
-                    ? "bg-amber-100 text-amber-800"
-                    : "bg-rose-100 text-rose-800"
-                }`}>
+                {isFree && (
+                  <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-teal-50 text-teal-800 border border-teal-200/60">
+                    Free
+                  </span>
+                )}
+              </div>
+
+              {/* Status Banner */}
+              <div className="mb-6 p-3.5 rounded-2xl bg-stone-50/70 border border-stone-200/60 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-white border border-stone-200/60 flex items-center justify-center text-stone-500 shadow-2xs">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-stone-800">เวลาทำการวันนี้</p>
+                    <p className="text-xs text-stone-500 font-medium">
+                      {openingStatus.isTodayOpen
+                        ? openingStatus.todayHoursText
+                        : "วันนี้ปิดทำการ"}
+                    </p>
+                  </div>
+                </div>
+                <span
+                  className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
+                    openingStatus.isOpenNow
+                      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                      : openingStatus.isTodayOpen
+                      ? "bg-amber-50 text-amber-800 border-amber-200"
+                      : "bg-rose-50 text-rose-700 border-rose-200"
+                  }`}
+                >
                   {openingStatus.badgeLabel}
                 </span>
               </div>
 
+              {/* Primary CTA Button (Pine Teal + Amber Accent) */}
               <a
                 href={mapsHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl bg-amber-600 text-sm font-bold text-white transition-colors hover:bg-amber-700"
+                className="inline-flex w-full h-12 items-center justify-center gap-2.5 rounded-xl bg-teal-700 text-sm font-bold text-white shadow-md shadow-teal-900/15 transition-all hover:bg-teal-800 active:scale-[0.98] cursor-pointer"
               >
-                <Navigation className="w-4 h-4" /> นำทางด้วย Google Maps
+                <Navigation className="w-4 h-4 text-amber-300" /> นำทางด้วย Google Maps
               </a>
+
+              {/* Secondary CTA (Phone) */}
               {destination.phone && (
                 <a
                   href={`tel:${destination.phone}`}
-                  className="mt-3 inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl border border-neutral-200 text-sm font-bold text-neutral-700 transition-colors hover:bg-neutral-50"
+                  className="mt-3 inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl border border-stone-200/80 bg-white text-sm font-semibold text-stone-700 transition-all hover:bg-stone-50 hover:border-stone-300"
                 >
-                  <Phone className="w-4 h-4" /> {destination.phone}
+                  <Phone className="w-4 h-4 text-stone-500" /> {destination.phone}
                 </a>
               )}
-              <p className="mt-4 text-center text-xs text-neutral-400">
-                ตรวจสอบเวลาทำการก่อนเดินทางทุกครั้ง
-              </p>
+
+              {/* Travel Tip Card */}
+              <div className="mt-6 p-4 rounded-2xl bg-amber-50/60 border border-amber-200/60">
+                <div className="flex items-start gap-2.5">
+                  <Compass className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-950/80 leading-relaxed">
+                    <strong className="font-semibold text-amber-950">
+                      คำแนะนำการเดินทาง:{" "}
+                    </strong>
+                    ควรตรวจสอบสภาพอากาศและเวลาทำการก่อนออกเดินทาง เพื่อให้การท่องเที่ยวราบรื่นและได้ภาพบรรยากาศที่ดีที่สุด
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Reviews */}
+        {/* ── Reviews Section ── */}
         <PlaceReviews
           reviews={reviews}
           currentUserId={user?.id}
@@ -528,13 +775,15 @@ export default function DestinationDetail() {
           copy={{
             formHeading: "เขียนรีวิวสถานที่นี้",
             ratingLabel: "คุณให้คะแนนความประทับใจเท่าไหร่?",
-            placeholder: "สถานที่สวยงามไหม? บรรยากาศเป็นอย่างไร? แชร์ให้คนอื่นรู้เลย...",
-            emptyText: "เป็นคนแรกที่แชร์ประสบการณ์และความประทับใจของสถานที่นี้สิ!",
+            placeholder:
+              "สถานที่สวยงามไหม? บรรยากาศเป็นอย่างไร? แชร์ให้คนอื่นรู้เลย...",
+            emptyText:
+              "เป็นคนแรกที่แชร์ประสบการณ์และความประทับใจของสถานที่นี้สิ!",
           }}
         />
       </main>
 
-      {/* Mobile sticky bar */}
+      {/* ── Mobile Sticky Bar ── */}
       <DetailStickyBar
         price={<div className="text-sm">{priceNode}</div>}
         cta={primaryCta}

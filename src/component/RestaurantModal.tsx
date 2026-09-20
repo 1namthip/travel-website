@@ -427,29 +427,29 @@ export default function RestaurantModal({
                     placeholder="เช่น The Coffee Club"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400"
                   />
                 </div>
 
                 {/* ─── Premium Custom Dropdown ─── */}
                 <div className="sm:col-span-1 space-y-1.5" ref={categoryDropdownRef}>
-                  <label className="text-[13px] font-medium text-zinc-700">
+                  <label className="text-[13px] font-medium text-stone-700">
                     หมวดหมู่
                   </label>
                   <div className="relative">
                     <button
                       type="button"
                       onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                      className={`w-full pl-3 pr-3 py-2 text-sm border rounded-lg bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
+                      className={`w-full pl-3.5 pr-3.5 py-2 text-sm border rounded-xl bg-white transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 cursor-pointer ${
                         isCategoryOpen
-                          ? "border-zinc-400 ring-4 ring-zinc-900/5"
-                          : "border-zinc-200 hover:border-zinc-300"
-                      } ${form.category ? "text-zinc-900" : "text-zinc-400"}`}
+                          ? "border-teal-600 ring-2 ring-teal-600/20"
+                          : "border-stone-200 hover:border-stone-300"
+                      } ${form.category ? "text-stone-900" : "text-stone-400"}`}
                     >
                       <span className="truncate">{form.category || "เลือกหมวดหมู่..."}</span>
                       <ChevronDown
                         size={16}
-                        className={`text-zinc-400 transition-transform duration-200 ${
+                        className={`text-stone-400 transition-transform duration-200 ${
                           isCategoryOpen ? "rotate-180" : ""
                         }`}
                       />
@@ -462,7 +462,7 @@ export default function RestaurantModal({
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 4, scale: 0.98 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute z-50 w-full mt-1.5 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 overflow-hidden"
+                          className="absolute z-50 w-full mt-1.5 bg-white border border-stone-200 rounded-xl shadow-lg py-1 overflow-hidden"
                         >
                           <div className="max-h-56 overflow-y-auto custom-scrollbar">
                             {categories.map((cat) => (
@@ -473,13 +473,13 @@ export default function RestaurantModal({
                                   setForm({ ...form, category: cat });
                                   setIsCategoryOpen(false);
                                 }}
-                                className="w-full text-left px-3 py-2 text-[13px] hover:bg-zinc-50 flex items-center justify-between transition-colors group"
+                                className="w-full text-left px-3.5 py-2 text-[13px] hover:bg-teal-50/50 flex items-center justify-between transition-colors group cursor-pointer"
                               >
-                                <span className={form.category === cat ? "text-zinc-900 font-medium" : "text-zinc-600 group-hover:text-zinc-900"}>
+                                <span className={form.category === cat ? "text-teal-900 font-semibold" : "text-stone-600 group-hover:text-teal-900"}>
                                   {cat}
                                 </span>
                                 {form.category === cat && (
-                                  <Check size={14} className="text-zinc-900" />
+                                  <Check size={14} className="text-teal-700" />
                                 )}
                               </button>
                             ))}
@@ -491,7 +491,7 @@ export default function RestaurantModal({
                 </div>
 
                 <div className="sm:col-span-1 space-y-1.5">
-                  <label className="text-[13px] font-medium text-zinc-700">
+                  <label className="text-[13px] font-medium text-stone-700">
                     ตำแหน่งที่ตั้ง / พิกัด
                   </label>
                   <input
@@ -499,25 +499,25 @@ export default function RestaurantModal({
                     placeholder="เช่น ชั้น G สยามพารากอน, ถ.สุขุมวิท"
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400"
                   />
                 </div>
 
                 <div className="sm:col-span-1 space-y-1.5">
-                  <label className="text-[13px] font-medium text-zinc-700 flex items-center gap-1">
-                    <Phone size={13} className="text-zinc-400" /> เบอร์โทรติดต่อ
+                  <label className="text-[13px] font-medium text-stone-700 flex items-center gap-1">
+                    <Phone size={13} className="text-stone-400" /> เบอร์โทรติดต่อ
                   </label>
                   <input
                     type="tel"
                     placeholder="08X-XXX-XXXX"
                     value={form.phone || ""}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400"
                   />
                 </div>
 
                 <div className="sm:col-span-2 space-y-1.5">
-                  <label className="text-[13px] font-medium text-zinc-700">
+                  <label className="text-[13px] font-medium text-stone-700">
                     คำอธิบาย / รายละเอียดเพิ่มเติม
                   </label>
                   <textarea
@@ -525,7 +525,7 @@ export default function RestaurantModal({
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                     rows={3}
-                    className="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-zinc-400 resize-none leading-relaxed"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all placeholder:text-stone-400 resize-none leading-relaxed"
                   />
                 </div>
               </div>
@@ -533,12 +533,12 @@ export default function RestaurantModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="px-6 py-4 border-t border-zinc-100 bg-zinc-50/50 flex justify-end gap-2.5">
+          <div className="px-6 py-4 border-t border-stone-100 bg-stone-50/70 flex justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-50"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-stone-200 bg-white px-5 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-100 disabled:opacity-50 cursor-pointer"
             >
               ยกเลิก
             </button>
@@ -546,11 +546,11 @@ export default function RestaurantModal({
               form="restaurant-form"
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex h-9 min-w-25 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:opacity-70"
+              className="inline-flex h-10 min-w-28 items-center justify-center gap-2 rounded-xl bg-teal-700 px-5 text-sm font-semibold text-white transition-all hover:bg-teal-800 shadow-md shadow-teal-900/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600/30 disabled:opacity-70 cursor-pointer"
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
-                  <Loader2 size={14} className="animate-spin text-zinc-400" />
+                  <Loader2 size={14} className="animate-spin text-white" />
                   กำลังบันทึก...
                 </span>
               ) : form.id ? (
