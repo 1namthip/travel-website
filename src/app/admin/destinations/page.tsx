@@ -762,14 +762,14 @@ export default function AdminDestinationsPage() {
         <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-xs mb-6 space-y-3.5">
           {/* Main Search row */}
           <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-            <div className="relative flex-1 w-full">
+            <div className="relative flex-1 w-full flex items-center">
               <Search
-                className="absolute left-3.5 text-stone-400 pointer-events-none"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"
                 size={17}
               />
               <input
                 type="text"
-                placeholder="🔍 ค้นหาชื่อสถานที่ หรือคำอธิบาย (เช่น น้ำตก, วัด, คาเฟ่, ธรรมชาติ)..."
+                placeholder="ค้นหาชื่อสถานที่ หรือคำอธิบาย (เช่น น้ำตก, วัด, คาเฟ่, ธรรมชาติ)..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -780,7 +780,8 @@ export default function AdminDestinationsPage() {
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-1 rounded-md transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-1 rounded-md transition-colors cursor-pointer"
+                  aria-label="ล้างการค้นหา"
                 >
                   <X size={15} />
                 </button>

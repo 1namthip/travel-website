@@ -224,7 +224,7 @@ export default function AdminRestaurantsPage() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
             <div className="relative flex-1 flex items-center">
               <Search
-                className="absolute left-3.5 text-stone-400 pointer-events-none"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"
                 size={16}
               />
               <input
@@ -237,7 +237,7 @@ export default function AdminRestaurantsPage() {
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-3 text-stone-400 hover:text-stone-600 p-1 rounded-md transition-colors cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-1 rounded-md transition-colors cursor-pointer"
                   aria-label="ล้างการค้นหา"
                 >
                   <X size={14} />
