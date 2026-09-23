@@ -107,6 +107,7 @@ interface TripResults {
   accommodations: TripItem[];
   restaurants: TripItem[];
   destinations: TripItem[];
+  exactDestinations?: TripItem[];
 }
 
 interface SelectedItem {
@@ -1286,7 +1287,7 @@ function DailyRouteTimeline({
 
 function TripRow({
   title, icon, items, type, selectedItems,
-  onToggle, onViewDetail, budget, spent, nights,
+  onToggle, onViewDetail, budget, spent, nights, exactMatch = false,
 }: {
   title: string;
   icon: React.ReactNode;
@@ -1298,6 +1299,7 @@ function TripRow({
   budget: number;
   spent: number;
   nights: number;
+  exactMatch?: boolean;
 }) {
   const isStay = type === "accommodation";
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -1321,8 +1323,8 @@ function TripRow({
     const result = items.filter((item) => {
       const itemPrice = Number(item.min_price ?? 0);
 
-      // เงื่อนไขสำหรับสถานที่ท่องเที่ยวในโหมดเลือกสถานที่เอง: ต้องราคาเท่ากับงบประมาณที่ระบุโดยตรง (price === budget)
-      if (type === "destination" && targetBudget > 0) {
+      // เงื่อนไขสำหรับสถานที่ตรงตามงบ: ต้องราคาเท่ากับงบประมาณที่ระบุโดยตรง (price === budget)
+      if (exactMatch && targetBudget > 0) {
         if (itemPrice !== targetBudget) return false;
       } else if (priceCeiling !== null && item.min_price * (isStay ? nights : 1) > priceCeiling) {
         return false;
@@ -1339,7 +1341,7 @@ function TripRow({
     if (sort === "price-desc") result.sort((a, b) => b.min_price - a.min_price);
     if (sort === "name") result.sort((a, b) => a.name.localeCompare(b.name, "th"));
     return result;
-  }, [items, search, category, maxPrice, sort, isStay, nights, type, budget]);
+  }, [items, search, category, maxPrice, sort, isStay, nights, exactMatch, budget]);
 
   const checkScroll = () => {
     if (!scrollRef.current) return;
@@ -1640,7 +1642,7 @@ export default function BudgetTripPlanner({
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const [activeTab, setActiveTab] = useState<"plans" | "custom">("plans");
+  const [activeTab, setActiveTab] = useState<"plans" | "exact" | "custom">("plans");
 
   // Results
   const [tripData, setTripData] = useState<TripResults | null>(null);
@@ -1700,6 +1702,18 @@ export default function BudgetTripPlanner({
     mode === "custom"
       ? Number(customBudgets.destination) || 0
       : Number(totalBudget) || 0;
+
+  const exactBudgetPlaces = useMemo(() => {
+    if (!tripData) return [];
+    if (tripData.exactDestinations && tripData.exactDestinations.length > 0) {
+      return tripData.exactDestinations.filter(
+        (d) => Number(d.min_price) === destinationBudget
+      );
+    }
+    return (tripData.destinations || []).filter(
+      (d) => Number(d.min_price) === destinationBudget
+    );
+  }, [tripData, destinationBudget]);
 
   const nights = Math.max((Number(days) || 1) - 1, 1);
 
@@ -1770,7 +1784,7 @@ export default function BudgetTripPlanner({
       } else {
         setPlans([]);
         setSelectedPlanId(null);
-        setActiveTab("custom"); // ถ้าไม่มี plan สำเร็จรูป ให้สลับไปโหมดเลือกเอง
+        setActiveTab("plans"); // แสดงหน้าแผนทริปแนะนำ (มีกล่องแจ้งเตือนไม่พบแผนพร้อมปุ่มเลือกหน้าอื่น)
       }
     } catch (error: any) {
       console.error("handleGenerate error:", error);
@@ -2151,10 +2165,10 @@ export default function BudgetTripPlanner({
                 </div>
               </div>
 
-              {/* ── 2. Results Navigation Tabs (Hybrid Best of Both) ──── */}
+              {/* ── 2. Results Navigation Tabs (3 Tabs: Plans, Exact Budget, Custom) ──── */}
               {hasSearched && !isLoading && (
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-8 bg-white p-2 rounded-2xl border border-neutral-200/80 shadow-xs">
-                  <div className="flex items-center gap-1.5 p-1 bg-neutral-100 rounded-xl">
+                  <div className="flex flex-wrap items-center gap-1.5 p-1 bg-neutral-100 rounded-xl">
                     <button
                       type="button"
                       onClick={() => setActiveTab("plans")}
@@ -2166,6 +2180,18 @@ export default function BudgetTripPlanner({
                     >
                       <Sparkles className="w-4 h-4 text-amber-500" />
                       แผนทริปแนะนำ ({displayPlans.length} สไตล์)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("exact")}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                        activeTab === "exact"
+                          ? "bg-white text-neutral-900 shadow-xs"
+                          : "text-neutral-500 hover:text-neutral-800"
+                      }`}
+                    >
+                      <MapPin className="w-4 h-4 text-emerald-600" />
+                      สถานที่ตามงบที่กรอก {exactBudgetPlaces.length > 0 ? `(${exactBudgetPlaces.length})` : ""}
                     </button>
                     <button
                       type="button"
@@ -2208,13 +2234,24 @@ export default function BudgetTripPlanner({
                       <p className="text-sm text-neutral-500 mb-6 leading-relaxed">
                         งบประมาณอาจยังไม่เพียงพอกับค่าที่พัก ({nights} คืน) และค่าอาหารสำหรับ {days} วันที่เลือก
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab("custom")}
-                        className="px-6 py-2.5 rounded-xl bg-amber-600 text-white font-bold text-sm hover:bg-amber-700 transition-colors shadow"
-                      >
-                        สลับไปเลือกสถานที่เองตามงบประมาณ
-                      </button>
+                      <div className="flex flex-wrap items-center justify-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("exact")}
+                          className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition-colors shadow flex items-center gap-2"
+                        >
+                          <MapPin className="w-4 h-4" />
+                          ดูสถานที่ราคา ฿{destinationBudget.toLocaleString()} ที่ตรงตามงบ
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("custom")}
+                          className="px-6 py-2.5 rounded-xl bg-amber-600 text-white font-bold text-sm hover:bg-amber-700 transition-colors shadow flex items-center gap-2"
+                        >
+                          <SlidersHorizontal className="w-4 h-4" />
+                          สลับไปเลือกสถานที่เอง
+                        </button>
+                      </div>
                     </motion.div>
                   )}
 
@@ -2436,7 +2473,84 @@ export default function BudgetTripPlanner({
                 </div>
               )}
 
-              {/* ── 4. Tab 2: Custom Selection Mode (Old File's Carousels) ── */}
+              {/* ── 4. Tab 2: Exact Budget Places View (สถานที่ตามงบที่กรอก) ── */}
+              {activeTab === "exact" && tripData && !isLoading && (
+                <div className="space-y-6">
+                  {/* Banner */}
+                  <div className="bg-emerald-50/80 border border-emerald-200/80 p-4.5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <MapPin className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-emerald-950">
+                          สถานที่ท่องเที่ยวราคา ฿{destinationBudget.toLocaleString()} บาท (ตรงตามงบที่กรอก)
+                        </h4>
+                        <p className="text-xs text-emerald-800 leading-relaxed mt-0.5">
+                          แสดงเฉพาะสถานที่ที่มีราคาตรงกับงบประมาณ ฿{destinationBudget.toLocaleString()} บาท ที่คุณระบุโดยตรง
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                      <span className="text-xs font-bold text-emerald-800 bg-white/80 border border-emerald-200 px-3 py-1.5 rounded-xl">
+                        พบ {exactBudgetPlaces.length} แห่ง
+                      </span>
+                      {selectedItems.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setIsSummaryOpen(true)}
+                          className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                        >
+                          ดูสรุป ({selectedItems.length})
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Empty State เมื่อไม่มีสถานที่ไหนที่งบตรงกัน */}
+                  {exactBudgetPlaces.length === 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-white rounded-3xl border border-neutral-200/80 p-8 sm:p-12 text-center shadow-sm max-w-2xl mx-auto my-6"
+                    >
+                      <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <AlertTriangle className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-xl font-bold text-neutral-900 mb-2">
+                        ไม่มีสถานที่ท่องเที่ยวในงบประมาณ ฿{destinationBudget.toLocaleString()} บาท
+                      </h3>
+                      <p className="text-sm text-neutral-500 mb-6 leading-relaxed">
+                        ไม่พบสถานที่ท่องเที่ยวในฐานข้อมูลที่มีราคาตรงกับ ฿{destinationBudget.toLocaleString()} บาทพอดี คุณสามารถสลับไปเลือกสถานที่เอง หรือปรับงบประมาณใหม่
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("custom")}
+                        className="px-6 py-2.5 rounded-xl bg-amber-600 text-white font-bold text-sm hover:bg-amber-700 transition-colors shadow"
+                      >
+                        สลับไปเลือกสถานที่เอง
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <TripRow
+                      title={`สถานที่ท่องเที่ยวราคา ฿${destinationBudget.toLocaleString()}`}
+                      icon={<MapPin className="w-5 h-5 text-emerald-600" />}
+                      items={exactBudgetPlaces}
+                      type="destination"
+                      selectedItems={selectedItems}
+                      onToggle={toggleSelection}
+                      onViewDetail={(item, type) => setSelectedPlaceForModal({ ...item, type })}
+                      budget={destinationBudget}
+                      spent={totalSpent}
+                      nights={nights}
+                      exactMatch={true}
+                    />
+                  )}
+                </div>
+              )}
+
+              {/* ── 5. Tab 3: Custom Selection Mode (Old File's Carousels) ── */}
               {activeTab === "custom" && tripData && !isLoading && (
                 <div className="space-y-12">
                   <div className="bg-amber-50/70 border border-amber-200/80 p-4 rounded-2xl flex items-center justify-between gap-3">
@@ -2468,6 +2582,7 @@ export default function BudgetTripPlanner({
                     budget={destinationBudget}
                     spent={totalSpent}
                     nights={nights}
+                    exactMatch={false}
                   />
 
                   <TripRow
@@ -2498,9 +2613,9 @@ export default function BudgetTripPlanner({
                 </div>
               )}
 
-              {/* ── 5. Floating Trip Dock (Custom Selection Mode) ─────── */}
+              {/* ── 6. Floating Trip Dock (Custom & Exact Selection Mode) ─── */}
               <AnimatePresence>
-                {activeTab === "custom" && tripData && !isLoading && selectedItems.length > 0 && !isSummaryOpen && (
+                {(activeTab === "custom" || activeTab === "exact") && tripData && !isLoading && selectedItems.length > 0 && !isSummaryOpen && (
                   <TripDock
                     count={selectedItems.length}
                     spent={totalSpent}

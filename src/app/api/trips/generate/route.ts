@@ -432,12 +432,14 @@ export async function POST(req: Request) {
       plans: validPlans,
       // ระบบใหม่: จัดกลุ่มสถานที่ตามวันเปิดและโซนพื้นที่
       perDay,
-      // ระบบเดิม (Backward Compatible 100%): รายการทั้งหมดสำหรับ Carousel & Filter หน้าเดิม (เลือกสถานที่เอง)
+      // ระบบจัดทริป: รายการสำหรับหน้าเลือกสถานที่เอง และหน้าสถานที่ตรงตามงบที่กรอก
       trip: {
         accommodations: enrichedAcc,
         restaurants: enrichedRes,
-        destinations: enrichedCustomDest,
+        destinations: enrichedDest,
+        exactDestinations: enrichedCustomDest,
       },
+      exactDestinations: enrichedCustomDest,
     });
   } catch (error: unknown) {
     console.error("Generate Trip Error:", error);
