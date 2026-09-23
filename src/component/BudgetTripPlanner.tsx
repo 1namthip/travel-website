@@ -1316,16 +1316,30 @@ function TripRow({
   const filteredItems = useMemo(() => {
     const query = search.trim().toLocaleLowerCase();
     const priceCeiling = maxPrice === "" ? null : Number(maxPrice);
-    const result = items.filter((item) =>
-      (!query || `${item.name} ${item.category || ""}`.toLocaleLowerCase().includes(query)) &&
-      (!category || item.category === category) &&
-      (priceCeiling === null || item.min_price * (isStay ? nights : 1) <= priceCeiling)
-    );
+    const targetBudget = Number(budget);
+
+    const result = items.filter((item) => {
+      const itemPrice = Number(item.min_price ?? 0);
+
+      // เงื่อนไขสำหรับสถานที่ท่องเที่ยวในโหมดเลือกสถานที่เอง: ต้องราคาเท่ากับงบประมาณที่ระบุโดยตรง (price === budget)
+      if (type === "destination" && targetBudget > 0) {
+        if (itemPrice !== targetBudget) return false;
+      } else if (priceCeiling !== null && item.min_price * (isStay ? nights : 1) > priceCeiling) {
+        return false;
+      }
+
+      // ค้นหาตามชื่อสถานที่หรือประเภท
+      const matchQuery = !query || `${item.name} ${item.category || ""}`.toLocaleLowerCase().includes(query);
+      const matchCategory = !category || item.category === category;
+
+      return matchQuery && matchCategory;
+    });
+
     if (sort === "price-asc") result.sort((a, b) => a.min_price - b.min_price);
     if (sort === "price-desc") result.sort((a, b) => b.min_price - a.min_price);
     if (sort === "name") result.sort((a, b) => a.name.localeCompare(b.name, "th"));
     return result;
-  }, [items, search, category, maxPrice, sort, isStay, nights]);
+  }, [items, search, category, maxPrice, sort, isStay, nights, type, budget]);
 
   const checkScroll = () => {
     if (!scrollRef.current) return;
@@ -1681,6 +1695,11 @@ export default function BudgetTripPlanner({
       Number(customBudgets.destination)
     );
   })();
+
+  const destinationBudget =
+    mode === "custom"
+      ? Number(customBudgets.destination) || 0
+      : Number(totalBudget) || 0;
 
   const nights = Math.max((Number(days) || 1) - 1, 1);
 
@@ -2446,7 +2465,7 @@ export default function BudgetTripPlanner({
                     selectedItems={selectedItems}
                     onToggle={toggleSelection}
                     onViewDetail={(item, type) => setSelectedPlaceForModal({ ...item, type })}
-                    budget={effectiveBudget}
+                    budget={destinationBudget}
                     spent={totalSpent}
                     nights={nights}
                   />

@@ -86,14 +86,19 @@ async function queryTable(
   maxBudget: number | null,
   limitCount: number = 300,
   travelDays?: DayCode[],
-  filterOpenDaysAtDb: boolean = false
+  filterOpenDaysAtDb: boolean = false,
+  exactBudget: boolean = false
 ) {
   const runQuery = (withOpenDaysFilter: boolean) => {
     let query = supabaseAdmin.from(tableName).select("*");
 
     if (maxBudget !== null) {
       const budgetInt = Math.max(0, Math.floor(maxBudget));
-      query = query.lte("min_price", budgetInt);
+      if (exactBudget) {
+        query = query.eq("min_price", budgetInt);
+      } else {
+        query = query.lte("min_price", budgetInt);
+      }
     } else {
       query = query.order("min_price", { ascending: true });
     }
@@ -256,11 +261,43 @@ export async function POST(req: Request) {
       ),
     ]);
 
+    // งบประมาณเป้าหมายของสถานที่ท่องเที่ยว (อ้างอิงจากที่กรอกโดยตรง เพื่อหน้าเลือกสถานที่เอง)
+    const userDestBudget =
+      mode === "custom"
+        ? Math.round(Number(customBudgets?.destination) || 0)
+        : Math.round(Number(totalBudget) || 0);
+
+    // ดึงสถานที่ท่องเที่ยวสำหรับแท็บ "เลือกสถานที่เอง" (ตรงกับงบประมาณที่ผู้ใช้กรอก price === budget โดยตรง)
+    let customDestinationsRaw: any[] = [];
+    if (userDestBudget > 0) {
+      const dbDestData = await queryTable(
+        "destinations",
+        userDestBudget,
+        300,
+        validatedTravelDays,
+        hasExplicitDays,
+        true // exactBudget: ใช้ query.eq("min_price", userDestBudget)
+      );
+
+      // กรองวันเปิดและเปรียบเทียบ price === budget อย่างเคร่งครัด
+      customDestinationsRaw = dbDestData.filter((item) => {
+        const itemPrice = Number(item.min_price);
+        if (itemPrice !== userDestBudget) return false;
+        if (hasExplicitDays) {
+          return isOpenOnAnySelectedDay(item, validatedTravelDays);
+        }
+        return true;
+      });
+    } else {
+      customDestinationsRaw = destinations;
+    }
+
     // ตรวจสอบว่ามีผลลัพธ์หรือไม่
     const noResults =
       accommodations.length === 0 &&
       restaurants.length === 0 &&
-      destinations.length === 0;
+      destinations.length === 0 &&
+      customDestinationsRaw.length === 0;
 
     // ติดป้ายชื่ออำเภอ/โซนจริงให้กับสถานที่ทุกแห่ง
     const enrich = (item: any) => ({
@@ -271,6 +308,7 @@ export async function POST(req: Request) {
     const enrichedAcc = shuffleArray(accommodations).map(enrich);
     const enrichedRes = shuffleArray(restaurants).map(enrich);
     const enrichedDest = shuffleArray(destinations).map(enrich);
+    const enrichedCustomDest = shuffleArray(customDestinationsRaw).map(enrich);
 
     // ─── 1. สร้าง perDay grouping ตามโซนและระยะทาง ──────────────────────────────
     const perDay: Record<
@@ -394,11 +432,11 @@ export async function POST(req: Request) {
       plans: validPlans,
       // ระบบใหม่: จัดกลุ่มสถานที่ตามวันเปิดและโซนพื้นที่
       perDay,
-      // ระบบเดิม (Backward Compatible 100%): รายการทั้งหมดสำหรับ Carousel & Filter หน้าเดิม
+      // ระบบเดิม (Backward Compatible 100%): รายการทั้งหมดสำหรับ Carousel & Filter หน้าเดิม (เลือกสถานที่เอง)
       trip: {
         accommodations: enrichedAcc,
         restaurants: enrichedRes,
-        destinations: enrichedDest,
+        destinations: enrichedCustomDest,
       },
     });
   } catch (error: unknown) {

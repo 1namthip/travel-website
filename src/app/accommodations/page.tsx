@@ -238,23 +238,25 @@ export default function AccommodationsPage() {
             {/* Search & Price Filter Controls */}
             <div className="flex items-center gap-2 w-full sm:w-auto">
               {/* Search Bar */}
-              <div className="relative flex-1 sm:w-64">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+              <div className="relative flex-1 sm:w-64 group">
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-stone-100/90 group-focus-within:bg-teal-50 flex items-center justify-center transition-colors pointer-events-none">
+                  <Search className="w-3.5 h-3.5 text-stone-400 group-focus-within:text-teal-700 transition-colors" strokeWidth={2.2} />
+                </div>
                 <input
                   type="text"
                   placeholder="ค้นหาชื่อที่พัก, ทำเล..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-9 py-2.5 rounded-full border border-stone-200 bg-white text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all shadow-2xs"
+                  className="w-full pl-11 pr-9 py-2.5 rounded-full border border-stone-200 bg-white text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all shadow-2xs"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
                     aria-label="ล้างการค้นหา"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
